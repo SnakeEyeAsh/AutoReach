@@ -1,6 +1,6 @@
 package com.javafx.JDBC;
 
-import java.lang.classfile.instruction.ConstantInstruction.LoadConstantInstruction;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -8,19 +8,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
-import org.checkerframework.checker.units.qual.h;
-import org.checkerframework.checker.units.qual.t;
+
 
 import com.javafx.Model.Alquiler;
 import com.javafx.Model.Cita;
 import com.javafx.Model.Cliente;
 
-import javafx.beans.Observable;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
