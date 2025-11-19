@@ -22,9 +22,9 @@ import javafx.collections.ObservableList;
 public class Conexion {
 
     private static Connection conexion;
-    private static String url = "jdbc:postgresql://localhost:5432/concesionario";
+    private static String url = "jdbc:postgresql://db.oynhtbeqraatfhsxyqee.supabase.co:5432/postgres";
     private static String user = "postgres";
-    private static String password = "12345678";
+    private static String password = "911GT3rs.rai";
 
     public Conexion(){
         
