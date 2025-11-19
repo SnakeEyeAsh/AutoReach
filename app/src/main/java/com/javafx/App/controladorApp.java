@@ -621,6 +621,7 @@ public class controladorApp implements Initializable {
         btnCitas.setDisable(true);
         btnCompras.setDisable(true);
         btnCerrarSesion.setDisable(true);
+        btnIrAIngreso.setDisable(true);
     }
 
     private void iniciarTablas() {
