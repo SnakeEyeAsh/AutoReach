@@ -42,7 +42,7 @@ public class Conexion {
         try {
             conexion = DriverManager.getConnection(url,user,password);
             System.out.println("conexion realizada");
-            estadoConexion = true;
+            
         
         } catch (SQLException e) {
             System.out.println(e.getMessage()+"el problemas es la conexion");
