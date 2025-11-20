@@ -19,6 +19,8 @@ import com.javafx.Model.Cliente;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+
+//prueba de conexion a la base de datos
 public class Conexion {
 
     private static Connection conexion;
