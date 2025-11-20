@@ -26,7 +26,7 @@ public class Conexion {
     private static String url = "jdbc:postgresql://db.oynhtbeqraatfhsxyqee.supabase.co:5432/postgres";
     private static String user = "postgres";
     private static String password = "911GT3rs.rai";
-    static boolean estadoConexion = false;
+    
     
 
     public Conexion(){
