@@ -2,7 +2,7 @@ package com.javafx.App;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
+
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -15,8 +15,7 @@ import com.javafx.Model.Cliente;
 import com.javafx.Model.Coche;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -38,7 +37,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
+
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -355,15 +354,17 @@ public class controladorApp implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        Platform.runLater(()->{
+        Conexion.realizarConexion();
+
+        /*Platform.runLater(()->{
             Stage s = (Stage)btnIrAInicio.getScene().getWindow();
             s.getIcons().add(new Image("Assets/autoIcon.png"));
-        });
+        });*/
         
 
         btnIrAInicio.setStyle("-fx-background-color:darkgrey");
 
-        Conexion.realizarConexion();
+        
 
         iniciarTablas();
         ocultarTodos();
@@ -626,22 +627,22 @@ public class controladorApp implements Initializable {
 
     private void iniciarTablas() {
 
-        tablaRegistro.setItems(seleccion.mostrarClientes());
+        tablaRegistro.setItems(Conexion.mostrarClientes());
         clnNombreRegistro.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         clnDniRegistro.setCellValueFactory(new PropertyValueFactory<>("dni"));
 
-        tblCitas.setItems(seleccion.mostrarCitas());
+        tblCitas.setItems(Conexion.mostrarCitas());
         clnMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
         clnFecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
         clnHora.setCellValueFactory(new PropertyValueFactory<>("hora"));
 
-        tblAlquiler.setItems(seleccion.mostrarAlquiler());
+        tblAlquiler.setItems(Conexion.mostrarAlquiler());
         clnFechaAlq.setCellValueFactory(new PropertyValueFactory<>("fechaDevolucion"));
         clnHoraAlq.setCellValueFactory(new PropertyValueFactory<>("horaDevolucion"));
         clnDNIAlq.setCellValueFactory(new PropertyValueFactory<>("dni"));
         clnMatriculaAlq.setCellValueFactory(new PropertyValueFactory<>("matricula"));
 
-        TablaCoches.setItems(seleccion.mostrarCoches());
+        TablaCoches.setItems(Conexion.mostrarCoches());
         clnMarca.setCellValueFactory(new PropertyValueFactory<>("Marca"));
         clnModelo.setCellValueFactory(new PropertyValueFactory<>("Modelo"));
         clnAño.setCellValueFactory(new PropertyValueFactory<>("Año"));

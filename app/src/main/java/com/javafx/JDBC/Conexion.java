@@ -9,15 +9,14 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
-
-
 import com.javafx.Model.Alquiler;
 import com.javafx.Model.Cita;
 import com.javafx.Model.Cliente;
-
+import com.javafx.Model.Coche;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
 
 
 //prueba de conexion a la base de datos
@@ -27,6 +26,8 @@ public class Conexion {
     private static String url = "jdbc:postgresql://db.oynhtbeqraatfhsxyqee.supabase.co:5432/postgres";
     private static String user = "postgres";
     private static String password = "911GT3rs.rai";
+    static boolean estadoConexion = false;
+    
 
     public Conexion(){
         
@@ -41,9 +42,10 @@ public class Conexion {
         try {
             conexion = DriverManager.getConnection(url,user,password);
             System.out.println("conexion realizada");
-
+            estadoConexion = true;
+        
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println(e.getMessage()+"el problemas es la conexion");
         }
     }
 
@@ -57,14 +59,14 @@ public class Conexion {
             }
         }
     }
-    public static ObservableList<Cliente> mostrarClientes(){
+    public static ObservableList<Cliente> mostrarClientes() {
 
         ObservableList<Cliente> lista = FXCollections.observableArrayList();
-        
-        try{
+
+        try {
             Statement consulta = conexion.createStatement();
             ResultSet resultado = consulta.executeQuery("SELECT * FROM cliente;");
-            while(resultado.next()){
+            while (resultado.next()) {
                 String nombre = resultado.getString("nombre");
                 String apellidos = resultado.getString("apellidos");
                 String dni = resultado.getString("dni_nif");
@@ -72,25 +74,25 @@ public class Conexion {
                 String mail = resultado.getString("email");
 
                 Cliente c = new Cliente(nombre, apellidos, dni, Integer.parseInt(telefono), mail);
-                
+
                 lista.add(c);
-                
+
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println("NO hace el try");
         }
         return lista;
     }
 
-    public static ObservableList<Cita> mostrarCitas(){
+    public static ObservableList<Cita> mostrarCitas() {
 
         ObservableList<Cita> lista = FXCollections.observableArrayList();
 
-        try{
+        try {
             Statement consulta = conexion.createStatement();
             ResultSet resultado = consulta.executeQuery("SELECT * FROM cita;");
-            while(resultado.next()){
+            while (resultado.next()) {
                 String num_bastidor = resultado.getString("num_bastidor_coche");
                 String fecha = resultado.getString("fecha");
                 String hora = resultado.getString("hora");
@@ -100,21 +102,22 @@ public class Conexion {
                 lista.add(c);
             }
 
-        }catch(SQLException error){
-            System.out.println("Error en la consulta de citas "+error.getMessage());
+        } catch (SQLException error) {
+            System.out.println("Error en la consulta de citas " + error.getMessage());
         }
         return lista;
 
     }
-    public static ObservableList<Alquiler> mostrarAlquiler(){
+
+    public static ObservableList<Alquiler> mostrarAlquiler() {
 
         ObservableList<Alquiler> lista = FXCollections.observableArrayList();
 
-        try{
+        try {
             Statement consulta = conexion.createStatement();
             ResultSet resultado = consulta.executeQuery("SELECT * FROM transaccion WHERE fecha_fin IS NOT NULL;");
-            while(resultado.next()){
-                
+            while (resultado.next()) {
+
                 Timestamp fecha = resultado.getTimestamp("fecha_fin");
                 String hora = resultado.getString("hora");
                 String dni = resultado.getString("cliente_id");
@@ -123,20 +126,50 @@ public class Conexion {
                 LocalDate dia = fecha.toLocalDateTime().toLocalDate();
 
                 String[] partes = hora.split(" ");
-                
 
                 Alquiler a = new Alquiler(dia.toString(), partes[1], dni, bastidor);
-                
 
                 lista.add(a);
             }
 
-        }catch(SQLException error){
-            System.out.println("Error en la consulta de citas "+error.getMessage());
+        } catch (SQLException error) {
+            System.out.println("Error en la consulta de citas " + error.getMessage());
         }
         return lista;
 
     }
+    public static ObservableList<Coche> mostrarCoches() {
+
+        ObservableList<Coche> lista = FXCollections.observableArrayList();
+
+        try {
+            Statement consulta = conexion.createStatement();
+            ResultSet resultado = consulta.executeQuery("SELECT * FROM coche;");
+            while (resultado.next()) {
+
+                String marca = resultado.getString("marca");
+                String modelo = resultado.getString("modelo");
+                Integer año = resultado.getInt("año");
+                Float kms = resultado.getFloat("kilometraje");
+                String bastidor = resultado.getString("num_bastidor");
+                Double precio = resultado.getDouble("precio_base");
+                String diseño = resultado.getString("diseño_llantas");
+                String diseñoLlantas = resultado.getString("diametro_llantas");
+                String color = resultado.getString("color");
+
+
+                Coche c = new Coche(marca, modelo, año+"",  kms+" Km", bastidor, precio+"", diseño, diseñoLlantas, color);
+
+                lista.add(c);
+            }
+
+        } catch (SQLException error) {
+            System.out.println("Error en la consulta de citas " + error.getMessage());
+        }
+        return lista;
+
+    }
+   
 
     
 

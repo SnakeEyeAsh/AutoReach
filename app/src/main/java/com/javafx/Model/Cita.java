@@ -1,6 +1,6 @@
 package com.javafx.Model;
 
-import java.sql.Date;
+
 
 public class Cita {
     private String matricula;
