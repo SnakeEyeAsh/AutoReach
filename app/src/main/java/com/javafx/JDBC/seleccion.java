@@ -17,7 +17,7 @@ import javafx.collections.ObservableList;
 
 public class seleccion {
 
-    private static Connection conexion = Conexion.getConnection();
+    /*private static Connection conexion = new Conexion().getConnection();
 
     public static ObservableList<Cliente> mostrarClientes() {
 
@@ -128,7 +128,7 @@ public class seleccion {
         }
         return lista;
 
-    }
+    }*/
 
 
 }

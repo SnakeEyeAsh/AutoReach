@@ -353,7 +353,8 @@ public class controladorApp implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        
+        
         Conexion.realizarConexion();
 
         Platform.runLater(()->{

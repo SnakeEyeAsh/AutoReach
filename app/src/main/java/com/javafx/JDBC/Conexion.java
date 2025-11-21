@@ -23,9 +23,9 @@ import javafx.collections.ObservableList;
 public class Conexion {
 
     private static Connection conexion;
-    private static String url = "jdbc:postgresql://aws-1-eu-west-3.pooler.supabase.com:6543/postgres";
-    private static String user = "postgres.oynhtbeqraatfhsxyqee";
-    private static String password = "911GT3rs.rai";
+    private static String url;
+    private static String user;
+    private static String password;
     
     
 
@@ -39,6 +39,10 @@ public class Conexion {
     }
 
     public static void realizarConexion() {
+        url = Config.get("db.url");
+        user = Config.get("db.user");
+        password = Config.get("db.password");
+
         try {
             conexion = DriverManager.getConnection(url,user,password);
             System.out.println("conexion realizada");
