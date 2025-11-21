@@ -356,10 +356,10 @@ public class controladorApp implements Initializable {
 
         Conexion.realizarConexion();
 
-        /*Platform.runLater(()->{
+        Platform.runLater(()->{
             Stage s = (Stage)btnIrAInicio.getScene().getWindow();
             s.getIcons().add(new Image("Assets/autoIcon.png"));
-        });*/
+        });
         
 
         btnIrAInicio.setStyle("-fx-background-color:darkgrey");
