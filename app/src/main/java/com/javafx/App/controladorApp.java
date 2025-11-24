@@ -354,18 +354,14 @@ public class controladorApp implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         
-        
         Conexion.realizarConexion();
 
         Platform.runLater(()->{
             Stage s = (Stage)btnIrAInicio.getScene().getWindow();
             s.getIcons().add(new Image("Assets/autoIcon.png"));
         });
-        
-
+    
         btnIrAInicio.setStyle("-fx-background-color:darkgrey");
-
-        
 
         iniciarTablas();
         ocultarTodos();
@@ -386,6 +382,7 @@ public class controladorApp implements Initializable {
             btnCitas.setDisable(false);
             btnCompras.setDisable(false);
             btnCerrarSesion.setDisable(false);
+            btnIrAIngreso.setDisable(false);
         }
     }
 
