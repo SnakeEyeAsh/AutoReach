@@ -4,6 +4,7 @@ public class Coche{
 
     private String Marca;
     private String Modelo;
+    private String Matricula;
     private String Año;
     private String kms;
     private String Bastidor;
@@ -11,10 +12,11 @@ public class Coche{
     private String Diseño;
     private String DiametroLlantas;
     private String Color;
-    public Coche(String marca, String modelo, String año, String kms, String bastidor, String precio, 
+    public Coche(String marca, String modelo,String matricula, String año, String kms, String bastidor, String precio, 
             String diseño, String diseñoLlantas, String color) {
         Marca = marca;
         Modelo = modelo;
+        Matricula = matricula;
         Año = año;
         this.kms = kms;
         Bastidor = bastidor;

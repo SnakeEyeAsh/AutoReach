@@ -1,23 +1,23 @@
 package com.javafx.JDBC;
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
+
 import com.javafx.Model.Alquiler;
 import com.javafx.Model.Cita;
 import com.javafx.Model.Cliente;
 import com.javafx.Model.Coche;
+import com.javafx.Model.Disponible;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-
 
 //prueba de conexion a la base de datos
 public class Conexion {
@@ -26,15 +26,12 @@ public class Conexion {
     private static String url;
     private static String user;
     private static String password;
-    
-    
 
-    public Conexion(){
-        
-        
+    public Conexion() {
+
     }
 
-    protected static Connection getConnection(){
+    protected static Connection getConnection() {
         return conexion;
     }
 
@@ -44,12 +41,11 @@ public class Conexion {
         password = Config.get("db.password");
 
         try {
-            conexion = DriverManager.getConnection(url,user,password);
+            conexion = DriverManager.getConnection(url, user, password);
             System.out.println("conexion realizada");
-            
-        
+
         } catch (SQLException e) {
-            System.out.println(e.getMessage()+"el problemas es la conexion");
+            System.out.println(e.getMessage() + "el problemas es la conexion");
         }
     }
 
@@ -63,6 +59,7 @@ public class Conexion {
             }
         }
     }
+
     public static ObservableList<Cliente> mostrarClientes() {
 
         ObservableList<Cliente> lista = FXCollections.observableArrayList();
@@ -97,7 +94,7 @@ public class Conexion {
             Statement consulta = conexion.createStatement();
             ResultSet resultado = consulta.executeQuery("SELECT * FROM cita;");
             while (resultado.next()) {
-                String num_bastidor = resultado.getString("num_bastidor_coche");
+                String num_bastidor = resultado.getString("matricula");
                 String fecha = resultado.getString("fecha");
                 String hora = resultado.getString("hora");
 
@@ -118,30 +115,34 @@ public class Conexion {
         ObservableList<Alquiler> lista = FXCollections.observableArrayList();
 
         try {
+
             Statement consulta = conexion.createStatement();
             ResultSet resultado = consulta.executeQuery("SELECT * FROM transaccion WHERE fecha_fin IS NOT NULL;");
             while (resultado.next()) {
 
                 Timestamp fecha = resultado.getTimestamp("fecha_fin");
                 String hora = resultado.getString("hora");
-                String dni = resultado.getString("cliente_id");
-                String bastidor = resultado.getString("vehiculo_id");
+                String dni = resultado.getString("cliente_dni");
+                String matricula = resultado.getString("id_vehiculo");
 
                 LocalDate dia = fecha.toLocalDateTime().toLocalDate();
 
                 String[] partes = hora.split(" ");
 
-                Alquiler a = new Alquiler(dia.toString(), partes[1], dni, bastidor);
+                Alquiler a = new Alquiler(dia.toString(), partes[1], dni, matricula);
+
+                System.out.println(matricula);
 
                 lista.add(a);
             }
 
         } catch (SQLException error) {
-            System.out.println("Error en la consulta de citas " + error.getMessage());
+            System.out.println("Error en la consulta de Alquiler " + error.getMessage());
         }
         return lista;
 
     }
+
     public static ObservableList<Coche> mostrarCoches() {
 
         ObservableList<Coche> lista = FXCollections.observableArrayList();
@@ -160,22 +161,156 @@ public class Conexion {
                 String diseño = resultado.getString("diseño_llantas");
                 String diseñoLlantas = resultado.getString("diametro_llantas");
                 String color = resultado.getString("color");
+                String matricula = resultado.getString("matricula");
 
-
-                Coche c = new Coche(marca, modelo, año+"",  kms+" Km", bastidor, precio+"", diseño, diseñoLlantas, color);
+                Coche c = new Coche(marca, modelo, matricula, año + "", kms + " Km", bastidor, precio + "", diseño,
+                        diseñoLlantas, color);
 
                 lista.add(c);
             }
 
         } catch (SQLException error) {
-            System.out.println("Error en la consulta de citas " + error.getMessage());
+            System.out.println("Error en la consulta muestra de Coches " + error.getMessage());
         }
         return lista;
 
     }
-   
+    public static ObservableList<Disponible> mostrarCoincidencias(String marca, String modelo) {
 
+    ObservableList<Disponible> lista = FXCollections.observableArrayList();
     
+    String sql = "SELECT * FROM coche WHERE Marca = ? AND Modelo = ?";
+
+    try (PreparedStatement consulta = conexion.prepareStatement(sql)) {
+        
+        consulta.setString(1, marca);
+        consulta.setString(2, modelo);
+        
+        try (ResultSet resultado = consulta.executeQuery()) {
+            while (resultado.next()) {
+                
+                Integer año = resultado.getInt("año");
+                Double precio = resultado.getDouble("precio_base");
+                Boolean disponible = resultado.getBoolean("disponible_alquiler");
+                String color = resultado.getString("color");
+                String dis = disponible ? "Si" : "No";
+                String matricula = resultado.getString("matricula");
+
+                double precioAlq = (precio/1000)*2;
+
+                Disponible d = new Disponible(
+                    año.toString(), 
+                    color, 
+                    dis, 
+                    precioAlq+" $", 
+                    matricula
+                );
+
+                lista.add(d);
+            }
+        }
+
+    } catch (SQLException error) {
+        System.out.println("Error en la consulta muestra de Coches: " + error.getMessage());
+        error.printStackTrace(); // Útil para debugging
+    }
+    
+    return lista;
+}
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 7
+    //////////////////////////////////////// INCERTAR/////////////////////////////////////////////////////////////////////
+    /// /////// 7
+
+    public static void crearCliente(String nombre, String apellidos, String dni, String telefono, String email,
+            String direccion, String fechaNac, String sexo) throws SQLException {
+
+        String sql = "INSERT INTO cliente(nombre,apellidos,dni_nif,telefono,email,direccion,fecha_nac,sexo) VALUES(?,?,?,?,?,?,?,?)";
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setString(2, apellidos);
+            ps.setString(3, dni);
+            ps.setString(4, telefono);
+            ps.setString(5, email);
+            ps.setString(6, direccion);
+            ps.setString(7, fechaNac);
+            ps.setString(8, sexo);
+
+            int filas = ps.executeUpdate();
+            System.out.println("Filas afectadas " + filas);
+
+        } catch (SQLException error) {
+
+            System.out.println("Error al incertar usuario " + error.getMessage());
+
+        }
+    }
+
+    public static void crearCita(String fecha, String hora, String informe, String matricula) throws SQLException {
+
+        String sql = "INSERT INTO cita(fecha,hora,informe,matricula) VALUES(?,?,?,?)";
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, fecha);
+            ps.setString(2, hora);
+            ps.setString(3, informe);
+            ps.setString(4, matricula);
+
+            int filas = ps.executeUpdate();
+            System.out.println("Filas afectadas " + filas);
+
+        } catch (SQLException error) {
+
+            System.out.println("Error al incertar cita " + error.getMessage());
+
+        }
+
+    }
+    public static void crearAlquiler(String fecha,
+                                     String fecha_fin,
+                                     String precio_total,
+                                     String precio_cuota,
+                                     String estado,
+                                     String empleado_id,
+                                     String hora,
+                                     String id_vehiculo,
+                                     String cliente_id) throws SQLException {
+
+        String sql = "INSERT INTO transaccions(fecha,fecha_fin,precio_total,precio_cuota,deposito,estado,empleado_id,hora,id_vehiculo,cliente_dni) VALUES(?,?,?,?,?,?,?,?,?,?)";
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, fecha);
+            ps.setString(2, fecha_fin);
+            ps.setString(3, precio_total);
+            ps.setString(4, precio_cuota);
+            ps.setString(5, "0");
+            ps.setString(6, estado);
+            ps.setString(7, empleado_id);
+            ps.setString(8, hora);
+            ps.setString(9, id_vehiculo);
+            ps.setString(10, cliente_id);
+
+            int filas = ps.executeUpdate();
+            System.out.println("Filas afectadas " + filas);
+
+        } catch (SQLException error) {
+
+            System.out.println("Error al incertar cita " + error.getMessage());
+
+        }
+
+    }
+
+    public static void actualizarDisponibles(boolean pestaña,String matricula){
+
+        String ventana = pestaña?"disponible_alquiler":"disponible_venta";
+
+        String sql = "UPDATE coche SET "+ventana+" = false WHERE matricula='"+matricula+"';";
+    }
+
 
 
 

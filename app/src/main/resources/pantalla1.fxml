@@ -7,10 +7,10 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
@@ -185,15 +185,15 @@
                                        </font>
                                     </Label>
                                     <TextField fx:id="txtEmail" layoutX="116.0" layoutY="382.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <Label layoutX="14.0" layoutY="343.0" prefHeight="18.0" prefWidth="82.0" text="Sexo">
+                                    <Label layoutX="14.0" layoutY="343.0" prefHeight="18.0" prefWidth="82.0" text="SEXO">
                                        <font>
                                           <Font name="Arial Bold" size="13.0" />
                                        </font>
                                     </Label>
-                                    <SplitMenuButton fx:id="splitMenuSexo" layoutX="119.0" layoutY="340.0" mnemonicParsing="false" onAction="#elegirSexo" prefHeight="26.0" prefWidth="170.0" text="Sexo">
+                                    <SplitMenuButton fx:id="splitMenuSexo" layoutX="119.0" layoutY="340.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="170.0" text="Sexo">
                                       <items>
-                                        <MenuItem mnemonicParsing="false" text="Masculino" />
-                                        <MenuItem mnemonicParsing="false" text="Femenino" />
+                                        <MenuItem fx:id="opMasculino" mnemonicParsing="false" onAction="#elegirMasculino" text="Masculino" />
+                                        <MenuItem fx:id="opFemenino" mnemonicParsing="false" onAction="#elegirFemenino" text="Femenino" />
                                       </items>
                                     </SplitMenuButton>
                                  </children>
@@ -221,12 +221,12 @@
                                           <Font name="Arial Bold" size="13.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="txtNombreVer" layoutX="116.0" layoutY="23.0" prefHeight="18.0" prefWidth="170.0" />
-                                    <TextField fx:id="txtDniVer" layoutX="116.0" layoutY="76.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <Button fx:id="btnSeleccionCLiente" layoutX="86.0" layoutY="459.0" mnemonicParsing="false" onAction="#seleccionarCliente" text="Seleccionar" />
-                                    <Button fx:id="btnEditarCliente" layoutX="175.0" layoutY="459.0" mnemonicParsing="false" onAction="#editarCliente" text="Editar" />
-                                    <Button fx:id="btnCancelarSeleccion" layoutX="234.0" layoutY="459.0" mnemonicParsing="false" onAction="#cancelarSeleccion" text="Cancelar" />
-                                    <TableView fx:id="tablaRegistro" layoutX="14.0" layoutY="126.0" prefHeight="322.0" prefWidth="273.0">
+                                    <TextField fx:id="txtNombreVer" layoutX="116.0" layoutY="23.0" prefHeight="26.0" prefWidth="191.0" />
+                                    <TextField fx:id="txtDniVer" layoutX="116.0" layoutY="76.0" prefHeight="26.0" prefWidth="191.0" />
+                                    <Button fx:id="btnSeleccionCLiente" layoutX="93.0" layoutY="459.0" mnemonicParsing="false" onAction="#seleccionarCliente" text="Seleccionar" />
+                                    <Button fx:id="btnEditarCliente" layoutX="181.0" layoutY="459.0" mnemonicParsing="false" onAction="#editarCliente" text="Editar" />
+                                    <Button fx:id="btnCancelarSeleccion" layoutX="242.0" layoutY="459.0" mnemonicParsing="false" onAction="#cancelarSeleccion" text="Cancelar" />
+                                    <TableView fx:id="tablaRegistro" layoutX="14.0" layoutY="126.0" prefHeight="322.0" prefWidth="290.0">
                                       <columns>
                                         <TableColumn fx:id="clnNombreRegistro" prefWidth="142.39995765686035" text="Nombre" />
                                         <TableColumn fx:id="clnDniRegistro" prefWidth="130.40004882812502" text="DNI" />
@@ -377,7 +377,7 @@
                               <Insets bottom="10.0" />
                            </VBox.margin>
                         </HBox>
-                        <DatePicker fx:id="cldCita" onAction="#seleccionarfechaCita" prefHeight="26.0" prefWidth="191.0">
+                        <DatePicker fx:id="cldCita" prefHeight="26.0" prefWidth="191.0">
                            <VBox.margin>
                               <Insets left="35.0" />
                            </VBox.margin>
@@ -417,15 +417,17 @@
                         <TableColumn fx:id="clnHora" prefWidth="209.59988403320312" text="Hora" />
                     </columns>
                   </TableView>
+                  <TextArea fx:id="txtAreaCitas" layoutX="306.0" layoutY="80.0" prefHeight="175.0" prefWidth="390.0" />
+                  <Label layoutX="306.0" layoutY="51.0" text="Informacion adicional:" />
                </children>
             </Pane>
             <Pane fx:id="pantallaAlquiler" prefHeight="578.0" prefWidth="768.0" visible="false">
                <children>
-                  <HBox prefHeight="164.0" prefWidth="724.0">
+                  <HBox prefHeight="234.0" prefWidth="724.0">
                      <children>
-                        <VBox prefHeight="200.0" prefWidth="209.0">
+                        <VBox prefHeight="214.0" prefWidth="188.0">
                            <children>
-                              <Label text="Opciones Generales">
+                              <Label text="Opciones de Coche">
                                  <VBox.margin>
                                     <Insets bottom="20.0" left="20.0" />
                                  </VBox.margin>
@@ -433,90 +435,50 @@
                                     <Font name="System Bold Italic" size="18.0" />
                                  </font>
                               </Label>
-                              <MenuButton fx:id="selectMarcaAlq" mnemonicParsing="false" onAction="#seleccionarMarca" text="Marca">
-                                <items>
-                                  <MenuItem mnemonicParsing="false" text="Action 1" />
-                                  <MenuItem mnemonicParsing="false" text="Action 2" />
-                                </items>
+                              <Label text="Marca">
                                  <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
-                              </MenuButton>
-                              <MenuButton fx:id="selectModeloAlq" mnemonicParsing="false" onAction="#seleccionarModelo" text="Modelo">
-                                 <items>
-                                    <MenuItem mnemonicParsing="false" text="Action 1" />
-                                    <MenuItem mnemonicParsing="false" text="Action 2" />
-                                 </items>
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
-                              </MenuButton>
-                              <MenuButton fx:id="selectAñoAlq" mnemonicParsing="false" onAction="#seleccionarAño" text="Año">
-                                 <items>
-                                    <MenuItem mnemonicParsing="false" text="Action 1" />
-                                    <MenuItem mnemonicParsing="false" text="Action 2" />
-                                 </items>
-                              </MenuButton>
-                           </children>
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                        </VBox>
-                        <VBox alignment="CENTER_LEFT" prefHeight="148.0" prefWidth="100.0">
-                           <children>
-                              <RadioButton mnemonicParsing="false" text="Gasolina">
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="Diesel">
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="Híbrido">
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="Electrico" />
-                           </children>
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin>
-                           <padding>
-                              <Insets top="30.0" />
-                           </padding>
-                        </VBox>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
-                           <children>
-                              <Label alignment="TOP_CENTER" text="SEGURO">
-                                 <font>
-                                    <Font name="System Bold Italic" size="14.0" />
-                                 </font>
-                                 <VBox.margin>
-                                    <Insets bottom="27.0" />
+                                    <Insets left="70.0" />
                                  </VBox.margin>
                               </Label>
-                              <RadioButton mnemonicParsing="false" text="Completo">
+                              <TextField fx:id="txtElegirMarca" maxWidth="100.0" prefHeight="26.0" prefWidth="142.0">
                                  <VBox.margin>
-                                    <Insets bottom="10.0" />
+                                    <Insets bottom="10.0" left="40.0" />
                                  </VBox.margin>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="Mínimo">
+                              </TextField>
+                              <Label text="Modelo">
                                  <VBox.margin>
-                                    <Insets bottom="10.0" />
+                                    <Insets left="70.0" />
                                  </VBox.margin>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="Sin Seguro" />
+                              </Label>
+                              <TextField fx:id="txtElegirModelo" maxWidth="100.0" prefHeight="26.0" prefWidth="100.0">
+                                 <VBox.margin>
+                                    <Insets left="40.0" />
+                                 </VBox.margin>
+                              </TextField>
+                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                 <children>
+                                  <Button fx:id="btnBuscarMatricula" mnemonicParsing="false" onAction="#buscarMatricula" text="Buscar" />
+                                    <Button fx:id="btnCancelarMatricula" mnemonicParsing="false" onAction="#cancelarBusquedaMatricula" text="Cancelar">
+                                       <HBox.margin>
+                                          <Insets left="20.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                 </children>
+                              </HBox>
                            </children>
-                           <HBox.margin>
-                              <Insets left="30.0" />
-                           </HBox.margin>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
                         </VBox>
+                        <TableView fx:id="TblCoincidencias" prefHeight="214.0" prefWidth="418.0">
+                          <columns>
+                            <TableColumn fx:id="clnAñoCoche" prefWidth="75.0" text="Año" />
+                            <TableColumn fx:id="clnDisponibleCoche" prefWidth="83.2000732421875" text="Disponible" />
+                              <TableColumn fx:id="clnColorCoche" prefWidth="84.80001831054688" text="Color" />
+                              <TableColumn fx:id="clnPrecioCoche" minWidth="0.0" prefWidth="55.199951171875" text="Precio" />
+                              <TableColumn fx:id="clnMatriculaCoche" minWidth="0.0" prefWidth="116.79995727539062" text="Matricula" />
+                          </columns>
+                        </TableView>
                      </children>
                      <padding>
                         <Insets left="20.0" top="20.0" />
@@ -526,12 +488,12 @@
                      <children>
                         <VBox prefHeight="322.0" prefWidth="180.0">
                            <children>
-                              <Label text="Fechas y Hirarios">
+                              <Label text="Fechas y Horarios">
                                  <font>
                                     <Font name="System Bold Italic" size="18.0" />
                                  </font>
                                  <VBox.margin>
-                                    <Insets bottom="10.0" left="30.0" />
+                                    <Insets bottom="10.0" left="15.0" />
                                  </VBox.margin>
                               </Label>
                               <Label text="Fecha de recogida">
@@ -539,17 +501,17 @@
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
                               </Label>
-                              <DatePicker fx:id="cldRecoger" onAction="#seleccionarFechaRecogida">
+                              <DatePicker fx:id="cldRecoger">
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
                               </DatePicker>
-                              <Label text="Hora de Recogida">
+                              <Label text="Hora de Entrega">
                                  <VBox.margin>
                                     <Insets />
                                  </VBox.margin>
                               </Label>
-                              <TextField fx:id="txtHoraRecogida" prefHeight="26.0" prefWidth="192.0">
+                              <TextField fx:id="txtHoraEntrega" prefHeight="26.0" prefWidth="192.0">
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
@@ -559,13 +521,11 @@
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
                               </Label>
-                              <DatePicker fx:id="cldEntrega" onAction="#seleccionarFechaEntrega">
+                              <DatePicker fx:id="cldEntrega">
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
                               </DatePicker>
-                              <Label text="Hora de entrega" />
-                              <TextField />
                            </children>
                            <HBox.margin>
                               <Insets right="10.0" />
@@ -576,7 +536,7 @@
                             <TableColumn fx:id="clnFechaAlq" prefWidth="80.00003355741501" text="Fecha" />
                             <TableColumn fx:id="clnHoraAlq" prefWidth="92.00006103515625" text="Hora" />
                               <TableColumn fx:id="clnDNIAlq" prefWidth="95.19996643066406" text="DNI" />
-                              <TableColumn fx:id="clnMatriculaAlq" prefWidth="149.5999755859375" text="Numero Bastidor" />
+                              <TableColumn fx:id="clnMatriculaAlq" prefWidth="149.5999755859375" text="Matricula" />
                           </columns>
                         </TableView>
                         <VBox alignment="CENTER" prefHeight="322.0" prefWidth="90.0">
@@ -606,7 +566,215 @@
                   </HBox>
                </children>
             </Pane>
-            <Pane fx:id="panelIngreso" prefHeight="200.0" prefWidth="200.0">
+            <Pane fx:id="panelVentas" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <HBox prefHeight="251.0" prefWidth="724.0">
+                     <children>
+                        <VBox prefHeight="310.0" prefWidth="298.0">
+                           <children>
+                              <Label text="CONFIGURACION DEL VEHICULO">
+                                 <VBox.margin>
+                                    <Insets left="55.0" top="30.0" />
+                                 </VBox.margin>
+                                 <font>
+                                    <Font name="System Bold Italic" size="14.0" />
+                                 </font>
+                              </Label>
+                              <HBox prefHeight="1.0" prefWidth="306.0">
+                                 <children>
+                                    <Label text="Marca">
+                                       <HBox.margin>
+                                          <Insets right="50.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="txtMarcaCompra" prefHeight="26.0" prefWidth="150.0">
+                                       <HBox.margin>
+                                          <Insets left="28.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" top="30.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox prefHeight="26.0" prefWidth="241.0">
+                                 <children>
+                                    <Label text="Modelo">
+                                       <HBox.margin>
+                                          <Insets right="50.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="txtModeloCompra">
+                                       <HBox.margin>
+                                          <Insets left="20.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox prefHeight="12.0" prefWidth="306.0">
+                                 <children>
+                                    <Label text="Año">
+                                       <HBox.margin>
+                                          <Insets right="50.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="txtAñoCpmpra">
+                                       <HBox.margin>
+                                          <Insets left="40.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox prefHeight="26.0" prefWidth="257.0">
+                                 <children>
+                                    <Label prefHeight="18.0" prefWidth="114.0" text="Consumo">
+                                       <HBox.margin>
+                                          <Insets right="50.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <MenuButton fx:id="slcConsumoCompra" mnemonicParsing="false" prefHeight="26.0" prefWidth="190.0" text="Combustible">
+                                       <items>
+                                          <MenuItem mnemonicParsing="false" text="Action 1" />
+                                          <MenuItem mnemonicParsing="false" text="Action 2" />
+                                       </items>
+                                       <HBox.margin>
+                                          <Insets right="40.0" />
+                                       </HBox.margin>
+                                    </MenuButton>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="10.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                           <HBox.margin>
+                              <Insets left="30.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <VBox prefHeight="235.0" prefWidth="298.0">
+                           <children>
+                              <Label text="INTERIOR DEL VEHICULO">
+                                 <VBox.margin>
+                                    <Insets left="55.0" top="30.0" />
+                                 </VBox.margin>
+                                 <font>
+                                    <Font name="System Bold Italic" size="14.0" />
+                                 </font>
+                              </Label>
+                              <HBox prefHeight="1.0" prefWidth="306.0">
+                                 <children>
+                                    <Label text="Patrón">
+                                       <HBox.margin>
+                                          <Insets right="50.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <MenuButton fx:id="slcPatronCompra" mnemonicParsing="false" prefHeight="26.0" prefWidth="140.0" text="Seleccionar Patron">
+                                       <items>
+                                          <MenuItem mnemonicParsing="false" text="Action 1" />
+                                          <MenuItem mnemonicParsing="false" text="Action 2" />
+                                       </items>
+                                       <HBox.margin>
+                                          <Insets left="25.0" />
+                                       </HBox.margin>
+                                    </MenuButton>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" top="30.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox prefHeight="26.0" prefWidth="241.0">
+                                 <children>
+                                    <Label text="Material">
+                                       <HBox.margin>
+                                          <Insets right="50.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <MenuButton fx:id="slcMaterialCompra" mnemonicParsing="false" text="Seleccioanr Material">
+                                       <items>
+                                          <MenuItem mnemonicParsing="false" text="Action 1" />
+                                          <MenuItem mnemonicParsing="false" text="Action 2" />
+                                       </items>
+                                       <HBox.margin>
+                                          <Insets left="15.0" />
+                                       </HBox.margin>
+                                    </MenuButton>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox prefHeight="12.0" prefWidth="306.0">
+                                 <children>
+                                    <Label text="Color">
+                                       <HBox.margin>
+                                          <Insets right="50.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <MenuButton fx:id="sclColorCompra" mnemonicParsing="false" prefHeight="26.0" prefWidth="137.0" text="Seleccioanr Color">
+                                       <items>
+                                          <MenuItem mnemonicParsing="false" text="Action 1" />
+                                          <MenuItem mnemonicParsing="false" text="Action 2" />
+                                       </items>
+                                       <HBox.margin>
+                                          <Insets left="30.0" />
+                                       </HBox.margin>
+                                    </MenuButton>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                                 <children>
+                                    <Button fx:id="btnBuscarCompra" mnemonicParsing="false" onAction="#BuscarCompra" text="Buscar">
+                                       <HBox.margin>
+                                          <Insets right="20.0" top="20.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                    <Button fx:id="btnCancelarBCompra" mnemonicParsing="false" onAction="#CancelarBusquedaCompra" text="Cancelar">
+                                       <HBox.margin>
+                                          <Insets right="50.0" top="20.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                           </children>
+                           <HBox.margin>
+                              <Insets left="30.0" />
+                           </HBox.margin>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <HBox alignment="BOTTOM_RIGHT" layoutX="-2.0" layoutY="258.0" prefHeight="266.0" prefWidth="724.0">
+                     <children>
+                        <TableView fx:id="tblOpcionesCompra" prefHeight="250.0" prefWidth="668.0">
+                          <columns>
+                            <TableColumn fx:id="clnMarcaCompra" prefWidth="52.00006067752838" text="Marca" />
+                            <TableColumn fx:id="clnModeloCompra" prefWidth="63.20001983642578" text="Modelo" />
+                              <TableColumn fx:id="clnAñoCompra" prefWidth="47.19994354248047" text="Año" />
+                              <TableColumn fx:id="clnPrecioCompra" prefWidth="61.5999755859375" text="Precio" />
+                              <TableColumn fx:id="clnColorCompra" prefWidth="59.199981689453125" text="Color" />
+                              <TableColumn fx:id="clnDiseñoRCompra" prefWidth="99.99996948242188" text="Diseño Ruedas" />
+                              <TableColumn fx:id="clnDiametroCompra" prefWidth="77.60003662109375" text="Diametro" />
+                              <TableColumn fx:id="clnInteriorCompra" prefWidth="63.9998779296875" text="Interior" />
+                              <TableColumn fx:id="clnMatIntCompra" prefWidth="138.4000244140625" text="Material Interior" />
+                          </columns>
+                           <HBox.margin>
+                              <Insets right="30.0" />
+                           </HBox.margin>
+                        </TableView>
+                     </children>
+                  </HBox>
+                  <Button fx:id="btnCompra" layoutX="471.0" layoutY="529.0" mnemonicParsing="false" onAction="#efectuarCompra" prefHeight="26.0" prefWidth="106.0" text="Aceptar" />
+                  <Button fx:id="btnCancelarCompra" layoutX="589.0" layoutY="529.0" mnemonicParsing="false" onAction="#cancelarCompra" prefHeight="26.0" prefWidth="95.0" text="Cancelar" />
+               </children></Pane>
+            <Pane fx:id="panelIngreso" prefHeight="200.0" prefWidth="200.0" visible="false">
                <children>
                   <HBox layoutX="1.0" prefHeight="38.0" prefWidth="724.0">
                      <children>
@@ -784,259 +952,6 @@
                   </HBox>
                </children>
             </Pane>
-            <Pane fx:id="panelVentas" prefHeight="200.0" prefWidth="200.0" visible="false">
-               <children>
-                  <HBox prefHeight="309.0" prefWidth="724.0">
-                     <children>
-                        <VBox prefHeight="310.0" prefWidth="298.0">
-                           <children>
-                              <Label text="CONFIGURACION DEL VEHICULO">
-                                 <VBox.margin>
-                                    <Insets left="55.0" top="30.0" />
-                                 </VBox.margin>
-                                 <font>
-                                    <Font name="System Bold Italic" size="14.0" />
-                                 </font>
-                              </Label>
-                              <HBox prefHeight="1.0" prefWidth="306.0">
-                                 <children>
-                                    <Label text="Marca">
-                                       <HBox.margin>
-                                          <Insets right="50.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <MenuButton fx:id="slcMarcaCompra" mnemonicParsing="false" text="Seleccionar Marca">
-                                      <items>
-                                        <MenuItem mnemonicParsing="false" text="Action 1" />
-                                        <MenuItem mnemonicParsing="false" text="Action 2" />
-                                      </items>
-                                       <HBox.margin>
-                                          <Insets left="20.0" />
-                                       </HBox.margin>
-                                    </MenuButton>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" top="30.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox prefHeight="26.0" prefWidth="241.0">
-                                 <children>
-                                    <Label text="Modelo">
-                                       <HBox.margin>
-                                          <Insets right="50.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <MenuButton fx:id="slcModeloCompra" mnemonicParsing="false" text="Seleccioanr Modelo">
-                                       <items>
-                                          <MenuItem mnemonicParsing="false" text="Action 1" />
-                                          <MenuItem mnemonicParsing="false" text="Action 2" />
-                                       </items>
-                                       <HBox.margin>
-                                          <Insets left="10.0" />
-                                       </HBox.margin>
-                                    </MenuButton>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox prefHeight="12.0" prefWidth="306.0">
-                                 <children>
-                                    <Label text="Año">
-                                       <HBox.margin>
-                                          <Insets right="50.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <MenuButton fx:id="slcAñoCompra" mnemonicParsing="false" text="Seleccioanr Año">
-                                       <items>
-                                          <MenuItem mnemonicParsing="false" text="Action 1" />
-                                          <MenuItem mnemonicParsing="false" text="Action 2" />
-                                       </items>
-                                       <HBox.margin>
-                                          <Insets left="30.0" />
-                                       </HBox.margin>
-                                    </MenuButton>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox prefHeight="26.0" prefWidth="257.0">
-                                 <children>
-                                    <Label text="Consumo">
-                                       <HBox.margin>
-                                          <Insets right="50.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <MenuButton fx:id="slcConsumoCompra" mnemonicParsing="false" text="Seleccionar Combustible">
-                                       <items>
-                                          <MenuItem mnemonicParsing="false" text="Action 1" />
-                                          <MenuItem mnemonicParsing="false" text="Action 2" />
-                                       </items>
-                                       <HBox.margin>
-                                          <Insets />
-                                       </HBox.margin>
-                                    </MenuButton>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets />
-                                 </VBox.margin>
-                              </HBox>
-                           </children>
-                           <HBox.margin>
-                              <Insets left="30.0" />
-                           </HBox.margin>
-                        </VBox>
-                        <VBox prefHeight="310.0" prefWidth="298.0">
-                           <children>
-                              <Label text="INTERIOR DEL VEHICULO">
-                                 <VBox.margin>
-                                    <Insets left="55.0" top="30.0" />
-                                 </VBox.margin>
-                                 <font>
-                                    <Font name="System Bold Italic" size="14.0" />
-                                 </font>
-                              </Label>
-                              <HBox prefHeight="1.0" prefWidth="306.0">
-                                 <children>
-                                    <Label text="Patrón">
-                                       <HBox.margin>
-                                          <Insets right="50.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <MenuButton fx:id="slcPatronCompra" mnemonicParsing="false" text="Seleccionar Patron">
-                                       <items>
-                                          <MenuItem mnemonicParsing="false" text="Action 1" />
-                                          <MenuItem mnemonicParsing="false" text="Action 2" />
-                                       </items>
-                                       <HBox.margin>
-                                          <Insets left="20.0" />
-                                       </HBox.margin>
-                                    </MenuButton>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" top="30.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox prefHeight="26.0" prefWidth="241.0">
-                                 <children>
-                                    <Label text="Material">
-                                       <HBox.margin>
-                                          <Insets right="50.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <MenuButton fx:id="slcMaterialCompra" mnemonicParsing="false" text="Seleccioanr Material">
-                                       <items>
-                                          <MenuItem mnemonicParsing="false" text="Action 1" />
-                                          <MenuItem mnemonicParsing="false" text="Action 2" />
-                                       </items>
-                                       <HBox.margin>
-                                          <Insets left="10.0" />
-                                       </HBox.margin>
-                                    </MenuButton>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox prefHeight="12.0" prefWidth="306.0">
-                                 <children>
-                                    <Label text="Color">
-                                       <HBox.margin>
-                                          <Insets right="50.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <MenuButton fx:id="sclColorCompra" mnemonicParsing="false" text="Seleccioanr Color">
-                                       <items>
-                                          <MenuItem mnemonicParsing="false" text="Action 1" />
-                                          <MenuItem mnemonicParsing="false" text="Action 2" />
-                                       </items>
-                                       <HBox.margin>
-                                          <Insets left="30.0" />
-                                       </HBox.margin>
-                                    </MenuButton>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </HBox>
-                           </children>
-                           <HBox.margin>
-                              <Insets left="30.0" />
-                           </HBox.margin>
-                        </VBox>
-                     </children>
-                  </HBox>
-                  <HBox alignment="BOTTOM_RIGHT" layoutX="-2.0" layoutY="258.0" prefHeight="266.0" prefWidth="724.0">
-                     <children>
-                        <VBox prefHeight="266.0" prefWidth="146.0">
-                           <children>
-                              <Label text="DISEÑO DE RUEDAS">
-                                 <VBox.margin>
-                                    <Insets bottom="30.0" top="10.0" />
-                                 </VBox.margin>
-                                 <font>
-                                    <Font name="System Bold Italic" size="14.0" />
-                                 </font>
-                              </Label>
-                              <RadioButton mnemonicParsing="false" text="19">
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="20">
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="21">
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="22" />
-                           </children>
-                           <HBox.margin>
-                              <Insets left="20.0" />
-                           </HBox.margin>
-                        </VBox>
-                        <VBox alignment="TOP_CENTER" prefHeight="266.0" prefWidth="158.0">
-                           <children>
-                              <Label text="LLANTAS">
-                                 <font>
-                                    <Font name="System Bold Italic" size="14.0" />
-                                 </font>
-                                 <VBox.margin>
-                                    <Insets bottom="30.0" top="10.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <MenuButton fx:id="slcLLantasCompra" mnemonicParsing="false" text="LLantas">
-                                <items>
-                                  <MenuItem mnemonicParsing="false" text="BBS" />
-                                  <MenuItem mnemonicParsing="false" text="Zigen" />
-                                </items>
-                              </MenuButton>
-                           </children>
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <HBox.margin>
-                              <Insets right="250.0" />
-                           </HBox.margin>
-                        </VBox>
-                        <Button fx:id="btnCompra" mnemonicParsing="false" onAction="#efectuarCompra" prefHeight="26.0" prefWidth="106.0" text="Aceptar">
-                           <HBox.margin>
-                              <Insets right="20.0" />
-                           </HBox.margin>
-                        </Button>
-                        <Button fx:id="btnCancelarCompra" mnemonicParsing="false" onAction="#cancelarCompr" prefHeight="26.0" prefWidth="95.0" text="Cancelar">
-                           <HBox.margin>
-                              <Insets right="40.0" />
-                           </HBox.margin>
-                        </Button>
-                     </children>
-                  </HBox>
-               </children></Pane>
          </children>
       </StackPane>
    </children>
