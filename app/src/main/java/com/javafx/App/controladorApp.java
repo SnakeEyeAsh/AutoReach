@@ -19,7 +19,7 @@ import com.javafx.Model.Coche;
 import com.javafx.Model.CocheCompleto;
 import com.javafx.Model.CocheCompra;
 import com.javafx.Model.Disponible;
-
+import com.javafx.Model.ValidadorAlquiler;
 import com.javafx.Model.ValidadorCliente;
 import com.javafx.Model.ValidadorCoche;
 
@@ -45,6 +45,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -496,6 +497,7 @@ public class controladorApp implements Initializable {
 
     private ValidadorCliente validador;
     private ValidadorCoche validadorC;
+    private ValidadorAlquiler validadorAlquiler;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -507,11 +509,18 @@ public class controladorApp implements Initializable {
         });
         validador = new ValidadorCliente();
         validadorC = new ValidadorCoche();
+        validadorAlquiler = new ValidadorAlquiler();
+
+        validadorAlquiler.inicializarValidadores(cldRecoger, cldEntrega, txtHoraEntrega);
         validadorC.inicializarValidadores(ingresoMarca, ingresoModelo, ingresoAño, ingresoKms, ingresoBastidor,
                 ingresoPrecio, ingresoDllantas, ingresoDiseñoLlantas, ingresoColor, ingresoMaterial,
                 ingresoDiseñoInterior, ingresoMatricula);
         validador.inicializarValidadores(txtNombre, txtApellidos, txtDireccion, txtTelefono, txtFechaNac, txtDni,
                 txtEmail, splitMenuSexo);
+
+        // Configurar tooltip para el campo de hora de entrega
+        Tooltip tooltipHora = new Tooltip("Formato: HH:mm (ejemplo: 14:30, 09:15)");
+        txtHoraEntrega.setTooltip(tooltipHora);
         btnIrAInicio.setStyle("-fx-background-color:darkgrey");
         iniciarTablas();
         ocultarTodos();
@@ -837,52 +846,55 @@ public class controladorApp implements Initializable {
 
     @FXML
     void confirmarAlquiler(ActionEvent event) {
-        if (!editandoAlquiler) {
-            Disponible d = TblCoincidencias.getSelectionModel().getSelectedItem();
 
-            LocalDate fecha = cldRecoger.getValue();
-            LocalDate fechaFin = cldEntrega.getValue();
+        if(validadorAlquiler.esFormularioValido()){
+            if (!editandoAlquiler) {
+                Disponible d = TblCoincidencias.getSelectionModel().getSelectedItem();
 
-            long dias = ChronoUnit.DAYS.between(fecha, fechaFin);
-            double precioTotal = dias * Double.parseDouble(d.getPrecio());
-            String estado = d.getDisponible().equals("si") ? "en_proceso" : "pendiente";
-            try {
+                LocalDate fecha = cldRecoger.getValue();
+                LocalDate fechaFin = cldEntrega.getValue();
 
-                Conexion.crearAlquiler(
-                        fecha.toString(),
-                        fechaFin.toString(),
-                        precioTotal + "",
-                        d.getPrecio(),
-                        estado,
-                        1 + "",
-                        txtHoraEntrega.getText(),
-                        d.getMatricula(),
-                        cliente.getDni());
-            } catch (SQLException e) {
-                System.out.println("Error al incertar cita desde controlador " + e.getMessage());
+                long dias = ChronoUnit.DAYS.between(fecha, fechaFin);
+                double precioTotal = dias * Double.parseDouble(d.getPrecio());
+                String estado = d.getDisponible().equals("si") ? "en_proceso" : "pendiente";
+                try {
+
+                    Conexion.crearAlquiler(
+                            fecha.toString(),
+                            fechaFin.toString(),
+                            precioTotal + "",
+                            d.getPrecio(),
+                            estado,
+                            1 + "",
+                            txtHoraEntrega.getText(),
+                            d.getMatricula(),
+                            cliente.getDni());
+                } catch (SQLException e) {
+                    System.out.println("Error al incertar cita desde controlador " + e.getMessage());
+                }
+                Conexion.actualizarAlquilado(d.getMatricula());
+
+            } else {
+                try {
+                    Alquiler a = tblAlquiler.getSelectionModel().getSelectedItem();
+                    Timestamp t1 = Timestamp.valueOf(cldRecoger.getValue().atStartOfDay());
+                    Timestamp t2 = Timestamp.valueOf(cldEntrega.getValue().atStartOfDay());
+
+                    Conexion.editarAlquiler(t1, txtHoraEntrega.getText(), t2, a.getMatricula(), a.getDni());
+
+                } catch (Exception e) {
+                    System.out.println("Error al actualizar alquiler" + e.getMessage());
+                }
+                mnElegirMarca.setDisable(false);
+                txtElegirModelo.setDisable(false);
+                btnBuscarMatricula.setDisable(false);
+                btnCancelarMatricula.setDisable(false);
+                cldRecoger.getEditor().clear();
+                txtHoraEntrega.clear();
+                cldEntrega.getEditor().clear();
+                editandoAlquiler = false;
+
             }
-            Conexion.actualizarAlquilado(d.getMatricula());
-
-        } else {
-            try {
-                Alquiler a = tblAlquiler.getSelectionModel().getSelectedItem();
-                Timestamp t1 = Timestamp.valueOf(cldRecoger.getValue().atStartOfDay());
-                Timestamp t2 = Timestamp.valueOf(cldEntrega.getValue().atStartOfDay());
-
-                Conexion.editarAlquiler(t1, txtHoraEntrega.getText(), t2, a.getMatricula(), a.getDni());
-
-            } catch (Exception e) {
-                System.out.println("Error al actualizar alquiler" + e.getMessage());
-            }
-            mnElegirMarca.setDisable(false);
-            txtElegirModelo.setDisable(false);
-            btnBuscarMatricula.setDisable(false);
-            btnCancelarMatricula.setDisable(false);
-            cldRecoger.getEditor().clear();
-            txtHoraEntrega.clear();
-            cldEntrega.getEditor().clear();
-            editandoAlquiler = false;
-
         }
 
     }
@@ -890,7 +902,6 @@ public class controladorApp implements Initializable {
     @FXML
     void cancelarAlquiler(ActionEvent event) {
         mnElegirMarca.setText("Marca");
-        ;
         txtElegirModelo.clear();
         TblCoincidencias.getItems().clear();
         cldRecoger.getEditor().clear();
@@ -1032,7 +1043,7 @@ public class controladorApp implements Initializable {
     @FXML
     void aceptarIngreso(ActionEvent event) {
 
-            if(validadorC.esFormularioValido()){
+        if (validadorC.esFormularioValido()) {
             String marca = ingresoMarca.getText();
             String modelo = ingresoModelo.getText();
             String año = ingresoAño.getText();
