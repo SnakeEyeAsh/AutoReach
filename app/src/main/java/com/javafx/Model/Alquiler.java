@@ -1,17 +1,22 @@
 package com.javafx.Model;
 
+import java.sql.Timestamp;
+
 public class Alquiler{
-    private String fechaDevolucion;
+    private Timestamp fechaDevolucion;
     private String horaDevolucion;
     private String dni;
     private String matricula;
-    public Alquiler(String fechaRecogida, String fechaEntrega, String dni, String matricula) {
-        this.fechaDevolucion = fechaRecogida;
+    private Timestamp fechaRecogida;
+    
+    public Alquiler(Timestamp fecha, String fechaEntrega, String dni, String matricula,Timestamp fechaRecogida2) {
+        this.fechaDevolucion = fecha;
         this.horaDevolucion = fechaEntrega;
         this.dni = dni;
         this.matricula = matricula;
+        this.fechaRecogida=fechaRecogida2;
     }
-    public String getFechaDevolucion() {
+    public Timestamp getFechaDevolucion() {
         return fechaDevolucion;
     }
     public String getHoraDevolucion() {
@@ -22,6 +27,24 @@ public class Alquiler{
     }
     public String getMatricula() {
         return matricula;
+    }
+    public void setFechaDevolucion(Timestamp fechaDevolucion) {
+        this.fechaDevolucion = fechaDevolucion;
+    }
+    public void setHoraDevolucion(String horaDevolucion) {
+        this.horaDevolucion = horaDevolucion;
+    }
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
+    }
+    public Timestamp getFechaRecogida() {
+        return fechaRecogida;
+    }
+    public void setFechaRecogida(Timestamp fechaRecogida) {
+        this.fechaRecogida = fechaRecogida;
     }
 
     

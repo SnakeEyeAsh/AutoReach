@@ -16,7 +16,7 @@ public class Coche{
             String diseño, String diseñoLlantas, String color) {
         Marca = marca;
         Modelo = modelo;
-        Matricula = matricula;
+        this.Matricula = matricula;
         Año = año;
         this.kms = kms;
         Bastidor = bastidor;
@@ -24,6 +24,7 @@ public class Coche{
         Diseño = diseño;
         DiametroLlantas = diseñoLlantas;
         Color = color;
+
     }
     public String getMarca() {
         return Marca;
@@ -78,6 +79,12 @@ public class Coche{
     }
     public void setColor(String color) {
         Color = color;
+    }
+    public String getMatricula() {
+        return Matricula;
+    }
+    public void setMatricula(String matricula) {
+        Matricula = matricula;
     }
 
     

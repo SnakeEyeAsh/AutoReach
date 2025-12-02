@@ -25,6 +25,10 @@ java { //Se indica la versión de JDK que ha de utilizar
 
 application { //Definimos clase principal del proyecto
     mainClass = 'com.javafx.App.App'
+    applicationDefaultJvmArgs = [
+        '--add-opens', 'javafx.graphics/javafx.scene=org.controlsfx.controls',
+        '--add-opens', 'javafx.graphics/javafx.scene=ALL-UNNAMED'
+    ]
 }
 
 sourceSets {
@@ -34,6 +38,11 @@ sourceSets {
         includes = ["**/*.fxml","**/*.png","**/*.properties"]  //Importante para poder abrir una extensión no reconocida
     }
   }
+}
+dependencies {
+    
+    implementation 'org.postgresql:postgresql:42.7.3'
+    implementation 'org.controlsfx:controlsfx:11.2.1' 
 }
 
 

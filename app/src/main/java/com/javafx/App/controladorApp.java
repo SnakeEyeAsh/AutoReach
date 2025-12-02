@@ -2,22 +2,26 @@ package com.javafx.App;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-
-
 import com.javafx.Data.Datos;
 import com.javafx.JDBC.Conexion;
-import com.javafx.JDBC.seleccion;
 import com.javafx.Model.Alquiler;
 import com.javafx.Model.Cita;
 import com.javafx.Model.Cliente;
 import com.javafx.Model.Coche;
+import com.javafx.Model.CocheCompleto;
+import com.javafx.Model.CocheCompra;
 import com.javafx.Model.Disponible;
+
+import com.javafx.Model.ValidadorCliente;
+import com.javafx.Model.ValidadorCoche;
 
 import javafx.application.Platform;
 
@@ -57,8 +61,85 @@ public class controladorApp implements Initializable {
 
     private Cliente cliente;
 
-    ///////////////////////////////// CRUD COCHES ////////////
-    
+    private Boolean editarCliente = false;
+
+    private boolean editandoAlquiler = false;
+
+    @FXML
+    private TextField ingresoAño;
+
+    @FXML
+    private TextField ingresoBastidor;
+
+    @FXML
+    private TextField ingresoColor;
+
+    @FXML
+    private TextField ingresoDiseñoInterior;
+
+    @FXML
+    private TextField ingresoDiseñoLlantas;
+
+    @FXML
+    private TextField ingresoDllantas;
+
+    @FXML
+    private TextField ingresoKms;
+
+    @FXML
+    private TextField ingresoMarca;
+
+    @FXML
+    private TextField ingresoMaterial;
+
+    @FXML
+    private TextField ingresoMatricula;
+
+    @FXML
+    private TextField ingresoModelo;
+
+    @FXML
+    private TextField ingresoPrecio;
+
+    @FXML
+    private MenuItem lujo;
+
+    @FXML
+    private MenuItem confort;
+
+    @FXML
+    private MenuItem deportivo;
+
+    @FXML
+    private MenuItem alcantara;
+
+    @FXML
+    private MenuItem cuero;
+
+    @FXML
+    private MenuItem tela;
+
+    @FXML
+    private MenuItem blanco;
+
+    @FXML
+    private MenuItem negro;
+
+    @FXML
+    private MenuItem azul;
+
+    @FXML
+    private MenuItem gris;
+
+    @FXML
+    private MenuButton slcPatronCompra;
+
+    @FXML
+    private MenuButton slcMaterialCompra;
+
+    @FXML
+    private TextField txtAñoCompra;
+
     @FXML
     private TextField txtMarcaCompra;
 
@@ -66,7 +147,7 @@ public class controladorApp implements Initializable {
     private TextField txtModeloCompra;
 
     @FXML
-    private TableView<Coche> tblOpcionesCompra;
+    private TableView<CocheCompra> tblOpcionesCompra;
 
     @FXML
     private TableColumn<Coche, String> clnMarcaCompra;
@@ -76,14 +157,13 @@ public class controladorApp implements Initializable {
 
     @FXML
     private TableColumn<Coche, String> clnPrecioCompra;
-    
+
     @FXML
     private TableColumn<Coche, String> clnAñoCompra;
 
     @FXML
     private TableColumn<Coche, String> clnColorCompra;
 
-    
     @FXML
     private TableColumn<Coche, String> clnDiametroCompra;
 
@@ -92,20 +172,19 @@ public class controladorApp implements Initializable {
 
     @FXML
     private TableColumn<Coche, String> clnMatIntCompra;
-    
+
     @FXML
     private TableColumn<Coche, String> clnDiseñoRCompra;
 
     @FXML
     private TableView<Disponible> TblCoincidencias;
-    
+
     @FXML
     private TableColumn<Disponible, String> clnAñoCoche;
 
     @FXML
     private TableColumn<Disponible, String> clnColorCoche;
 
-    
     @FXML
     private TableColumn<Disponible, String> clnDisponibleCoche;
 
@@ -113,16 +192,21 @@ public class controladorApp implements Initializable {
     private TableColumn<Disponible, String> clnMatriculaCoche;
 
     @FXML
-    private TableColumn<Disponible, String> clnPrecioCoche;   
-    
+    private TableColumn<Disponible, String> clnPrecioCoche;
+
     @FXML
     private Button btnBuscarMatricula;
 
     @FXML
-    private Button btnCancelarMatricula;
+    private Button btnEliminarCliente;
 
     @FXML
-    private TextField txtElegirMarca;
+    private Button btnEditarCoche;
+
+    @FXML
+    private Button btnCancelarMatricula;
+    @FXML
+    private MenuButton mnElegirMarca;
 
     @FXML
     private TextField txtElegirModelo;
@@ -193,7 +277,6 @@ public class controladorApp implements Initializable {
     @FXML
     private Button btnBuscarCliente;
 
-    
     @FXML
     private Button btnBuscarCompra;
 
@@ -328,7 +411,8 @@ public class controladorApp implements Initializable {
 
     @FXML
     private AnchorPane panelNuevoCliente;
-    /////////////////////////////////////////// PANELES //////////////////////////////////////
+    /////////////////////////////////////////// PANELES
+    /////////////////////////////////////////// //////////////////////////////////////
 
     @FXML
     private Pane panelRegistro;
@@ -349,9 +433,6 @@ public class controladorApp implements Initializable {
 
     @FXML
     private MenuButton sclColorCompra;
-
-    @FXML
-    private MenuButton slcConsumoCompra;
 
     @FXML
     private SplitMenuButton slcMatCita;
@@ -402,9 +483,6 @@ public class controladorApp implements Initializable {
     private TextField txtNombre;
 
     @FXML
-    private TextField txtNombreVer;
-
-    @FXML
     private TextField txtTelefono;
 
     @FXML
@@ -413,33 +491,44 @@ public class controladorApp implements Initializable {
     @FXML
     private VBox ventanaLogin;
 
-    
     @FXML
     private TextArea txtAreaCitas;
 
-
+    private ValidadorCliente validador;
+    private ValidadorCoche validadorC;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        
+
         Conexion.realizarConexion();
-        Platform.runLater(()->{
-            Stage s = (Stage)btnIrAInicio.getScene().getWindow();
+        Platform.runLater(() -> {
+            Stage s = (Stage) btnIrAInicio.getScene().getWindow();
             s.getIcons().add(new Image("Assets/autoIcon.png"));
         });
-
+        validador = new ValidadorCliente();
+        validadorC = new ValidadorCoche();
+        validadorC.inicializarValidadores(ingresoMarca, ingresoModelo, ingresoAño, ingresoKms, ingresoBastidor,
+                ingresoPrecio, ingresoDllantas, ingresoDiseñoLlantas, ingresoColor, ingresoMaterial,
+                ingresoDiseñoInterior, ingresoMatricula);
+        validador.inicializarValidadores(txtNombre, txtApellidos, txtDireccion, txtTelefono, txtFechaNac, txtDni,
+                txtEmail, splitMenuSexo);
         btnIrAInicio.setStyle("-fx-background-color:darkgrey");
         iniciarTablas();
         ocultarTodos();
         desactivarBotones();
         mostrarPanel(paneLogin);
         deshabilitarBotonesCliente();
+        llenarMenuMarcas();
 
-        cliente = new Cliente("Pepe", "Gonzales", "7526083f", 623162788, "empleado@gmail.com");////////////////////////////////////////////////////////////////
+        txtElegirModelo.setDisable(true);//////// Paralizacion temporal
+
+        cliente = new Cliente("Ana", "Rodriguez", "12345678B", 623162788,
+                "ana.rodriguez@email.com", "Avenida de la Constitución 42, Barcelona");
 
     }
 
-    ////////////////////////////////////////////////////////-----LOGIN------//////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////// -----LOGIN-----
+    /// - //////////////////////////////////////////////////////////////
 
     @FXML
     void IniciarSesion(ActionEvent event) {
@@ -448,24 +537,26 @@ public class controladorApp implements Initializable {
             mostrarPanel(panelRegistro);
             btnAlquiler.setDisable(false);
             btnIrAInicio.setDisable(false);
-            btnCitas.setDisable(false);
-            btnCompras.setDisable(false);
+            // btnCitas.setDisable(false);
+            // btnCompras.setDisable(false);
             btnCerrarSesion.setDisable(false);
             btnIrAIngreso.setDisable(false);
-        }else{
+        } else {
             AlertaFallo.mostrar();
         }
     }
 
-    ////////////////////////////---LOGIN CLIENTE---/////////////////////////////////////////
-    
-     @FXML
+    //////////////////////////// ---LOGIN
+    /// CLIENTE--- /////////////////////////////////////////
+
+    @FXML
     void crearCliente(ActionEvent event) {
-        txtNombreVer.setDisable(true);
+
         txtDniVer.setDisable(true);
         btnSeleccionCLiente.setDisable(true);
         btnEditarCliente.setDisable(true);
         btnCancelarSeleccion.setDisable(true);
+        btnEliminarCliente.setDisable(true);
 
         txtNombre.setDisable(false);
         txtApellidos.setDisable(false);
@@ -481,36 +572,55 @@ public class controladorApp implements Initializable {
 
     @FXML
     void añadirCliente(ActionEvent event) {
-        String nombre = txtNombre.getText();
-        String apellidos = txtApellidos.getText();
-        String direccion = txtDireccion.getText();
-        String telefono = txtTelefono.getText();
-        String fechaNac = txtFechaNac.getText();
-        String dni = txtDni.getText();
-        String email = txtEmail.getText();
-        String sexo = splitMenuSexo.getText();
-        try{
-        Conexion.crearCliente(nombre,apellidos, dni, telefono, email,direccion,fechaNac,sexo);
-            Alert alerta = new Alert(AlertType.CONFIRMATION);
-            alerta.showAndWait();
-        }catch(SQLException error){
-            System.out.println(error.getMessage());
+
+        // Validar el formulario antes de guardar
+        if (validador.validarYMostrarErrores()) {
+
+            String nombre = txtNombre.getText();
+            String apellidos = txtApellidos.getText();
+            String direccion = txtDireccion.getText();
+            String telefono = txtTelefono.getText();
+            String fechaNac = txtFechaNac.getText();
+            String dni = txtDni.getText();
+            String email = txtEmail.getText();
+            String sexo = splitMenuSexo.getText();
+
+            try {
+                Conexion.crearCliente(nombre, apellidos, dni, telefono, email, direccion, fechaNac, sexo);
+                Alert alerta = new Alert(AlertType.CONFIRMATION);
+                alerta.setTitle("Cliente añadido");
+                alerta.setHeaderText("Éxito");
+                alerta.setContentText("El cliente ha sido creado correctamente");
+                alerta.showAndWait();
+                limpiarCliente();
+                iniciarTablas();
+            } catch (SQLException error) {
+                Alert alerta = new Alert(AlertType.ERROR);
+                alerta.setTitle("Error de base de datos");
+                alerta.setHeaderText("No se pudo crear el cliente");
+                alerta.setContentText("Error: " + error.getMessage());
+                alerta.showAndWait();
+            }
         }
+    }
+
+    @FXML
+    void cancelarNuevoCliente(ActionEvent event) {
 
     }
-     @FXML
-    void cancelarNuevoCliente(ActionEvent event) {
-        alertaDesarrollo.mostrar();
-    }
-    /*==================================BUSCAR===========================================*/
+    /*
+     * ==================================BUSCAR=====================================
+     * ======
+     */
 
     @FXML
     void buscarLogin(ActionEvent event) {
-        txtNombreVer.setDisable(false);
+
         txtDniVer.setDisable(false);
         btnSeleccionCLiente.setDisable(false);
         btnEditarCliente.setDisable(false);
         btnCancelarSeleccion.setDisable(false);
+        btnEliminarCliente.setDisable(false);
 
         txtNombre.setDisable(true);
         txtApellidos.setDisable(true);
@@ -527,22 +637,155 @@ public class controladorApp implements Initializable {
 
     @FXML
     void seleccionarCliente(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        if (editarCliente) {
+            // Validar formulario antes de guardar cambios
+            if (validador.validarYMostrarErrores()) {
+                try {
+                    Cliente c = tablaRegistro.getSelectionModel().getSelectedItem();
+
+                    // Actualizar datos del cliente con los valores del formulario
+                    c.setNombre(txtNombre.getText());
+                    c.setApellidos(txtApellidos.getText());
+                    c.setDireccion(txtDireccion.getText());
+                    c.setTelefono(Double.parseDouble(txtTelefono.getText().replaceAll("[\\s-+]", "")));
+                    c.setEmail(txtEmail.getText());
+
+                    Conexion.editarCliente(c);
+
+                    Alert alerta = new Alert(AlertType.INFORMATION);
+                    alerta.setTitle("Cliente actualizado");
+                    alerta.setHeaderText("Éxito");
+                    alerta.setContentText("El cliente ha sido actualizado correctamente");
+                    alerta.showAndWait();
+
+                    editarCliente = false;
+                    limpiarCliente();
+                    iniciarTablas();
+                    deshabilitarBotonesCliente();
+
+                } catch (NumberFormatException e) {
+                    Alert alerta = new Alert(AlertType.ERROR);
+                    alerta.setTitle("Error de formato");
+                    alerta.setHeaderText("Teléfono inválido");
+                    alerta.setContentText("El teléfono debe contener solo números");
+                    alerta.showAndWait();
+                } catch (Exception e) {
+                    Alert alerta = new Alert(AlertType.ERROR);
+                    alerta.setTitle("Error al actualizar");
+                    alerta.setHeaderText("No se pudo actualizar el cliente");
+                    alerta.setContentText("Error: " + e.getMessage());
+                    alerta.showAndWait();
+                }
+            }
+        } else {
+            // Modo selección normal (no edición)
+            Cliente c = tablaRegistro.getSelectionModel().getSelectedItem();
+            if (c != null) {
+                // Aquí puedes agregar lógica para seleccionar un cliente
+                // Por ejemplo, mostrarlo en los campos de solo lectura
+
+                txtDniVer.setText(c.getDni());
+            }
+        }
     }
 
     @FXML
     void editarCliente(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        Cliente c = tablaRegistro.getSelectionModel().getSelectedItem();
+
+        if (c == null) {
+            Alert alerta = new Alert(AlertType.WARNING);
+            alerta.setTitle("Ningún cliente seleccionado");
+            alerta.setHeaderText("Selecciona un cliente");
+            alerta.setContentText("Por favor, selecciona un cliente de la tabla para editarlo");
+            alerta.showAndWait();
+            return;
+        }
+
+        // Activar modo edición
+        editarCliente = true;
+
+        // Cargar datos del cliente en los campos
+        txtNombre.setText(c.getNombre());
+        txtNombre.setDisable(false);
+
+        txtApellidos.setText(c.getApellidos());
+        txtApellidos.setDisable(false);
+
+        txtDireccion.setText(c.getDireccion());
+        txtDireccion.setDisable(false);
+
+        // Convertir teléfono a String sin decimales
+        txtTelefono.setText(String.valueOf((int) c.getTelefono()));
+        txtTelefono.setDisable(false);
+
+        txtDni.setText(c.getDni());
+        txtDni.setDisable(true); // DNI no se debe editar
+
+        txtEmail.setText(c.getEmail());
+        txtEmail.setDisable(false);
+
+        // Deshabilitar otros botones durante la edición
+        btnEliminarCliente.setDisable(true);
+        btnCancelarSeleccion.setDisable(false);
+        btnSeleccionCLiente.setDisable(false); // Este botón guardará los cambios
+        btnEditarCliente.setDisable(true);
+        btnNuevoCliente.setDisable(true);
+        btnBuscarCliente.setDisable(true);
+    }
+
+    @FXML
+    void eliminarCliente(ActionEvent event) {
+        Cliente c = tablaRegistro.getSelectionModel().getSelectedItem();
+
+        if (c == null) {
+            Alert alerta = new Alert(AlertType.WARNING);
+            alerta.setTitle("Ningún cliente seleccionado");
+            alerta.setHeaderText("Selecciona un cliente");
+            alerta.setContentText("Por favor, selecciona un cliente de la tabla para eliminarlo");
+            alerta.showAndWait();
+            return;
+        }
+
+        // Confirmar eliminación
+        Alert confirmacion = new Alert(AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar eliminación");
+        confirmacion.setHeaderText("¿Eliminar cliente?");
+        confirmacion.setContentText(
+                "¿Estás seguro de que deseas eliminar a " + c.getNombre() + " " + c.getApellidos() + "?");
+
+        if (confirmacion.showAndWait().get() == ButtonType.OK) {
+            try {
+                Conexion.eliminarCliente(c);
+                Alert alerta = new Alert(AlertType.INFORMATION);
+                alerta.setTitle("Cliente eliminado");
+                alerta.setHeaderText("Éxito");
+                alerta.setContentText("El cliente ha sido eliminado correctamente");
+                alerta.showAndWait();
+                iniciarTablas();
+                limpiarCliente();
+            } catch (Exception e) {
+                Alert alerta = new Alert(AlertType.ERROR);
+                alerta.setTitle("Error al eliminar");
+                alerta.setHeaderText("No se pudo eliminar el cliente");
+                alerta.setContentText("Error: " + e.getMessage());
+                alerta.showAndWait();
+            }
+        }
     }
 
     @FXML
     void cancelarSeleccion(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        // Cancelar modo edición y limpiar campos
+        editarCliente = false;
+        limpiarCliente();
+        deshabilitarBotonesCliente();
     }
 
-    //////////////////////////-----ELEGIR SEXO-------/////////////////////////////////
+    ////////////////////////// -----ELEGIR
+    /// SEXO------- /////////////////////////////////
 
-        @FXML
+    @FXML
     void elegirFemenino(ActionEvent event) {
         splitMenuSexo.setText(opFemenino.getText());
     }
@@ -551,10 +794,12 @@ public class controladorApp implements Initializable {
     void elegirMasculino(ActionEvent event) {
         splitMenuSexo.setText(opMasculino.getText());
     }
-    //////////////////////////////////////////////////////////////////////////////////
-    //////////////////////-----------CITAS-----------------///////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////
-    
+
+    ////////////////////////////////////////////////////////////////////////////////// -
+    /// ----------CITAS-----------------//////////////////////////
+    /// /
+    ////////////////////////////////////////////////////////////////////////////////// //////////////////////////////////////////////////////////////////////////////////
+
     @FXML
     void guardarCita(ActionEvent event) {
         alertaDesarrollo.mostrar();
@@ -576,39 +821,111 @@ public class controladorApp implements Initializable {
         alertaDesarrollo.mostrar();
 
     }
-    ////////////////////////////////////////////////////////////////////////////////
-    ////////////////////--------Alquiler--------//////////////////////////////////
-    /// ////////////////////////////////////////////////////////////////////
-    
-     @FXML
+
+    //////////////////////////////////////////////////////////////////////////////// -
+    /// -------Alquiler--------///////////////////////////////// /
+    /// /////////////////////////////////////////////////////////////////////////
+    ///
+    ///
+    ///
+    /// CREAR Y AÑADIR FUNCION QUE cambie el estado de disponibilidad de los
+    /// vehiculos cuando son alquilados
+    ///
+    ///
+    ///
+    /// //////////////////////////////////////////////////////////////////////////////
+
+    @FXML
     void confirmarAlquiler(ActionEvent event) {
-        Disponible d = TblCoincidencias.getSelectionModel().getSelectedItem();
+        if (!editandoAlquiler) {
+            Disponible d = TblCoincidencias.getSelectionModel().getSelectedItem();
 
-        LocalDate fecha = cldRecoger.getValue();
-        LocalDate fechaFin = cldEntrega.getValue();
+            LocalDate fecha = cldRecoger.getValue();
+            LocalDate fechaFin = cldEntrega.getValue();
 
-        long dias = ChronoUnit.DAYS.between(fecha, fechaFin);
-        double precioTotal = dias * Integer.parseInt(d.getPrecio());
-        try{
+            long dias = ChronoUnit.DAYS.between(fecha, fechaFin);
+            double precioTotal = dias * Double.parseDouble(d.getPrecio());
+            String estado = d.getDisponible().equals("si") ? "en_proceso" : "pendiente";
+            try {
 
-        Conexion.crearAlquiler(fecha.toString(),
-                                fechaFin.toString(),
-                                precioTotal+"",
-                                 d.getPrecio(),
-                                  d.getDisponible(),
-                                   1+"",
-                                    txtHoraEntrega.getText(),
-                                     d.getMatricula(),
-                                      cliente.getDni());
-        }catch(SQLException e){
-            System.out.println("Error al incertar cita desde controlador "+e.getMessage());
+                Conexion.crearAlquiler(
+                        fecha.toString(),
+                        fechaFin.toString(),
+                        precioTotal + "",
+                        d.getPrecio(),
+                        estado,
+                        1 + "",
+                        txtHoraEntrega.getText(),
+                        d.getMatricula(),
+                        cliente.getDni());
+            } catch (SQLException e) {
+                System.out.println("Error al incertar cita desde controlador " + e.getMessage());
+            }
+            Conexion.actualizarAlquilado(d.getMatricula());
+
+        } else {
+            try {
+                Alquiler a = tblAlquiler.getSelectionModel().getSelectedItem();
+                Timestamp t1 = Timestamp.valueOf(cldRecoger.getValue().atStartOfDay());
+                Timestamp t2 = Timestamp.valueOf(cldEntrega.getValue().atStartOfDay());
+
+                Conexion.editarAlquiler(t1, txtHoraEntrega.getText(), t2, a.getMatricula(), a.getDni());
+
+            } catch (Exception e) {
+                System.out.println("Error al actualizar alquiler" + e.getMessage());
+            }
+            mnElegirMarca.setDisable(false);
+            txtElegirModelo.setDisable(false);
+            btnBuscarMatricula.setDisable(false);
+            btnCancelarMatricula.setDisable(false);
+            cldRecoger.getEditor().clear();
+            txtHoraEntrega.clear();
+            cldEntrega.getEditor().clear();
+            editandoAlquiler = false;
+
         }
 
     }
 
     @FXML
     void cancelarAlquiler(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        mnElegirMarca.setText("Marca");
+        ;
+        txtElegirModelo.clear();
+        TblCoincidencias.getItems().clear();
+        cldRecoger.getEditor().clear();
+        txtHoraEntrega.clear();
+        cldEntrega.getEditor().clear();
+    }
+
+    @FXML
+    void editarAlq(ActionEvent event) {
+        Alquiler a = tblAlquiler.getSelectionModel().getSelectedItem();
+
+        if (a != null) {
+            editandoAlquiler = true;
+
+            mnElegirMarca.setDisable(true);
+            txtElegirModelo.setDisable(true);
+            btnBuscarMatricula.setDisable(true);
+            btnCancelarMatricula.setDisable(true);
+
+            Timestamp fechaR = a.getFechaRecogida();
+            Timestamp fechaE = a.getFechaDevolucion();
+            String hora = a.getHoraDevolucion();
+
+            cldRecoger.setValue(fechaR.toLocalDateTime().toLocalDate());
+            cldEntrega.setValue(fechaE.toLocalDateTime().toLocalDate());
+            txtHoraEntrega.setText(hora);
+
+        } else {
+            Alert alerta = new Alert(AlertType.ERROR);
+            alerta.setHeaderText("Error");
+            alerta.setContentText("Debes seleccionar un alquiler para editarlo");
+            alerta.showAndWait();
+
+        }
+
     }
 
     @FXML
@@ -618,16 +935,12 @@ public class controladorApp implements Initializable {
     }
 
     @FXML
-    void editarAlq(ActionEvent event) {
-        alertaDesarrollo.mostrar();
-    }
-    @FXML
     void buscarMatricula(ActionEvent event) {
 
-        //TblCoincidencias.getItems().clear();
-        String marca = txtElegirMarca.getText();
-        String modelo = txtElegirModelo.getText();
-        TblCoincidencias.setItems(Conexion.mostrarCoincidencias(marca,modelo));
+        // TblCoincidencias.getItems().clear();
+        String marca = mnElegirMarca.getText();
+        // String modelo = txtElegirModelo.getText();
+        TblCoincidencias.setItems(Conexion.mostrarCoincidencias(marca));
         clnAñoCoche.setCellValueFactory(new PropertyValueFactory<>("año"));
         clnDisponibleCoche.setCellValueFactory(new PropertyValueFactory<>("Disponible"));
         clnColorCoche.setCellValueFactory(new PropertyValueFactory<>("Color"));
@@ -638,21 +951,23 @@ public class controladorApp implements Initializable {
 
     @FXML
     void cancelarBusquedaMatricula(ActionEvent event) {
-       txtElegirMarca.clear();
-       txtElegirModelo.clear();
-       TblCoincidencias.getItems().clear();
+        mnElegirMarca.setText("Marca");
+        ;
+        txtElegirModelo.clear();
+        TblCoincidencias.getItems().clear();
     }
 
-    /// 
+    ///
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////-----------COMPRA------------///////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
+    ////////////// -----------COMPRA------------//////////////////////////////////////////////
+    /// /
+    /// ///////////////////////////////////////////////////////////////////////////////////
 
     @FXML
     void efectuarCompra(ActionEvent event) {
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/pantallaCompra.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ventanaInfo.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();
@@ -676,6 +991,33 @@ public class controladorApp implements Initializable {
     @FXML
     void BuscarCompra(ActionEvent event) {
 
+        String marca = txtMarcaCompra.getText();
+        String modelo = txtModeloCompra.getText();
+        String año = txtAñoCompra.getText();
+        String patron = slcPatronCompra.getText();
+        String material = slcMaterialCompra.getText();
+        String color = sclColorCompra.getText();
+
+        if (año.isEmpty() || !año.matches("\\d+")) {
+            // Mostrar alerta al usuario
+            System.err.println("Por favor ingrese un año válido");
+            return;
+        }
+
+        CocheCompra c = new CocheCompra(marca, modelo, año, "0", color, "", "", "", patron, material);
+
+        tblOpcionesCompra.getItems().clear();
+        tblOpcionesCompra.setItems(Conexion.buscarCoche(c));
+
+        clnMarcaCompra.setCellValueFactory(new PropertyValueFactory<>("Marca"));
+        clnModeloCompra.setCellValueFactory(new PropertyValueFactory<>("Modelo"));
+        clnAñoCompra.setCellValueFactory(new PropertyValueFactory<>("Año"));
+        clnColorCompra.setCellValueFactory(new PropertyValueFactory<>("Color"));
+        clnPrecioCompra.setCellValueFactory(new PropertyValueFactory<>("Precio"));
+        clnDiseñoRCompra.setCellValueFactory(new PropertyValueFactory<>("DiseñoRuedas"));
+        clnDiametroCompra.setCellValueFactory(new PropertyValueFactory<>("DiametroLlantas"));
+        clnInteriorCompra.setCellValueFactory(new PropertyValueFactory<>("Interior"));
+        clnMatIntCompra.setCellValueFactory(new PropertyValueFactory<>("Material"));
     }
 
     @FXML
@@ -683,32 +1025,129 @@ public class controladorApp implements Initializable {
 
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////--------INGRESOS-----------------////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -
+    /// -------INGRESOS----------------- ///////////////////////////////////
+    /// /
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @FXML
     void aceptarIngreso(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+
+            if(validadorC.esFormularioValido()){
+            String marca = ingresoMarca.getText();
+            String modelo = ingresoModelo.getText();
+            String año = ingresoAño.getText();
+            String kms = ingresoKms.getText();
+            String nBastidor = ingresoBastidor.getText();
+            String precio = ingresoPrecio.getText();
+            String diametro = ingresoDllantas.getText();
+            String diseñoLlantas = ingresoDiseñoLlantas.getText();
+            String color = ingresoColor.getText();
+            String material = ingresoMaterial.getText();
+            String diseñoInterior = ingresoDiseñoInterior.getText();
+            String matricula = ingresoMatricula.getText();
+
+            try {
+
+                Conexion.crearIngreso(nBastidor,
+                        marca,
+                        modelo,
+                        año,
+                        kms,
+                        true,
+                        true,
+                        precio,
+                        color,
+                        diseñoLlantas,
+                        diametro,
+                        diseñoInterior,
+                        material,
+                        matricula);
+
+            } catch (SQLException e) {
+                System.out.println("error al incertar Coche" + e.getMessage());
+            }
+            limpiarIngreso();
+        }
     }
 
     @FXML
     void cancelarIngreso(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        limpiarIngreso();
     }
 
     @FXML
     void editarIngreso(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        btnAceptarIngreso.setDisable(true);
+        btnCancelarIngresos.setDisable(true);
+        btnBorrarIngreso.setDisable(true);
+
+        Coche c = TablaCoches.getSelectionModel().getSelectedItem();
+
+        CocheCompleto cc = Conexion.buscarIngreso(c.getBastidor());
+
+        ingresoMarca.setText(cc.getMarca());
+        ingresoModelo.setText(cc.getModelo());
+        ingresoAño.setText(cc.getAño() + "");
+        ingresoKms.setText(cc.getKilometraje() + "");
+        ingresoBastidor.setText(cc.getNumBastidor());
+        ingresoPrecio.setText(cc.getPrecioBase() + "");
+        ingresoDllantas.setText(cc.getDiametroLlantas() + "");
+        ingresoDiseñoLlantas.setText(cc.getDisenoLlantas());
+        ingresoColor.setText(cc.getColor());
+        ingresoMaterial.setText(cc.getMaterialInterior());
+        ingresoDiseñoInterior.setText(cc.getDisenoInterior());
+        ingresoMatricula.setText(cc.getMatricula());
+
+    }
+
+    @FXML
+    void editarCoche(ActionEvent event) {
+        try {
+            Conexion.actualizarCoche(ingresoBastidor.getText(),
+                    ingresoMarca.getText(),
+                    ingresoModelo.getText(),
+                    ingresoAño.getText(),
+                    ingresoKms.getText(),
+                    true,
+                    true,
+                    ingresoPrecio.getText(),
+                    ingresoColor.getText(),
+                    ingresoDiseñoLlantas.getText(),
+                    ingresoDllantas.getText(),
+                    ingresoDiseñoInterior.getText(),
+                    ingresoMaterial.getText(),
+                    ingresoMatricula.getText());
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        btnAceptarIngreso.setDisable(false);
+        btnCancelarIngresos.setDisable(false);
+        btnBorrarIngreso.setDisable(false);
+
+        limpiarIngreso();
+        iniciarTablas();
+
     }
 
     @FXML
     void borrarIngreso(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        Coche c = TablaCoches.getSelectionModel().getSelectedItem();
+        try {
+            Conexion.borrarCoche(c.getBastidor());
+
+        } catch (SQLException e) {
+            System.out.println("Error al eliminar coche" + e.getMessage());
+        }
+        limpiarIngreso();
+        iniciarTablas();
+
     }
-   
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    /// /////////////////////------SALIR----------------/////////////////////////////////////////
-    /// /////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////// /
+    /// ////////////////////------SALIR----------------//////////////////////////////
+    /// //////////
+    /// /
+    ///////////////////////////////////////////////////////////////////////////////////////////// /////////////////////////////////////////////////////////////////////////////////////
     @FXML
     void cerrarSesion(ActionEvent event) {
         Alert alerta = new Alert(AlertType.WARNING);
@@ -725,7 +1164,6 @@ public class controladorApp implements Initializable {
             alerta.close();
         }
     }
-
 
     /////////////////////////////////////////////////////////// CAMBIAR ENTRE
     /// PANELES /////////////////////////////////////////////
@@ -759,18 +1197,34 @@ public class controladorApp implements Initializable {
         cambiarColores.cambiar(btnIrAIngreso, btnCompras, btnIrAInicio, btnAlquiler, btnCitas);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////--------    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////// -
+    /// ------
+    /// -
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    /// 
+    ///
     /// FUNCIONES AUXILIARES
-    /// 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /// 
-    private void deshabilitarBotonesCliente(){
-        txtNombreVer.setDisable(true);
+
+    private void llenarMenuMarcas() {
+        List<String> lista = Conexion.obtenerMarcas();
+
+        for (int i = 0; i < lista.size(); i++) {
+            String nombreMarca = lista.get(i);
+            MenuItem m = new MenuItem(nombreMarca);
+
+            // Cuando se pulse, actualizar el texto del MenuButton
+            m.setOnAction(e -> {
+                mnElegirMarca.setText(nombreMarca);
+                System.out.println("Marca seleccionada: " + nombreMarca);
+            });
+
+            mnElegirMarca.getItems().add(m);
+        }
+    }
+
+    private void deshabilitarBotonesCliente() {
+
         txtDniVer.setDisable(true);
         btnSeleccionCLiente.setDisable(true);
         btnEditarCliente.setDisable(true);
@@ -785,7 +1239,7 @@ public class controladorApp implements Initializable {
         btnAñadirNuevoCliente.setDisable(true);
         btnCancelarNuevoCliente.setDisable(true);
         splitMenuSexo.setDisable(true);
-        
+
     }
 
     private void ocultarTodos() {
@@ -839,6 +1293,82 @@ public class controladorApp implements Initializable {
         clnBastidor.setCellValueFactory(new PropertyValueFactory<>("Bastidor"));
         clnColor.setCellValueFactory(new PropertyValueFactory<>("Color"));
 
+    }
+
+    private void limpiarCliente() {
+        txtNombre.clear();
+        txtApellidos.clear();
+        txtDireccion.clear();
+        txtTelefono.clear();
+        txtFechaNac.clear();
+        txtDni.clear();
+        txtEmail.clear();
+        splitMenuSexo.setText("Sexo");
+    }
+
+    private void limpiarIngreso() {
+        ingresoMarca.clear();
+        ingresoModelo.clear();
+        ingresoAño.clear();
+        ingresoKms.clear();
+        ingresoBastidor.clear();
+        ingresoPrecio.clear();
+        ingresoDllantas.clear();
+        ingresoDiseñoLlantas.clear();
+        ingresoColor.clear();
+        ingresoMaterial.clear();
+        ingresoDiseñoInterior.clear();
+        ingresoMatricula.clear();
+    }
+
+    @FXML
+    void setAlcantara(ActionEvent event) {
+        slcMaterialCompra.setText(alcantara.getText());
+    }
+
+    @FXML
+    void setCuero(ActionEvent event) {
+        slcMaterialCompra.setText(cuero.getText());
+    }
+
+    @FXML
+    void setTela(ActionEvent event) {
+        slcMaterialCompra.setText(tela.getText());
+    }
+
+    @FXML
+    void setAzul(ActionEvent event) {
+        sclColorCompra.setText(azul.getText());
+    }
+
+    @FXML
+    void setBlanco(ActionEvent event) {
+        sclColorCompra.setText(blanco.getText());
+    }
+
+    @FXML
+    void setNegro(ActionEvent event) {
+        sclColorCompra.setText(negro.getText());
+    }
+
+    @FXML
+    void setGris(ActionEvent event) {
+        sclColorCompra.setText(gris.getText());
+    }
+
+    @FXML
+    void setConfort(ActionEvent event) {
+        slcPatronCompra.setText(confort.getText());
+    }
+
+    @FXML
+    void setDeportivo(ActionEvent event) {
+        slcPatronCompra.setText(deportivo.getText());
+    }
+
+    @FXML
+    void setLujo(ActionEvent event) {
+        slcPatronCompra.setText(lujo.getText());
     }
 
 }
