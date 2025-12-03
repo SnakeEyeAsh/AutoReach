@@ -9,6 +9,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.TextField;
 
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
@@ -27,6 +28,11 @@ public class ValidadorAlquiler {
     // Referencias a los DatePickers para validaciones cruzadas
     private DatePicker cldRecogida;
     private DatePicker cldEntrega;
+
+    // Estilos CSS para los campos
+    private static final String ESTILO_ERROR = "-fx-background-color: #ffcccc;"; // Rojo pálido
+    private static final String ESTILO_VALIDO = "-fx-background-color: #ccffcc;"; // Verde pálido
+    private static final String ESTILO_DEFECTO = ""; // Sin estilo (color por defecto)
 
     /**
      * Inicializa el validador con todos los campos del formulario de alquiler.
@@ -50,6 +56,11 @@ public class ValidadorAlquiler {
         registrarValidadorFechaRecogida(cldRecogida);
         registrarValidadorFechaEntrega(cldEntrega);
         registrarValidadorHoraEntrega(txtHoraEntrega);
+
+        // Aplicar estilos CSS a los campos
+        aplicarEstilosDinamicos(cldRecogida);
+        aplicarEstilosDinamicos(cldEntrega);
+        aplicarEstilosDinamicos(txtHoraEntrega);
 
         // Inicializar decoraciones visuales
         Platform.runLater(() -> validador.initInitialDecoration());
@@ -204,6 +215,71 @@ public class ValidadorAlquiler {
      */
     private boolean esTextoVacio(String texto) {
         return texto == null || texto.trim().isEmpty();
+    }
+
+    /**
+     * Aplica estilos CSS dinámicos a un control según su estado de validación.
+     * - Rojo pálido si hay errores
+     * - Verde pálido si es válido y tiene contenido
+     * - Color por defecto si está vacío
+     *
+     * @param control Control al que aplicar los estilos
+     */
+    private void aplicarEstilosDinamicos(Control control) {
+        if (control == null) return;
+
+        // Listener para cambios en TextField
+        if (control instanceof TextField) {
+            TextField textField = (TextField) control;
+            textField.textProperty().addListener((obs, oldVal, newVal) -> {
+                Platform.runLater(() -> actualizarEstiloCampo(control));
+            });
+        }
+        // Listener para cambios en DatePicker
+        else if (control instanceof DatePicker) {
+            DatePicker datePicker = (DatePicker) control;
+            datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+                Platform.runLater(() -> actualizarEstiloCampo(control));
+            });
+        }
+
+        // Aplicar estilo inicial
+        Platform.runLater(() -> actualizarEstiloCampo(control));
+    }
+
+    /**
+     * Actualiza el estilo de un campo según su estado de validación.
+     *
+     * @param control Control a actualizar
+     */
+    private void actualizarEstiloCampo(Control control) {
+        if (control == null || validador == null) return;
+
+        // Verificar si el campo tiene contenido
+        boolean estaVacio = false;
+        if (control instanceof TextField) {
+            estaVacio = esTextoVacio(((TextField) control).getText());
+        } else if (control instanceof DatePicker) {
+            estaVacio = ((DatePicker) control).getValue() == null;
+        }
+
+        // Si está vacío, aplicar estilo por defecto
+        if (estaVacio) {
+            control.setStyle(ESTILO_DEFECTO);
+            return;
+        }
+
+        // Verificar si hay errores de validación para este control
+        ValidationResult resultado = validador.getValidationResult();
+        boolean tieneErrores = resultado.getErrors().stream()
+                .anyMatch(error -> error.getTarget() == control);
+
+        // Aplicar estilo según el estado
+        if (tieneErrores) {
+            control.setStyle(ESTILO_ERROR);
+        } else {
+            control.setStyle(ESTILO_VALIDO);
+        }
     }
 
     /**

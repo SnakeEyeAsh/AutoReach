@@ -23,6 +23,11 @@ java { //Se indica la versión de JDK que ha de utilizar
     }
 }
 
+// Configurar codificación UTF-8 para la compilación
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 application { //Definimos clase principal del proyecto
     mainClass = 'com.javafx.App.App'
     applicationDefaultJvmArgs = [

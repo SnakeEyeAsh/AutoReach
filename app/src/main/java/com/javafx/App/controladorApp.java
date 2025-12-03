@@ -1278,6 +1278,7 @@ public class controladorApp implements Initializable {
         btnCompras.setDisable(true);
         btnCerrarSesion.setDisable(true);
         btnIrAIngreso.setDisable(true);
+        btnEliminarCliente.setDisable(true);
     }
 
     private void iniciarTablas() {

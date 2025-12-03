@@ -10,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Control;
 import javafx.scene.control.SplitMenuButton;
+import javafx.scene.control.TextField;
 
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationResult;
@@ -26,6 +27,11 @@ public class ValidadorCliente {
 
     // Validador único que maneja todos los campos
     private ValidationSupport validador;
+
+    // Estilos CSS para los campos
+    private static final String ESTILO_ERROR = "-fx-background-color: #ffcccc;"; // Rojo pálido
+    private static final String ESTILO_VALIDO = "-fx-background-color: #ccffcc;"; // Verde pálido
+    private static final String ESTILO_DEFECTO = ""; // Sin estilo (color por defecto)
 
     /**
      * Inicializa el validador con todos los campos del formulario.
@@ -56,6 +62,16 @@ public class ValidadorCliente {
         registrarValidadorDni(dni);
         registrarValidadorFecha(fechaNac);
         registrarValidadorSexo(sexo);
+
+        // Aplicar estilos CSS a los campos
+        aplicarEstilosDinamicos(nombre);
+        aplicarEstilosDinamicos(apellidos);
+        aplicarEstilosDinamicos(direccion);
+        aplicarEstilosDinamicos(telefono);
+        aplicarEstilosDinamicos(email);
+        aplicarEstilosDinamicos(dni);
+        aplicarEstilosDinamicos(fechaNac);
+        aplicarEstilosDinamicos(sexo);
 
         // Inicializar decoraciones visuales
         Platform.runLater(() -> validador.initInitialDecoration());
@@ -340,6 +356,75 @@ public class ValidadorCliente {
             } catch (Exception e2) {
                 return null;
             }
+        }
+    }
+
+    /**
+     * Aplica estilos CSS dinámicos a un control según su estado de validación.
+     * - Rojo pálido si hay errores
+     * - Verde pálido si es válido y tiene contenido
+     * - Color por defecto si está vacío
+     *
+     * @param control Control al que aplicar los estilos
+     */
+    private void aplicarEstilosDinamicos(Control control) {
+        if (control == null) return;
+
+        // Listener para cambios en el texto (para TextField y similares)
+        if (control instanceof TextField) {
+            TextField textField = (TextField) control;
+            textField.textProperty().addListener((obs, oldVal, newVal) -> {
+                actualizarEstiloCampo(control);
+            });
+        }
+        // Listener para cambios en SplitMenuButton
+        else if (control instanceof SplitMenuButton) {
+            SplitMenuButton menu = (SplitMenuButton) control;
+            menu.textProperty().addListener((obs, oldVal, newVal) -> {
+                actualizarEstiloCampo(control);
+            });
+        }
+
+        // Aplicar estilo inicial
+        actualizarEstiloCampo(control);
+    }
+
+    /**
+     * Actualiza el estilo de un campo según su estado de validación.
+     *
+     * @param control Control a actualizar
+     */
+    private void actualizarEstiloCampo(Control control) {
+        if (control == null || validador == null) return;
+
+        // Verificar si el campo tiene contenido
+        boolean estaVacio = false;
+        if (control instanceof TextField) {
+            estaVacio = esTextoVacio(((TextField) control).getText());
+        } else if (control instanceof SplitMenuButton) {
+            String texto = ((SplitMenuButton) control).getText();
+            estaVacio = esTextoVacio(texto) ||
+                        texto.equalsIgnoreCase("Sexo") ||
+                        texto.equalsIgnoreCase("Selecciona") ||
+                        texto.equalsIgnoreCase("Seleccione");
+        }
+
+        // Si está vacío, aplicar estilo por defecto
+        if (estaVacio) {
+            control.setStyle(ESTILO_DEFECTO);
+            return;
+        }
+
+        // Verificar si hay errores de validación para este control
+        ValidationResult resultado = validador.getValidationResult();
+        boolean tieneErrores = resultado.getErrors().stream()
+                .anyMatch(error -> error.getTarget() == control);
+
+        // Aplicar estilo según el estado
+        if (tieneErrores) {
+            control.setStyle(ESTILO_ERROR);
+        } else {
+            control.setStyle(ESTILO_VALIDO);
         }
     }
 
