@@ -5,6 +5,7 @@ plugins {
 
 repositories {
 	mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 javafx {
@@ -12,10 +13,6 @@ javafx {
     modules = [ 'javafx.base', 'javafx.swing', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media']
 }
 
-dependencies {
-    //No es necesario incluir las dependencias porque ya lo hace el plugin por nosotros
-    implementation 'org.postgresql:postgresql:42.7.3'
-}
 
 java { //Se indica la versión de JDK que ha de utilizar
     toolchain {
@@ -45,9 +42,10 @@ sourceSets {
   }
 }
 dependencies {
-    
+
     implementation 'org.postgresql:postgresql:42.7.3'
-    implementation 'org.controlsfx:controlsfx:11.2.1' 
+    implementation 'org.controlsfx:controlsfx:11.2.1'
+    implementation 'io.github.mkpaz:atlantafx-base:2.0.1'
 }
 
 

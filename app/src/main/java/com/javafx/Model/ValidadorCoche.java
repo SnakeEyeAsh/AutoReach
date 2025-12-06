@@ -4,11 +4,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
+import javafx.util.Duration;
 
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
@@ -165,19 +167,19 @@ public class ValidadorCoche {
                 return ValidationResult.fromError(c, "El kilometraje es obligatorio");
             }
 
-            // Validar que sea un número
-            if (!texto.matches("^[0-9]+$")) {
-                return ValidationResult.fromError(c, "El kilometraje debe ser un número");
+            // Validar que sea un número (puede ser decimal con punto)
+            if (!texto.matches("^[0-9]+(\\.[0-9]+)?$")) {
+                return ValidationResult.fromError(c, "El kilometraje debe ser un número válido (puede usar punto decimal)");
             }
 
-            int kms;
+            double kms;
             try {
-                kms = Integer.parseInt(texto);
+                kms = Double.parseDouble(texto);
             } catch (NumberFormatException e) {
                 return ValidationResult.fromError(c, "Kilometraje inválido");
             }
 
-            // Validar rango razonable (0 - 1,000,000 km)
+            // Validar rango razonable (puede ser 0.0 hasta 1,000,000 km)
             if (kms < 0) {
                 return ValidationResult.fromError(c, "El kilometraje no puede ser negativo");
             }
@@ -198,16 +200,21 @@ public class ValidadorCoche {
                 return ValidationResult.fromError(c, "El número de bastidor es obligatorio");
             }
 
-            String bastidor = texto.trim().toUpperCase();
+            String bastidor = texto.trim();
 
             // El VIN estándar tiene 17 caracteres
             if (bastidor.length() != 17) {
-                return ValidationResult.fromError(c, "El número de bastidor debe tener 17 caracteres");
+                return ValidationResult.fromError(c, "El número de bastidor debe tener exactamente 17 caracteres");
             }
 
-            // Solo letras y números (sin I, O, Q para evitar confusión)
-            if (!bastidor.matches("^[A-HJ-NPR-Z0-9]{17}$")) {
-                return ValidationResult.fromError(c, "Bastidor inválido (solo letras y números, sin I, O, Q)");
+            // Verificar que todas las letras sean mayúsculas
+            if (!bastidor.equals(bastidor.toUpperCase())) {
+                return ValidationResult.fromError(c, "El bastidor debe contener solo letras MAYÚSCULAS");
+            }
+
+            // Verificar que no contenga las letras O, Q (prohibidas en VIN)
+            if (bastidor.contains("O") || bastidor.contains("Q")) {
+                return ValidationResult.fromError(c, "El bastidor no puede contener las letras O o Q");
             }
 
             return ValidationResult.fromInfo(c, "");
@@ -389,6 +396,7 @@ public class ValidadorCoche {
     /**
      * Comprueba las validaciones y muestra una alerta detallada si hay errores.
      * Útil para validar antes de guardar el formulario.
+     * Aplica un efecto de shake a los campos vacíos.
      *
      * @return true si todos los campos son válidos, false en caso contrario
      */
@@ -400,6 +408,12 @@ public class ValidadorCoche {
         if (resultado.getErrors().isEmpty()) {
             return true;
         }
+
+        // Aplicar efecto shake a los controles con errores
+        resultado.getErrors().forEach(error -> {
+            Control control = (Control) error.getTarget();
+            aplicarEfectoShake(control);
+        });
 
         // Recopilar mensajes de error
         List<String> errores = new ArrayList<>();
@@ -422,6 +436,22 @@ public class ValidadorCoche {
         alerta.showAndWait();
 
         return false;
+    }
+
+    /**
+     * Aplica un efecto de shake (movimiento horizontal) a un control.
+     *
+     * @param control Control al que aplicar el efecto
+     */
+    private void aplicarEfectoShake(Control control) {
+        if (control == null) return;
+
+        TranslateTransition shake = new TranslateTransition(Duration.millis(100), control);
+        shake.setFromX(0);
+        shake.setByX(10);
+        shake.setCycleCount(6);
+        shake.setAutoReverse(true);
+        shake.play();
     }
 
     /**
@@ -479,12 +509,20 @@ public class ValidadorCoche {
         if (control instanceof TextField) {
             TextField textField = (TextField) control;
             textField.textProperty().addListener((obs, oldVal, newVal) -> {
-                actualizarEstiloCampo(control);
+                // Usar Platform.runLater para asegurar que la validación se complete primero
+                Platform.runLater(() -> actualizarEstiloCampo(control));
+            });
+
+            // Listener adicional para cuando pierde el foco
+            textField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal) { // Cuando pierde el foco
+                    Platform.runLater(() -> actualizarEstiloCampo(control));
+                }
             });
         }
 
         // Aplicar estilo inicial
-        actualizarEstiloCampo(control);
+        Platform.runLater(() -> actualizarEstiloCampo(control));
     }
 
     /**

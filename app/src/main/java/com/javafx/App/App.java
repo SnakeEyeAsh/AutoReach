@@ -16,7 +16,7 @@ public class App extends Application{
     private static Stage stage;
 
      @Override
-    public void start(Stage primeraEscena) throws Exception { 
+    public void start(Stage primeraEscena) throws Exception {
 
         Parent root = FXMLLoader.load(getClass().getResource("/pantalla1.fxml"));
 
@@ -25,8 +25,8 @@ public class App extends Application{
         primeraEscena.setScene(scene);
         primeraEscena.setTitle("AutoReach");
         primeraEscena.show();
-        
-        
+
+
     }
 
     static Stage getStage(){

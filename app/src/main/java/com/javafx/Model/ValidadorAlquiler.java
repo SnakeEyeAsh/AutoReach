@@ -4,12 +4,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+import javafx.util.Duration;
 
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
@@ -140,6 +142,7 @@ public class ValidadorAlquiler {
     /**
      * Comprueba las validaciones y muestra una alerta detallada si hay errores.
      * Útil para validar antes de guardar el formulario.
+     * Aplica un efecto de shake a los campos vacíos.
      *
      * @return true si todos los campos son válidos, false en caso contrario
      */
@@ -151,6 +154,12 @@ public class ValidadorAlquiler {
         if (resultado.getErrors().isEmpty()) {
             return true;
         }
+
+        // Aplicar efecto shake a los controles con errores
+        resultado.getErrors().forEach(error -> {
+            Control control = (Control) error.getTarget();
+            aplicarEfectoShake(control);
+        });
 
         // Recopilar mensajes de error
         List<String> errores = new ArrayList<>();
@@ -173,6 +182,22 @@ public class ValidadorAlquiler {
         alerta.showAndWait();
 
         return false;
+    }
+
+    /**
+     * Aplica un efecto de shake (movimiento horizontal) a un control.
+     *
+     * @param control Control al que aplicar el efecto
+     */
+    private void aplicarEfectoShake(Control control) {
+        if (control == null) return;
+
+        TranslateTransition shake = new TranslateTransition(Duration.millis(100), control);
+        shake.setFromX(0);
+        shake.setByX(10);
+        shake.setCycleCount(6);
+        shake.setAutoReverse(true);
+        shake.play();
     }
 
     /**

@@ -10,6 +10,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.postgresql.core.SqlCommand;
+
 import com.javafx.Model.Alquiler;
 import com.javafx.Model.Cita;
 import com.javafx.Model.Cliente;
@@ -92,7 +94,6 @@ public class Conexion {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            System.out.println("NO hace el try");
         }
         return lista;
     }
@@ -139,7 +140,7 @@ public class Conexion {
 
                 Alquiler a = new Alquiler(fecha, hora, dni, matricula, fechaRecogida);
 
-                System.out.println(matricula);
+                // System.out.println(matricula);
 
                 lista.add(a);
             }
@@ -187,6 +188,38 @@ public class Conexion {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 7
     //////////////////////////////////////// CLIENTES////////////////////////////////////////////////////////////////////
     /// / ///////
+
+    public static List<Cliente> buscarClientes(String dni) {
+
+        String sql = "SELECT * FROM cliente WHERE dni_nif = ?;";
+
+        List<Cliente> lista = new ArrayList<>();
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+
+            ps.setString(1, dni);
+
+            ResultSet resultado = ps.executeQuery();
+
+            while (resultado.next()) {
+
+                String nombre = resultado.getString("nombre");
+                String apellido = resultado.getString("apellidos");
+                String telefono = resultado.getString("telefono");
+                String email = resultado.getString("email");
+                String direccion = resultado.getString("direccion");
+
+                Cliente c = new Cliente(nombre, apellido, dni, Double.parseDouble(telefono), email, direccion);
+                lista.add(c);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error al actualizar Lista de clientes " + e.getMessage());
+        }
+
+        return lista;
+
+    }
 
     public static void crearCliente(String nombre, String apellidos, String dni, String telefono, String email,
             String direccion, String fechaNac, String sexo) throws SQLException {
@@ -291,7 +324,9 @@ public class Conexion {
             String hora,
             String id_vehiculo,
             String cliente_id) throws SQLException {
-        System.out.println(fecha + fecha_fin);
+
+        // System.out.println(fecha + fecha_fin);
+
         String sql = "INSERT INTO transaccion(fecha,fecha_fin,precio_total,precio_cuota,deposito,estado,empleado_id,hora,id_vehiculo,cliente_dni) VALUES(?,?,?,?,?,?,?,?,?,?)";
 
         /// SOLUCION TEMPORAL EL ESTADO DEBE SER PENDIENTE EN PROCESO O FINALIZADA
@@ -321,7 +356,7 @@ public class Conexion {
 
     public static void actualizarAlquilado(String matricula) {
 
-        String sql = "UPDATE coche SET (disponible_alquiler, disponible_ventas) VALUES (false,false) WHERE matricula = ?;";
+        String sql = "UPDATE coche SET disponible_alquiler = false, disponible_ventas = false WHERE matricula = ?;";
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, matricula);
 
@@ -332,23 +367,57 @@ public class Conexion {
         }
     }
 
+    public static void liberarCoche(String matricula) {
+
+        String sql = "UPDATE coche SET disponible_alquiler = true, disponible_ventas = true WHERE matricula = ?;";
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, matricula);
+
+            int filas = ps.executeUpdate();
+            System.out.println("Filas afectadas al liberar coche: " + filas);
+        } catch (SQLException e) {
+            System.out.println("Error al liberar la disponibilidad del coche " + e.getMessage());
+        }
+    }
+
     public static List<String> obtenerMarcas() {
 
         List<String> lista = new ArrayList<>();
         try {
 
             Statement consulta = conexion.createStatement();
-            ResultSet resultado = consulta.executeQuery("SELECT marca FROM coche;");
+            ResultSet resultado = consulta.executeQuery("SELECT DISTINCT marca FROM coche;");
 
             while (resultado.next()) {
                 String marca = resultado.getString("marca");
 
                 lista.add(marca);
-                System.out.println(marca);
+                // System.out.println(marca);
             }
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }
+
+        return lista;
+    }
+
+    public static List<String> obtenerModelosPorMarca(String marca) {
+
+        List<String> lista = new ArrayList<>();
+        String sql = "SELECT DISTINCT modelo FROM coche WHERE marca = ? ORDER BY modelo;";
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, marca);
+            ResultSet resultado = ps.executeQuery();
+
+            while (resultado.next()) {
+                String modelo = resultado.getString("modelo");
+                lista.add(modelo);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error al obtener modelos: " + e.getMessage());
         }
 
         return lista;
@@ -390,6 +459,48 @@ public class Conexion {
         } catch (SQLException error) {
             System.out.println("Error en la consulta muestra de Coches: " + error.getMessage());
             error.printStackTrace(); // Útil para debugging
+        }
+
+        return lista;
+    }
+
+    public static ObservableList<Disponible> mostrarCoincidencias(String marca, String modelo) {
+
+        ObservableList<Disponible> lista = FXCollections.observableArrayList();
+
+        String sql = "SELECT * FROM coche WHERE marca = ? AND modelo = ?";
+
+        try (PreparedStatement consulta = conexion.prepareStatement(sql)) {
+
+            consulta.setString(1, marca);
+            consulta.setString(2, modelo);
+
+            try (ResultSet resultado = consulta.executeQuery()) {
+                while (resultado.next()) {
+
+                    Integer año = resultado.getInt("año");
+                    Double precio = resultado.getDouble("precio_base");
+                    Boolean disponible = resultado.getBoolean("disponible_alquiler");
+                    String color = resultado.getString("color");
+                    String dis = disponible ? "Si" : "No";
+                    String matricula = resultado.getString("matricula");
+
+                    double precioAlq = (precio / 1000) * 2;
+
+                    Disponible d = new Disponible(
+                            año.toString(),
+                            color,
+                            dis,
+                            precioAlq + "",
+                            matricula);
+
+                    lista.add(d);
+                }
+            }
+
+        } catch (SQLException error) {
+            System.out.println("Error en la consulta muestra de Coches por marca y modelo: " + error.getMessage());
+            error.printStackTrace();
         }
 
         return lista;
@@ -490,7 +601,7 @@ public class Conexion {
             System.err.println("Error al buscar coche: " + e.getMessage());
             e.printStackTrace();
         }
-        System.out.println(lista);
+        // System.out.println(lista);
         return lista;
     }
 
@@ -656,6 +767,58 @@ public class Conexion {
         } catch (SQLException error) {
             System.out.println("Error al borrar coche: " + error.getMessage());
         }
+    }
+
+    // Obtener matrículas de coches asociados a un cliente
+    public static List<String> obtenerMatriculasPorCliente(String dniCliente) {
+        List<String> matriculas = new ArrayList<>();
+        String sql = "SELECT DISTINCT id_vehiculo FROM transaccion WHERE cliente_dni = ?";
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, dniCliente);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                matriculas.add(rs.getString("id_vehiculo"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener matrículas del cliente: " + e.getMessage());
+        }
+
+        return matriculas;
+    }
+
+    // Obtener información completa de un coche por matrícula
+    public static CocheCompleto buscarCochePorMatricula(String matricula) {
+        CocheCompleto c = null;
+        String sql = "SELECT * FROM coche WHERE matricula = ?";
+
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, matricula);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                c = new CocheCompleto(
+                        rs.getString("num_bastidor"),
+                        rs.getString("marca"),
+                        rs.getString("modelo"),
+                        rs.getInt("año"),
+                        rs.getDouble("kilometraje"),
+                        rs.getBoolean("disponible_ventas"),
+                        rs.getBoolean("disponible_alquiler"),
+                        rs.getDouble("precio_base"),
+                        rs.getString("color"),
+                        rs.getString("diseño_llantas"),
+                        rs.getInt("diametro_llantas"),
+                        rs.getString("diseño_interior"),
+                        rs.getString("material_interior"),
+                        rs.getString("matricula"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al buscar coche por matrícula: " + e.getMessage());
+        }
+
+        return c;
     }
 
 }

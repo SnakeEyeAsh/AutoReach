@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
+
 
 import com.javafx.Data.Datos;
 import com.javafx.JDBC.Conexion;
@@ -23,18 +23,21 @@ import com.javafx.Model.ValidadorAlquiler;
 import com.javafx.Model.ValidadorCliente;
 import com.javafx.Model.ValidadorCoche;
 
+
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
+import javafx.collections.transformation.FilteredList;
+import javafx.util.Duration;
 
 import javafx.event.ActionEvent;
+import javafx.scene.input.KeyEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -65,6 +68,8 @@ public class controladorApp implements Initializable {
     private Boolean editarCliente = false;
 
     private boolean editandoAlquiler = false;
+
+    private boolean sesionActiva = false;
 
     @FXML
     private TextField ingresoAño;
@@ -210,7 +215,7 @@ public class controladorApp implements Initializable {
     private MenuButton mnElegirMarca;
 
     @FXML
-    private TextField txtElegirModelo;
+    private ComboBox<String> cmbElegirModelo;
 
     @FXML
     private ListView<Coche> listaCoincidencias;
@@ -274,6 +279,9 @@ public class controladorApp implements Initializable {
 
     @FXML
     private Button btnAñadirNuevoCliente;
+
+    @FXML
+    private Button btnCancelarEdicionIngreso;
 
     @FXML
     private Button btnBuscarCliente;
@@ -412,8 +420,7 @@ public class controladorApp implements Initializable {
 
     @FXML
     private AnchorPane panelNuevoCliente;
-    /////////////////////////////////////////// PANELES
-    /////////////////////////////////////////// //////////////////////////////////////
+    /////////////////////////////////////////// PANELES //////////////////////////////////////
 
     @FXML
     private Pane panelRegistro;
@@ -469,7 +476,7 @@ public class controladorApp implements Initializable {
     private TextField txtDni;
 
     @FXML
-    private TextField txtDniVer;
+    private ComboBox<String> comboDni;
 
     @FXML
     private TextField txtEmail;
@@ -498,6 +505,7 @@ public class controladorApp implements Initializable {
     private ValidadorCliente validador;
     private ValidadorCoche validadorC;
     private ValidadorAlquiler validadorAlquiler;
+    
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -528,12 +536,18 @@ public class controladorApp implements Initializable {
         mostrarPanel(paneLogin);
         deshabilitarBotonesCliente();
         llenarMenuMarcas();
+        configurarComboDni(); // Configurar ComboBox de DNI con filtrado
+        btnEditarCoche.setDisable(true); // Deshabilitar btnEditarCoche inicialmente
 
-        txtElegirModelo.setDisable(true);//////// Paralizacion temporal
+        // Deshabilitar ComboBox de modelo hasta que se seleccione una marca
+        cmbElegirModelo.setDisable(true);
+        cmbElegirModelo.setEditable(true);
 
         cliente = new Cliente("Ana", "Rodriguez", "12345678B", 623162788,
                 "ana.rodriguez@email.com", "Avenida de la Constitución 42, Barcelona");
 
+        // Configurar deselección al hacer clic fuera de las tablas
+        configurarDeseleccionTablas();
     }
 
     //////////////////////////////////////////////////////////////// -----LOGIN-----
@@ -550,7 +564,28 @@ public class controladorApp implements Initializable {
             // btnCompras.setDisable(false);
             btnCerrarSesion.setDisable(false);
             btnIrAIngreso.setDisable(false);
+
+            // Limpiar estilos de error si el login fue exitoso
+            txtUser.setStyle("");
+            txtContraseña.setStyle("");
         } else {
+            // Aplicar efecto shake y borde rojo a los campos con contenido incorrecto
+            if (!txtUser.getText().equals(Datos.ADMIN.toString())) {
+                aplicarEfectoShake(txtUser);
+                aplicarEstiloError(txtUser);
+            } else {
+                // Limpiar estilo si el usuario es correcto
+                txtUser.setStyle("");
+            }
+
+            if (!txtContraseña.getText().equals(Datos.PASSWORD.toString())) {
+                aplicarEfectoShake(txtContraseña);
+                aplicarEstiloError(txtContraseña);
+            } else {
+                // Limpiar estilo si la contraseña es correcta
+                txtContraseña.setStyle("");
+            }
+
             AlertaFallo.mostrar();
         }
     }
@@ -561,7 +596,7 @@ public class controladorApp implements Initializable {
     @FXML
     void crearCliente(ActionEvent event) {
 
-        txtDniVer.setDisable(true);
+        comboDni.setDisable(true);
         btnSeleccionCLiente.setDisable(true);
         btnEditarCliente.setDisable(true);
         btnCancelarSeleccion.setDisable(true);
@@ -596,19 +631,19 @@ public class controladorApp implements Initializable {
 
             try {
                 Conexion.crearCliente(nombre, apellidos, dni, telefono, email, direccion, fechaNac, sexo);
-                Alert alerta = new Alert(AlertType.CONFIRMATION);
-                alerta.setTitle("Cliente añadido");
-                alerta.setHeaderText("Éxito");
-                alerta.setContentText("El cliente ha sido creado correctamente");
-                alerta.showAndWait();
+                AlertaEstilizada.mostrarInformacion(
+                    "Cliente añadido",
+                    "Éxito",
+                    "El cliente ha sido creado correctamente"
+                );
                 limpiarCliente();
                 iniciarTablas();
             } catch (SQLException error) {
-                Alert alerta = new Alert(AlertType.ERROR);
-                alerta.setTitle("Error de base de datos");
-                alerta.setHeaderText("No se pudo crear el cliente");
-                alerta.setContentText("Error: " + error.getMessage());
-                alerta.showAndWait();
+                AlertaEstilizada.mostrarError(
+                    "Error de base de datos",
+                    "No se pudo crear el cliente",
+                    "Error: " + error.getMessage()
+                );
             }
         }
     }
@@ -625,7 +660,7 @@ public class controladorApp implements Initializable {
     @FXML
     void buscarLogin(ActionEvent event) {
 
-        txtDniVer.setDisable(false);
+        comboDni.setDisable(false);
         btnSeleccionCLiente.setDisable(false);
         btnEditarCliente.setDisable(false);
         btnCancelarSeleccion.setDisable(false);
@@ -661,11 +696,11 @@ public class controladorApp implements Initializable {
 
                     Conexion.editarCliente(c);
 
-                    Alert alerta = new Alert(AlertType.INFORMATION);
-                    alerta.setTitle("Cliente actualizado");
-                    alerta.setHeaderText("Éxito");
-                    alerta.setContentText("El cliente ha sido actualizado correctamente");
-                    alerta.showAndWait();
+                    AlertaEstilizada.mostrarInformacion(
+                        "Cliente actualizado",
+                        "Éxito",
+                        "El cliente ha sido actualizado correctamente"
+                    );
 
                     editarCliente = false;
                     limpiarCliente();
@@ -673,27 +708,47 @@ public class controladorApp implements Initializable {
                     deshabilitarBotonesCliente();
 
                 } catch (NumberFormatException e) {
-                    Alert alerta = new Alert(AlertType.ERROR);
-                    alerta.setTitle("Error de formato");
-                    alerta.setHeaderText("Teléfono inválido");
-                    alerta.setContentText("El teléfono debe contener solo números");
-                    alerta.showAndWait();
+                    AlertaEstilizada.mostrarError(
+                        "Error de formato",
+                        "Teléfono inválido",
+                        "El teléfono debe contener solo números"
+                    );
                 } catch (Exception e) {
-                    Alert alerta = new Alert(AlertType.ERROR);
-                    alerta.setTitle("Error al actualizar");
-                    alerta.setHeaderText("No se pudo actualizar el cliente");
-                    alerta.setContentText("Error: " + e.getMessage());
-                    alerta.showAndWait();
+                    AlertaEstilizada.mostrarError(
+                        "Error al actualizar",
+                        "No se pudo actualizar el cliente",
+                        "Error: " + e.getMessage()
+                    );
                 }
             }
         } else {
             // Modo selección normal (no edición)
             Cliente c = tablaRegistro.getSelectionModel().getSelectedItem();
             if (c != null) {
-                // Aquí puedes agregar lógica para seleccionar un cliente
-                // Por ejemplo, mostrarlo en los campos de solo lectura
+                // Asignar cliente seleccionado a la variable privada
+                cliente = c;
 
-                txtDniVer.setText(c.getDni());
+                // Rellenar los labels con la información del cliente
+                lblNombre.setText("Nombre: " + cliente.getNombre() + " " + cliente.getApellidos());
+                lblNumero.setText("Teléfono: " + (int)cliente.getTelefono());
+                lblEmail.setText("Email: " + cliente.getEmail());
+                lblSexo.setText("DNI: " + cliente.getDni());
+                lblEdad.setText("Dirección: " + cliente.getDireccion());
+
+                // Activar sesión
+                sesionActiva = true;
+
+                // Cargar matrículas de coches del cliente
+                cargarMatriculasCliente();
+
+                // Mostrar el panel de sesión
+                mostrarPanel(pantallaSesion);
+            } else {
+                AlertaEstilizada.mostrarAdvertencia(
+                    "Sin selección",
+                    "Ningún cliente seleccionado",
+                    "Por favor, selecciona un cliente de la tabla"
+                );
             }
         }
     }
@@ -703,11 +758,11 @@ public class controladorApp implements Initializable {
         Cliente c = tablaRegistro.getSelectionModel().getSelectedItem();
 
         if (c == null) {
-            Alert alerta = new Alert(AlertType.WARNING);
-            alerta.setTitle("Ningún cliente seleccionado");
-            alerta.setHeaderText("Selecciona un cliente");
-            alerta.setContentText("Por favor, selecciona un cliente de la tabla para editarlo");
-            alerta.showAndWait();
+            AlertaEstilizada.mostrarAdvertencia(
+                "Ningún cliente seleccionado",
+                "Selecciona un cliente",
+                "Por favor, selecciona un cliente de la tabla para editarlo"
+            );
             return;
         }
 
@@ -748,37 +803,37 @@ public class controladorApp implements Initializable {
         Cliente c = tablaRegistro.getSelectionModel().getSelectedItem();
 
         if (c == null) {
-            Alert alerta = new Alert(AlertType.WARNING);
-            alerta.setTitle("Ningún cliente seleccionado");
-            alerta.setHeaderText("Selecciona un cliente");
-            alerta.setContentText("Por favor, selecciona un cliente de la tabla para eliminarlo");
-            alerta.showAndWait();
+            AlertaEstilizada.mostrarAdvertencia(
+                "Ningún cliente seleccionado",
+                "Selecciona un cliente",
+                "Por favor, selecciona un cliente de la tabla para eliminarlo"
+            );
             return;
         }
 
         // Confirmar eliminación
-        Alert confirmacion = new Alert(AlertType.CONFIRMATION);
-        confirmacion.setTitle("Confirmar eliminación");
-        confirmacion.setHeaderText("¿Eliminar cliente?");
-        confirmacion.setContentText(
-                "¿Estás seguro de que deseas eliminar a " + c.getNombre() + " " + c.getApellidos() + "?");
+        boolean confirmado = AlertaEstilizada.confirmar(
+            "Confirmar eliminación",
+            "¿Eliminar cliente?",
+            "¿Estás seguro de que deseas eliminar a " + c.getNombre() + " " + c.getApellidos() + "?"
+        );
 
-        if (confirmacion.showAndWait().get() == ButtonType.OK) {
+        if (confirmado) {
             try {
                 Conexion.eliminarCliente(c);
-                Alert alerta = new Alert(AlertType.INFORMATION);
-                alerta.setTitle("Cliente eliminado");
-                alerta.setHeaderText("Éxito");
-                alerta.setContentText("El cliente ha sido eliminado correctamente");
-                alerta.showAndWait();
+                AlertaEstilizada.mostrarInformacion(
+                    "Cliente eliminado",
+                    "Éxito",
+                    "El cliente ha sido eliminado correctamente"
+                );
                 iniciarTablas();
                 limpiarCliente();
             } catch (Exception e) {
-                Alert alerta = new Alert(AlertType.ERROR);
-                alerta.setTitle("Error al eliminar");
-                alerta.setHeaderText("No se pudo eliminar el cliente");
-                alerta.setContentText("Error: " + e.getMessage());
-                alerta.showAndWait();
+                AlertaEstilizada.mostrarError(
+                    "Error al eliminar",
+                    "No se pudo eliminar el cliente",
+                    "Error: " + e.getMessage()
+                );
             }
         }
     }
@@ -806,8 +861,7 @@ public class controladorApp implements Initializable {
 
     ////////////////////////////////////////////////////////////////////////////////// -
     /// ----------CITAS-----------------//////////////////////////
-    /// /
-    ////////////////////////////////////////////////////////////////////////////////// //////////////////////////////////////////////////////////////////////////////////
+    /// / //////////////////////////////////////////////////////////////////////////////////
 
     @FXML
     void guardarCita(ActionEvent event) {
@@ -847,7 +901,7 @@ public class controladorApp implements Initializable {
     @FXML
     void confirmarAlquiler(ActionEvent event) {
 
-        if(validadorAlquiler.esFormularioValido()){
+        if(validadorAlquiler.validarYMostrarErrores()){
             if (!editandoAlquiler) {
                 Disponible d = TblCoincidencias.getSelectionModel().getSelectedItem();
 
@@ -857,7 +911,8 @@ public class controladorApp implements Initializable {
                 long dias = ChronoUnit.DAYS.between(fecha, fechaFin);
                 double precioTotal = dias * Double.parseDouble(d.getPrecio());
                 String estado = d.getDisponible().equals("si") ? "en_proceso" : "pendiente";
-                try {
+                if(d.getDisponible().toLowerCase().equals("si")){
+                    try {
 
                     Conexion.crearAlquiler(
                             fecha.toString(),
@@ -869,10 +924,19 @@ public class controladorApp implements Initializable {
                             txtHoraEntrega.getText(),
                             d.getMatricula(),
                             cliente.getDni());
-                } catch (SQLException e) {
-                    System.out.println("Error al incertar cita desde controlador " + e.getMessage());
+                    } catch (SQLException e) {
+                        System.out.println("Error al incertar cita desde controlador " + e.getMessage());
+                    }finally{
+                        Conexion.actualizarAlquilado(d.getMatricula());
+                    }
+                }else{
+                    /////////ALERTA UNICA
+                    AlertaEstilizada.mostrarError(
+                        "Coche no disponible",
+                        "Cuidado",
+                        "No puedes alquilar un coche que no se encuentra disponible"
+                    );
                 }
-                Conexion.actualizarAlquilado(d.getMatricula());
 
             } else {
                 try {
@@ -886,7 +950,7 @@ public class controladorApp implements Initializable {
                     System.out.println("Error al actualizar alquiler" + e.getMessage());
                 }
                 mnElegirMarca.setDisable(false);
-                txtElegirModelo.setDisable(false);
+                cmbElegirModelo.setDisable(false);
                 btnBuscarMatricula.setDisable(false);
                 btnCancelarMatricula.setDisable(false);
                 cldRecoger.getEditor().clear();
@@ -902,7 +966,7 @@ public class controladorApp implements Initializable {
     @FXML
     void cancelarAlquiler(ActionEvent event) {
         mnElegirMarca.setText("Marca");
-        txtElegirModelo.clear();
+        cmbElegirModelo.getSelectionModel().clearSelection();
         TblCoincidencias.getItems().clear();
         cldRecoger.getEditor().clear();
         txtHoraEntrega.clear();
@@ -917,7 +981,7 @@ public class controladorApp implements Initializable {
             editandoAlquiler = true;
 
             mnElegirMarca.setDisable(true);
-            txtElegirModelo.setDisable(true);
+            cmbElegirModelo.setDisable(true);
             btnBuscarMatricula.setDisable(true);
             btnCancelarMatricula.setDisable(true);
 
@@ -930,28 +994,78 @@ public class controladorApp implements Initializable {
             txtHoraEntrega.setText(hora);
 
         } else {
-            Alert alerta = new Alert(AlertType.ERROR);
-            alerta.setHeaderText("Error");
-            alerta.setContentText("Debes seleccionar un alquiler para editarlo");
-            alerta.showAndWait();
-
+            AlertaEstilizada.mostrarError(
+                "Error",
+                "Sin selección",
+                "Debes seleccionar un alquiler para editarlo"
+            );
         }
 
     }
 
     @FXML
     void borrarAlq(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        Alquiler a = tblAlquiler.getSelectionModel().getSelectedItem();
 
+        if (a == null) {
+            AlertaEstilizada.mostrarAdvertencia(
+                "Ningún alquiler seleccionado",
+                "Selecciona un alquiler",
+                "Por favor, selecciona un alquiler de la tabla para eliminarlo"
+            );
+            return;
+        }
+
+        // Confirmar eliminación
+        boolean confirmado = AlertaEstilizada.confirmar(
+            "Confirmar eliminación",
+            "¿Eliminar alquiler?",
+            "¿Estás seguro de que deseas eliminar el alquiler del vehículo " + a.getMatricula() + "?"
+        );
+
+        if (confirmado) {
+            try {
+                Conexion.eliminarAlquiler(a.getMatricula());
+                Conexion.liberarCoche(a.getMatricula());
+                AlertaEstilizada.mostrarInformacion(
+                    "Alquiler eliminado",
+                    "Éxito",
+                    "El alquiler ha sido eliminado correctamente"
+                );
+                iniciarTablas();
+            } catch (Exception e) {
+                AlertaEstilizada.mostrarError(
+                    "Error al eliminar",
+                    "No se pudo eliminar el alquiler",
+                    "Error: " + e.getMessage()
+                );
+            }
+        }
     }
 
     @FXML
     void buscarMatricula(ActionEvent event) {
 
-        // TblCoincidencias.getItems().clear();
         String marca = mnElegirMarca.getText();
-        // String modelo = txtElegirModelo.getText();
-        TblCoincidencias.setItems(Conexion.mostrarCoincidencias(marca));
+        String modelo = cmbElegirModelo.getSelectionModel().getSelectedItem();
+
+        // Validar que se haya seleccionado al menos una marca
+        if (marca == null || marca.equals("Marca") || marca.trim().isEmpty()) {
+            AlertaEstilizada.mostrarAdvertencia(
+                "Marca no seleccionada",
+                "Selecciona una marca",
+                "Por favor, selecciona una marca antes de buscar"
+            );
+            return;
+        }
+
+        // Buscar por marca y modelo si ambos están seleccionados, sino solo por marca
+        if (modelo != null && !modelo.trim().isEmpty()) {
+            TblCoincidencias.setItems(Conexion.mostrarCoincidencias(marca, modelo));
+        } else {
+            TblCoincidencias.setItems(Conexion.mostrarCoincidencias(marca));
+        }
+
         clnAñoCoche.setCellValueFactory(new PropertyValueFactory<>("año"));
         clnDisponibleCoche.setCellValueFactory(new PropertyValueFactory<>("Disponible"));
         clnColorCoche.setCellValueFactory(new PropertyValueFactory<>("Color"));
@@ -963,16 +1077,14 @@ public class controladorApp implements Initializable {
     @FXML
     void cancelarBusquedaMatricula(ActionEvent event) {
         mnElegirMarca.setText("Marca");
-        ;
-        txtElegirModelo.clear();
+        cmbElegirModelo.getSelectionModel().clearSelection();
         TblCoincidencias.getItems().clear();
     }
 
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////// -----------COMPRA------------//////////////////////////////////////////////
-    /// /
-    /// ///////////////////////////////////////////////////////////////////////////////////
+    /// / ///////////////////////////////////////////////////////////////////////////////////
 
     @FXML
     void efectuarCompra(ActionEvent event) {
@@ -989,7 +1101,7 @@ public class controladorApp implements Initializable {
             stage.showAndWait();
 
         } catch (IOException e) {
-            System.out.println(e.getMessage() + "Hola");
+            System.out.println(e.getMessage() + "Error al efectuar Compra");
         }
 
     }
@@ -1038,12 +1150,11 @@ public class controladorApp implements Initializable {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -
     /// -------INGRESOS----------------- ///////////////////////////////////
-    /// /
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// / //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @FXML
     void aceptarIngreso(ActionEvent event) {
 
-        if (validadorC.esFormularioValido()) {
+        if (validadorC.validarYMostrarErrores()) {
             String marca = ingresoMarca.getText();
             String modelo = ingresoModelo.getText();
             String año = ingresoAño.getText();
@@ -1075,7 +1186,7 @@ public class controladorApp implements Initializable {
                         matricula);
 
             } catch (SQLException e) {
-                System.out.println("error al incertar Coche" + e.getMessage());
+                System.out.println("Error al incertar Coche" + e.getMessage());
             }
             limpiarIngreso();
         }
@@ -1088,11 +1199,21 @@ public class controladorApp implements Initializable {
 
     @FXML
     void editarIngreso(ActionEvent event) {
+        Coche c = TablaCoches.getSelectionModel().getSelectedItem();
+
+        if (c == null) {
+            AlertaEstilizada.mostrarAdvertencia(
+                "Ningún coche seleccionado",
+                "Selecciona un coche",
+                "Por favor, selecciona un coche de la tabla para editarlo"
+            );
+            return;
+        }
+
         btnAceptarIngreso.setDisable(true);
         btnCancelarIngresos.setDisable(true);
         btnBorrarIngreso.setDisable(true);
-
-        Coche c = TablaCoches.getSelectionModel().getSelectedItem();
+        btnEditarCoche.setDisable(false); // Habilitar btnEditarCoche
 
         CocheCompleto cc = Conexion.buscarIngreso(c.getBastidor());
 
@@ -1134,6 +1255,7 @@ public class controladorApp implements Initializable {
         btnAceptarIngreso.setDisable(false);
         btnCancelarIngresos.setDisable(false);
         btnBorrarIngreso.setDisable(false);
+        btnEditarCoche.setDisable(true); // Deshabilitar btnEditarCoche después de guardar
 
         limpiarIngreso();
         iniciarTablas();
@@ -1154,25 +1276,39 @@ public class controladorApp implements Initializable {
 
     }
 
+    @FXML
+    void cancelarEdicionIngreso(ActionEvent event) {
+        // Limpiar todos los campos de ingreso
+        limpiarIngreso();
+
+        // Deseleccionar la tabla
+        TablaCoches.getSelectionModel().clearSelection();
+
+        // Rehabilitar botones
+        btnAceptarIngreso.setDisable(false);
+        btnCancelarIngresos.setDisable(false);
+        btnBorrarIngreso.setDisable(false);
+        btnEditarCoche.setDisable(true);
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////// /
     /// ////////////////////------SALIR----------------//////////////////////////////
     /// //////////
-    /// /
-    ///////////////////////////////////////////////////////////////////////////////////////////// /////////////////////////////////////////////////////////////////////////////////////
+    /// / /////////////////////////////////////////////////////////////////////////////////////
     @FXML
     void cerrarSesion(ActionEvent event) {
-        Alert alerta = new Alert(AlertType.WARNING);
-        alerta.setHeaderText("Saliendo del Programa");
-        alerta.setContentText("Seguro que quieres salir del programa");
-        alerta.getButtonTypes().addAll(ButtonType.CANCEL);
+        boolean confirmado = AlertaEstilizada.confirmar(
+            "Salir del programa",
+            "Saliendo del Programa",
+            "¿Seguro que quieres salir del programa?"
+        );
 
-        Optional<ButtonType> opcion = alerta.showAndWait();
-
-        if (opcion.isPresent() && opcion.get().equals(ButtonType.OK)) {
+        if (confirmado) {
+            // Desactivar sesión antes de cerrar
+            sesionActiva = false;
+            cliente = null;
             Stage escena = (Stage) btnIrAInicio.getScene().getWindow();
             escena.close();
-        } else {
-            alerta.close();
         }
     }
 
@@ -1186,6 +1322,14 @@ public class controladorApp implements Initializable {
 
     @FXML
     void irAalquiler(ActionEvent event) {
+        if (!sesionActiva) {
+            AlertaEstilizada.mostrarAdvertencia(
+                "Acceso denegado",
+                "Sesión no iniciada",
+                "Debes seleccionar un cliente antes de acceder al módulo de alquiler"
+            );
+            return;
+        }
         mostrarPanel(pantallaAlquiler);
         cambiarColores.cambiar(btnAlquiler, btnIrAInicio, btnCompras, btnCitas, btnIrAIngreso);
     }
@@ -1210,8 +1354,7 @@ public class controladorApp implements Initializable {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////// -
     /// ------
-    /// -
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// - ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     ///
@@ -1222,24 +1365,280 @@ public class controladorApp implements Initializable {
 
         for (int i = 0; i < lista.size(); i++) {
             String nombreMarca = lista.get(i);
-            MenuItem m = new MenuItem(nombreMarca);
 
-            // Cuando se pulse, actualizar el texto del MenuButton
-            m.setOnAction(e -> {
-                mnElegirMarca.setText(nombreMarca);
-                System.out.println("Marca seleccionada: " + nombreMarca);
-            });
+            // Verificar si la marca ya existe en el menú
+            boolean marcaExiste = mnElegirMarca.getItems().stream()
+                    .anyMatch(item -> item.getText().equals(nombreMarca));
 
-            mnElegirMarca.getItems().add(m);
+            if (!marcaExiste) {
+                MenuItem m = new MenuItem(nombreMarca);
+
+                // Cuando se pulse, actualizar el texto del MenuButton y cargar modelos
+                m.setOnAction(e -> {
+                    mnElegirMarca.setText(nombreMarca);
+                    System.out.println("Marca seleccionada: " + nombreMarca);
+                    // Habilitar y cargar modelos para esta marca
+                    cargarModelosPorMarca(nombreMarca);
+                });
+
+                mnElegirMarca.getItems().add(m);
+            }
         }
+    }
+
+    /**
+     * Carga los modelos disponibles para una marca específica en el ComboBox
+     */
+    private void cargarModelosPorMarca(String marca) {
+        // Limpiar selección anterior
+        cmbElegirModelo.getSelectionModel().clearSelection();
+        cmbElegirModelo.getEditor().clear();
+
+        // Obtener modelos de la marca seleccionada
+        List<String> modelos = Conexion.obtenerModelosPorMarca(marca);
+
+        // Crear lista filtrable con los modelos
+        FilteredList<String> filteredModelos = new FilteredList<>(
+            javafx.collections.FXCollections.observableArrayList(modelos),
+            p -> true
+        );
+
+        // Configurar el ComboBox con la lista filtrada
+        cmbElegirModelo.setItems(filteredModelos);
+        cmbElegirModelo.setEditable(true);
+        cmbElegirModelo.setDisable(false); // Habilitar el ComboBox
+
+        // Obtener el editor del ComboBox
+        TextField txtComboModelo = cmbElegirModelo.getEditor();
+
+        // EventFilter: bloquear el espacio
+        txtComboModelo.addEventFilter(KeyEvent.KEY_TYPED, event -> {
+            if (event.getCharacter().equals(" ")) {
+                event.consume();
+            }
+        });
+
+        // Listener para filtrar mientras se escribe
+        txtComboModelo.textProperty().addListener((obs, oldValue, newValue) -> {
+            final String selected = cmbElegirModelo.getSelectionModel().getSelectedItem();
+
+            // Si está vacío, restaurar filtro y ocultar
+            if (newValue == null || newValue.trim().isEmpty()) {
+                filteredModelos.setPredicate(p -> true);
+                cmbElegirModelo.hide();
+                return;
+            }
+
+            // Si no hay nada seleccionado o se está escribiendo algo diferente
+            if (selected == null || !selected.equals(newValue)) {
+                // Filtrar modelos que empiecen o contengan el texto
+                filteredModelos.setPredicate(p ->
+                    p.toLowerCase().startsWith(newValue.toLowerCase().trim()) ||
+                    p.toLowerCase().contains(newValue.toLowerCase().trim())
+                );
+                cmbElegirModelo.setVisibleRowCount(5);
+                cmbElegirModelo.show();
+            } else {
+                filteredModelos.setPredicate(p -> true);
+            }
+        });
+
+        // Listener para la selección
+        cmbElegirModelo.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                txtComboModelo.positionCaret(txtComboModelo.getText().length());
+            }
+        });
+    }
+
+    /**
+     * Configura el ComboBox de DNI con filtrado y autocompletado
+     * Los DNIs se obtienen de la tabla de clientes
+     */
+    private void configurarComboDni() {
+        // Crear lista filtrable con los DNIs de los clientes
+        FilteredList<String> filteredDnis = new FilteredList<>(
+            tablaRegistro.getItems().stream()
+                .map(Cliente::getDni)
+                .collect(javafx.collections.FXCollections::observableArrayList,
+                         java.util.List::add,
+                         java.util.List::addAll),
+            p -> true
+        );
+
+        // Configurar el ComboBox con la lista filtrada
+        comboDni.setItems(filteredDnis);
+        comboDni.setEditable(true);
+
+        // Obtener el editor del ComboBox (TextField interno)
+        TextField txtComboDni = comboDni.getEditor();
+
+        // EventFilter: bloquear el espacio para evitar problemas
+        txtComboDni.addEventFilter(KeyEvent.KEY_TYPED, event -> {
+            if (event.getCharacter().equals(" ")) {
+                event.consume(); // Bloquea que se escriba el espacio
+            }
+        });
+
+        // Listener para el texto: filtrar DNIs mientras se escribe
+        txtComboDni.textProperty().addListener((obs, oldValue, newValue) -> {
+            final String selected = comboDni.getSelectionModel().getSelectedItem();
+
+            // Si el campo está vacío, restaurar filtro y ocultar dropdown
+            if (newValue == null || newValue.trim().isEmpty()) {
+                filteredDnis.setPredicate(p -> true);
+                comboDni.hide();
+                return;
+            }
+
+            // Si no hay nada seleccionado o se está escribiendo algo diferente
+            if (selected == null || !selected.equals(newValue)) {
+                // Filtrar DNIs que empiecen con el texto escrito
+                filteredDnis.setPredicate(p -> p.toLowerCase().startsWith(newValue.toLowerCase().trim()));
+                comboDni.setVisibleRowCount(5);
+                comboDni.show();
+            } else {
+                // Si se seleccionó algo, quitar el filtro
+                filteredDnis.setPredicate(p -> true);
+            }
+        });
+
+        // Listener para la selección: posicionar cursor al final y buscar cliente
+        comboDni.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                txtComboDni.positionCaret(txtComboDni.getText().length());
+                // Buscar y seleccionar el cliente con este DNI
+                buscarYSeleccionarClientePorDni(newValue);
+            }
+        });
+    }
+
+    /**
+     * Busca un cliente por DNI en la tabla y lo selecciona automáticamente
+     */
+    private void buscarYSeleccionarClientePorDni(String dni) {
+        // Buscar el cliente en la tabla
+        for (Cliente c : tablaRegistro.getItems()) {
+            if (c.getDni().equals(dni)) {
+                // Seleccionar el cliente en la tabla
+                tablaRegistro.getSelectionModel().select(c);
+                // Scroll para hacerlo visible
+                tablaRegistro.scrollTo(c);
+
+                // Asignar cliente seleccionado a la variable privada
+                cliente = c;
+
+                // Rellenar los labels con la información del cliente
+                lblNombre.setText("Nombre: " + cliente.getNombre() + " " + cliente.getApellidos());
+                lblNumero.setText("Teléfono: " + (int)cliente.getTelefono());
+                lblEmail.setText("Email: " + cliente.getEmail());
+                lblSexo.setText("DNI: " + cliente.getDni());
+                lblEdad.setText("Dirección: " + cliente.getDireccion());
+
+                // Activar sesión
+                sesionActiva = true;
+
+                // Cargar matrículas de coches del cliente
+                cargarMatriculasCliente();
+
+                // Mostrar el panel de sesión
+                mostrarPanel(pantallaSesion);
+
+                return;
+            }
+        }
+
+        // Si no se encuentra, mostrar advertencia
+        AlertaEstilizada.mostrarAdvertencia(
+            "Cliente no encontrado",
+            "DNI no válido",
+            "No se encontró ningún cliente con el DNI: " + dni
+        );
+    }
+
+    /**
+     * Configura todas las tablas para que se deseleccionen al hacer clic fuera de ellas
+     */
+    private void configurarDeseleccionTablas() {
+        // Ejecutar después de que se cargue la escena
+        Platform.runLater(() -> {
+            // Esperar a que las tablas estén completamente cargadas
+            Platform.runLater(() -> {
+                // Agregar listener global a la escena
+                if (btnIrAInicio.getScene() != null) {
+                    btnIrAInicio.getScene().setOnMousePressed(event -> {
+                        // Verificar si el clic NO fue en ninguna tabla
+                        if (!esClicEnAlgunaTabla(event.getTarget())) {
+                            // Deseleccionar todas las tablas
+                            deseleccionarTodasLasTablas();
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    /**
+     * Verifica si el clic fue dentro de alguna tabla
+     */
+    private boolean esClicEnAlgunaTabla(Object target) {
+        return esHijoDeTabla(target, tablaRegistro) ||
+               esHijoDeTabla(target, TablaCoches) ||
+               esHijoDeTabla(target, tblCitas) ||
+               esHijoDeTabla(target, tblAlquiler) ||
+               esHijoDeTabla(target, TblCoincidencias) ||
+               esHijoDeTabla(target, tblOpcionesCompra);
+    }
+
+    /**
+     * Deselecciona todas las tablas de la aplicación
+     */
+    private void deseleccionarTodasLasTablas() {
+        if (tablaRegistro != null) {
+            tablaRegistro.getSelectionModel().clearSelection();
+        }
+        if (TablaCoches != null) {
+            TablaCoches.getSelectionModel().clearSelection();
+        }
+        if (tblCitas != null) {
+            tblCitas.getSelectionModel().clearSelection();
+        }
+        if (tblAlquiler != null) {
+            tblAlquiler.getSelectionModel().clearSelection();
+        }
+        if (TblCoincidencias != null) {
+            TblCoincidencias.getSelectionModel().clearSelection();
+        }
+        if (tblOpcionesCompra != null) {
+            tblOpcionesCompra.getSelectionModel().clearSelection();
+        }
+    }
+
+    /**
+     * Verifica si un nodo es hijo de una tabla
+     */
+    private boolean esHijoDeTabla(Object target, TableView<?> tabla) {
+        if (!(target instanceof javafx.scene.Node)) {
+            return false;
+        }
+
+        javafx.scene.Node nodo = (javafx.scene.Node) target;
+        while (nodo != null) {
+            if (nodo == tabla) {
+                return true;
+            }
+            nodo = nodo.getParent();
+        }
+        return false;
     }
 
     private void deshabilitarBotonesCliente() {
 
-        txtDniVer.setDisable(true);
-        btnSeleccionCLiente.setDisable(true);
-        btnEditarCliente.setDisable(true);
-        btnCancelarSeleccion.setDisable(true);
+        comboDni.setDisable(true);
+        //btnSeleccionCLiente.setDisable(true);
+        //btnEditarCliente.setDisable(true);
+        //btnEliminarCliente.setDisable(true);
+        //btnCancelarSeleccion.setDisable(true);
         txtNombre.setDisable(true);
         txtApellidos.setDisable(true);
         txtDireccion.setDisable(true);
@@ -1278,7 +1677,7 @@ public class controladorApp implements Initializable {
         btnCompras.setDisable(true);
         btnCerrarSesion.setDisable(true);
         btnIrAIngreso.setDisable(true);
-        btnEliminarCliente.setDisable(true);
+        
     }
 
     private void iniciarTablas() {
@@ -1381,6 +1780,99 @@ public class controladorApp implements Initializable {
     @FXML
     void setLujo(ActionEvent event) {
         slcPatronCompra.setText(lujo.getText());
+    }
+
+    /**
+     * Aplica un efecto de shake (movimiento horizontal) a un control TextField.
+     * Útil para indicar visualmente que un campo tiene un error o contenido incorrecto.
+     *
+     * @param textField TextField al que aplicar el efecto
+     */
+    private void aplicarEfectoShake(TextField textField) {
+        if (textField == null) return;
+
+        TranslateTransition shake = new TranslateTransition(Duration.millis(100), textField);
+        shake.setFromX(0);
+        shake.setByX(10);
+        shake.setCycleCount(6);
+        shake.setAutoReverse(true);
+        shake.play();
+    }
+
+    /**
+     * Aplica un estilo visual de error a un TextField.
+     * Muestra un borde rojo y fondo ligeramente rojizo para indicar un error.
+     *
+     * @param textField TextField al que aplicar el estilo de error
+     */
+    private void aplicarEstiloError(TextField textField) {
+        if (textField == null) return;
+
+        textField.setStyle(
+            "-fx-border-color: #ff0000; " +
+            "-fx-border-width: 2px; " +
+            "-fx-border-radius: 3px; " +
+            "-fx-background-color: #ffcccc;"
+        );
+    }
+
+    /**
+     * Carga las matrículas de los coches asociados al cliente actual en el MenuButton
+     */
+    private void cargarMatriculasCliente() {
+        if (cliente == null) return;
+
+        // Limpiar el menú
+        slcMatriculaLogin.getItems().clear();
+        slcMatriculaLogin.setText("Matricula");
+
+        // Obtener matrículas del cliente
+        List<String> matriculas = Conexion.obtenerMatriculasPorCliente(cliente.getDni());
+
+        // Agregar cada matrícula como MenuItem
+        for (String matricula : matriculas) {
+            MenuItem item = new MenuItem(matricula);
+            item.setOnAction(e -> mostrarInfoCoche(matricula));
+            slcMatriculaLogin.getItems().add(item);
+        }
+
+        // Si no hay matrículas, mostrar mensaje
+        if (matriculas.isEmpty()) {
+            lblMarca.setText("Sin vehículos asociados");
+            lblModelo.setText("");
+            lblAño.setText("");
+            lblKms.setText("");
+            lblNBastidor.setText("");
+        }
+    }
+
+    /**
+     * Muestra la información del coche en los labels correspondientes
+     * @param matricula La matrícula del coche a mostrar
+     */
+    private void mostrarInfoCoche(String matricula) {
+        slcMatriculaLogin.setText(matricula);
+
+        CocheCompleto coche = Conexion.buscarCochePorMatricula(matricula);
+
+        if (coche != null) {
+            lblMarca.setText("Marca: " + coche.getMarca());
+            lblModelo.setText("Modelo: " + coche.getModelo());
+            lblAño.setText("Año: " + coche.getAño());
+            lblKms.setText("Kilometraje: " + coche.getKilometraje() + " km");
+            lblNBastidor.setText("Bastidor: " + coche.getNumBastidor());
+
+            // Cargar información adicional en la lista
+            tablaDeInformacion.getItems().clear();
+            tablaDeInformacion.getItems().add("Color: " + coche.getColor());
+            tablaDeInformacion.getItems().add("Precio: " + coche.getPrecioBase() + "€");
+            tablaDeInformacion.getItems().add("Diseño Interior: " + coche.getDisenoInterior());
+            tablaDeInformacion.getItems().add("Material Interior: " + coche.getMaterialInterior());
+            tablaDeInformacion.getItems().add("Diseño Llantas: " + coche.getDisenoLlantas());
+            tablaDeInformacion.getItems().add("Diámetro Llantas: " + coche.getDiametroLlantas() + "\"");
+            tablaDeInformacion.getItems().add("Disponible Venta: " + (coche.getDisponibleVentas() ? "Sí" : "No"));
+            tablaDeInformacion.getItems().add("Disponible Alquiler: " + (coche.getDisponibleAlquiler() ? "Sí" : "No"));
+        }
     }
 
 }
