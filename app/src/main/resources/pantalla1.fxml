@@ -27,9 +27,9 @@
    <children>
       <ToolBar depthTest="DISABLE" orientation="VERTICAL" prefHeight="534.0" prefWidth="110.0" style="-fx-background-color: orange; -fx-padding: 2;">
          <items>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox prefHeight="548.0" prefWidth="120.0">
                <children>
-                  <Button fx:id="btnIrAInicio" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAInicio" prefHeight="26.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Inicio">
+                  <Button fx:id="btnIrAInicio" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAInicio" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Inicio">
                      <graphic>
                         <ImageView fx:id="btnInicio" fitHeight="48.0" fitWidth="48.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -41,7 +41,7 @@
                         <Insets bottom="10.0" top="30.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnCitas" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcitas" prefHeight="26.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Citas">
+                  <Button fx:id="btnCitas" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcitas" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Citas">
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -53,7 +53,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnAlquiler" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAalquiler" prefHeight="26.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Alquiler">
+                  <Button fx:id="btnAlquiler" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAalquiler" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Alquiler">
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -65,7 +65,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnCompras" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcompras" prefHeight="26.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Compras">
+                  <Button fx:id="btnCompras" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcompras" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Compras">
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -77,7 +77,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnIrAIngreso" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAIngresos" prefHeight="26.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Ingresos">
+                  <Button fx:id="btnIrAIngreso" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAIngresos" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Ingresos">
                      <graphic>
                         <ImageView fx:id="btnInicio1" fitHeight="48.0" fitWidth="48.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -89,7 +89,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnCerrarSesion" contentDisplay="TOP" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="78.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Salir">
+                  <Button fx:id="btnCerrarSesion" contentDisplay="TOP" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="78.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Salir">
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="51.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -501,7 +501,7 @@
                   <Button fx:id="btnCompra" layoutX="471.0" layoutY="529.0" mnemonicParsing="false" onAction="#efectuarCompra" prefHeight="26.0" prefWidth="106.0" text="Aceptar" />
                   <Button fx:id="btnCancelarCompra" layoutX="589.0" layoutY="529.0" mnemonicParsing="false" onAction="#cancelarCompra" prefHeight="26.0" prefWidth="95.0" text="Cancelar" />
                </children></Pane>
-            <Pane fx:id="panelIngreso" prefHeight="200.0" prefWidth="200.0">
+            <Pane fx:id="panelIngreso" prefHeight="200.0" prefWidth="200.0" visible="false">
                <children>
                   <HBox layoutX="1.0" prefHeight="38.0" prefWidth="724.0">
                      <children>
@@ -855,7 +855,7 @@
                   </HBox>
                </children>
             </Pane>
-            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="702.0" visible="false" StackPane.alignment="CENTER_RIGHT">
+            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="702.0" StackPane.alignment="CENTER_RIGHT">
                <children>
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>

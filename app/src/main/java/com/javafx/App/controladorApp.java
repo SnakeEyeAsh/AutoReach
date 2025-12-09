@@ -514,6 +514,21 @@ public class controladorApp implements Initializable {
         Platform.runLater(() -> {
             Stage s = (Stage) btnIrAInicio.getScene().getWindow();
             s.getIcons().add(new Image("Assets/autoIcon.png"));
+
+            // Cargar hoja de estilos CSS
+            try {
+                URL cssURL = getClass().getResource("/styles.css");
+                if (cssURL != null) {
+                    String css = cssURL.toExternalForm();
+                    s.getScene().getStylesheets().add(css);
+                    System.out.println("✓ CSS cargado exitosamente: " + css);
+                } else {
+                    System.err.println("✗ No se encontró el archivo styles.css en resources");
+                }
+            } catch (Exception e) {
+                System.err.println("✗ Error al cargar styles.css: " + e.getMessage());
+                e.printStackTrace();
+            }
         });
         validador = new ValidadorCliente();
         validadorC = new ValidadorCoche();
@@ -529,6 +544,26 @@ public class controladorApp implements Initializable {
         // Configurar tooltip para el campo de hora de entrega
         Tooltip tooltipHora = new Tooltip("Formato: HH:mm (ejemplo: 14:30, 09:15)");
         txtHoraEntrega.setTooltip(tooltipHora);
+
+        // Configurar tooltips para campos de cliente
+        txtFechaNac.setTooltip(new Tooltip("Formato: AAAA-MM-DD (ejemplo: 1990-05-15)"));
+        txtEmail.setTooltip(new Tooltip("Formato: usuario@dominio.com (ejemplo: juan.perez@gmail.com)"));
+        txtDireccion.setTooltip(new Tooltip("Dirección completa (ejemplo: Calle Mayor 123, Madrid)"));
+
+        // Configurar tooltips para campos de ingreso de coches
+        ingresoAño.setTooltip(new Tooltip("Año del vehículo (ejemplo: 2023)"));
+        ingresoBastidor.setTooltip(new Tooltip("Número de bastidor VIN de 17 caracteres (ejemplo: 1HGBH41JXMN109186)"));
+        ingresoColor.setTooltip(new Tooltip("Color del vehículo (ejemplo: Rojo, Azul Metalizado, Negro)"));
+        ingresoDiseñoInterior.setTooltip(new Tooltip("Diseño interior (ejemplo: Deportivo, Clásico, Moderno)"));
+        ingresoDiseñoLlantas.setTooltip(new Tooltip("Diseño de llantas (ejemplo: Aleación, Radial, Deportiva)"));
+        ingresoDllantas.setTooltip(new Tooltip("Diámetro de llantas en pulgadas (ejemplo: 16, 17, 18)"));
+        ingresoKms.setTooltip(new Tooltip("Kilometraje del vehículo (ejemplo: 15000.5)"));
+        ingresoMarca.setTooltip(new Tooltip("Marca del vehículo (ejemplo: Toyota, BMW, Ford)"));
+        ingresoMaterial.setTooltip(new Tooltip("Material del interior (ejemplo: Cuero, Tela, Alcantara)"));
+        ingresoMatricula.setTooltip(new Tooltip("Matrícula del vehículo: 4 números + 3 letras (ejemplo: 1234ABC)"));
+        ingresoModelo.setTooltip(new Tooltip("Modelo del vehículo (ejemplo: Corolla, Serie 3, Focus)"));
+        ingresoPrecio.setTooltip(new Tooltip("Precio base del vehículo (ejemplo: 25000.00)"));
+
         btnIrAInicio.setStyle("-fx-background-color:darkgrey");
         iniciarTablas();
         ocultarTodos();
@@ -548,6 +583,9 @@ public class controladorApp implements Initializable {
 
         // Configurar deselección al hacer clic fuera de las tablas
         configurarDeseleccionTablas();
+
+        // Configurar menús contextuales para las tablas
+        configurarMenusContextuales();
     }
 
     //////////////////////////////////////////////////////////////// -----LOGIN-----
@@ -629,6 +667,17 @@ public class controladorApp implements Initializable {
             String email = txtEmail.getText();
             String sexo = splitMenuSexo.getText();
 
+            // Verificar si ya existe un cliente con ese DNI
+            List<Cliente> clientesExistentes = Conexion.buscarClientes(dni);
+            if (!clientesExistentes.isEmpty()) {
+                AlertaEstilizada.mostrarAdvertencia(
+                    "DNI duplicado",
+                    "El cliente ya existe",
+                    "Ya existe un cliente registrado con el DNI " + dni + ". No se puede crear un duplicado."
+                );
+                return;
+            }
+
             try {
                 Conexion.crearCliente(nombre, apellidos, dni, telefono, email, direccion, fechaNac, sexo);
                 AlertaEstilizada.mostrarInformacion(
@@ -650,6 +699,8 @@ public class controladorApp implements Initializable {
 
     @FXML
     void cancelarNuevoCliente(ActionEvent event) {
+
+        limpiarCliente();
 
     }
     /*
@@ -844,6 +895,9 @@ public class controladorApp implements Initializable {
         editarCliente = false;
         limpiarCliente();
         deshabilitarBotonesCliente();
+        btnNuevoCliente.setDisable(false);
+        btnBuscarCliente.setDisable(false);
+        btnSeleccionCLiente.setDisable(false);
     }
 
     ////////////////////////// -----ELEGIR
@@ -1168,6 +1222,17 @@ public class controladorApp implements Initializable {
             String diseñoInterior = ingresoDiseñoInterior.getText();
             String matricula = ingresoMatricula.getText();
 
+            // Verificar si ya existe un coche con esa matrícula
+            CocheCompleto cocheExistente = Conexion.buscarCochePorMatricula(matricula);
+            if (cocheExistente != null) {
+                AlertaEstilizada.mostrarAdvertencia(
+                    "Matrícula duplicada",
+                    "El coche ya existe",
+                    "Ya existe un coche registrado con la matrícula " + matricula + ". No se puede crear un duplicado."
+                );
+                return;
+            }
+
             try {
 
                 Conexion.crearIngreso(nBastidor,
@@ -1185,10 +1250,21 @@ public class controladorApp implements Initializable {
                         material,
                         matricula);
 
+                AlertaEstilizada.mostrarInformacion(
+                    "Coche añadido",
+                    "Éxito",
+                    "El coche ha sido registrado correctamente"
+                );
+                limpiarIngreso();
+                iniciarTablas();
+
             } catch (SQLException e) {
-                System.out.println("Error al incertar Coche" + e.getMessage());
+                AlertaEstilizada.mostrarError(
+                    "Error de base de datos",
+                    "No se pudo crear el coche",
+                    "Error: " + e.getMessage()
+                );
             }
-            limpiarIngreso();
         }
     }
 
@@ -1873,6 +1949,206 @@ public class controladorApp implements Initializable {
             tablaDeInformacion.getItems().add("Disponible Venta: " + (coche.getDisponibleVentas() ? "Sí" : "No"));
             tablaDeInformacion.getItems().add("Disponible Alquiler: " + (coche.getDisponibleAlquiler() ? "Sí" : "No"));
         }
+    }
+
+    /**
+     * Configura los menús contextuales (clic derecho) para todas las TableViews
+     */
+    private void configurarMenusContextuales() {
+        // Menú contextual para tabla de Clientes
+        configurarMenuContextualClientes();
+
+        // Menú contextual para tabla de Citas
+        configurarMenuContextualCitas();
+
+        // Menú contextual para tabla de Alquileres
+        configurarMenuContextualAlquileres();
+
+        // Menú contextual para tabla de Coches
+        configurarMenuContextualCoches();
+
+        // Menú contextual para tabla de Coincidencias
+        configurarMenuContextualCoincidencias();
+
+        // Menú contextual para tabla de Opciones de Compra
+        configurarMenuContextualOpcionesCompra();
+    }
+
+    /**
+     * Configura el menú contextual para la tabla de Clientes
+     */
+    private void configurarMenuContextualClientes() {
+        javafx.scene.control.ContextMenu contextMenu = new javafx.scene.control.ContextMenu();
+
+        javafx.scene.control.MenuItem modificarItem = new javafx.scene.control.MenuItem("Modificar");
+        modificarItem.setOnAction(e -> editarCliente(new ActionEvent()));
+
+        javafx.scene.control.MenuItem eliminarItem = new javafx.scene.control.MenuItem("Eliminar");
+        eliminarItem.setOnAction(e -> eliminarCliente(new ActionEvent()));
+
+        contextMenu.getItems().addAll(modificarItem, eliminarItem);
+        tablaRegistro.setContextMenu(contextMenu);
+    }
+
+    /**
+     * Configura el menú contextual para la tabla de Citas
+     */
+    private void configurarMenuContextualCitas() {
+        javafx.scene.control.ContextMenu contextMenu = new javafx.scene.control.ContextMenu();
+
+        javafx.scene.control.MenuItem modificarItem = new javafx.scene.control.MenuItem("Modificar");
+        modificarItem.setOnAction(e -> editarCita(new ActionEvent()));
+
+        javafx.scene.control.MenuItem eliminarItem = new javafx.scene.control.MenuItem("Eliminar");
+        eliminarItem.setOnAction(e -> borrarCita(new ActionEvent()));
+
+        contextMenu.getItems().addAll(modificarItem, eliminarItem);
+        tblCitas.setContextMenu(contextMenu);
+    }
+
+    /**
+     * Configura el menú contextual para la tabla de Alquileres
+     */
+    private void configurarMenuContextualAlquileres() {
+        javafx.scene.control.ContextMenu contextMenu = new javafx.scene.control.ContextMenu();
+
+        javafx.scene.control.MenuItem modificarItem = new javafx.scene.control.MenuItem("Modificar");
+        modificarItem.setOnAction(e -> editarAlq(new ActionEvent()));
+
+        javafx.scene.control.MenuItem eliminarItem = new javafx.scene.control.MenuItem("Eliminar");
+        eliminarItem.setOnAction(e -> {
+            Alquiler alquilerSeleccionado = tblAlquiler.getSelectionModel().getSelectedItem();
+            if (alquilerSeleccionado != null) {
+                boolean confirmado = AlertaEstilizada.confirmar(
+                    "Eliminar Alquiler",
+                    "¿Estás seguro?",
+                    "¿Deseas eliminar este alquiler del vehículo " + alquilerSeleccionado.getMatricula() + "?"
+                );
+                if (confirmado) {
+                    Conexion.eliminarAlquiler(alquilerSeleccionado.getMatricula());
+                    tblAlquiler.getItems().remove(alquilerSeleccionado);
+                    Conexion.liberarCoche(alquilerSeleccionado.getMatricula());
+                    iniciarTablas();
+                }
+            }
+        });
+
+        contextMenu.getItems().addAll(modificarItem, eliminarItem);
+        tblAlquiler.setContextMenu(contextMenu);
+    }
+
+    /**
+     * Configura el menú contextual para la tabla de Coches
+     */
+    private void configurarMenuContextualCoches() {
+        javafx.scene.control.ContextMenu contextMenu = new javafx.scene.control.ContextMenu();
+
+        javafx.scene.control.MenuItem modificarItem = new javafx.scene.control.MenuItem("Modificar");
+        modificarItem.setOnAction(e -> editarIngreso(new ActionEvent()));
+
+        javafx.scene.control.MenuItem eliminarItem = new javafx.scene.control.MenuItem("Eliminar");
+        eliminarItem.setOnAction(e -> {
+            Coche cocheSeleccionado = TablaCoches.getSelectionModel().getSelectedItem();
+            if (cocheSeleccionado != null) {
+                boolean confirmado = AlertaEstilizada.confirmar(
+                    "Eliminar Coche",
+                    "¿Estás seguro?",
+                    "¿Deseas eliminar el coche " + cocheSeleccionado.getMarca() + " " + cocheSeleccionado.getModelo() + " (" + cocheSeleccionado.getMatricula() + ")?"
+                );
+                if (confirmado) {
+                    try {
+                        Conexion.borrarCoche(cocheSeleccionado.getBastidor());
+                        TablaCoches.getItems().remove(cocheSeleccionado);
+                        iniciarTablas();
+                        AlertaEstilizada.mostrarInformacion("Coche eliminado", "Éxito", "El coche ha sido eliminado correctamente");
+                    } catch (Exception ex) {
+                        AlertaEstilizada.mostrarError("Error al eliminar", "Error", "No se pudo eliminar el coche: " + ex.getMessage());
+                    }
+                }
+            }
+        });
+
+        contextMenu.getItems().addAll(modificarItem, eliminarItem);
+        TablaCoches.setContextMenu(contextMenu);
+    }
+
+    /**
+     * Configura el menú contextual para la tabla de Coincidencias
+     */
+    private void configurarMenuContextualCoincidencias() {
+        javafx.scene.control.ContextMenu contextMenu = new javafx.scene.control.ContextMenu();
+
+        javafx.scene.control.MenuItem eliminarItem = new javafx.scene.control.MenuItem("Eliminar");
+        eliminarItem.setOnAction(e -> {
+            Disponible disponibleSeleccionado = TblCoincidencias.getSelectionModel().getSelectedItem();
+            if (disponibleSeleccionado != null) {
+                boolean confirmado = AlertaEstilizada.confirmar(
+                    "Eliminar Coche",
+                    "¿Estás seguro?",
+                    "¿Deseas eliminar el coche con matrícula " + disponibleSeleccionado.getMatricula() + "?"
+                );
+                if (confirmado) {
+                    try {
+                        // Buscar el coche completo para obtener el bastidor
+                        CocheCompleto coche = Conexion.buscarCochePorMatricula(disponibleSeleccionado.getMatricula());
+                        if (coche != null) {
+                            Conexion.borrarCoche(coche.getNumBastidor());
+                            TblCoincidencias.getItems().remove(disponibleSeleccionado);
+                            iniciarTablas();
+                            AlertaEstilizada.mostrarInformacion("Coche eliminado", "Éxito", "El coche ha sido eliminado correctamente");
+                        } else {
+                            AlertaEstilizada.mostrarError("Error", "Coche no encontrado", "No se encontró el coche con esa matrícula");
+                        }
+                    } catch (Exception ex) {
+                        AlertaEstilizada.mostrarError("Error al eliminar", "Error", "No se pudo eliminar el coche: " + ex.getMessage());
+                    }
+                }
+            }
+        });
+
+        contextMenu.getItems().add(eliminarItem);
+        TblCoincidencias.setContextMenu(contextMenu);
+    }
+
+    /**
+     * Configura el menú contextual para la tabla de Opciones de Compra
+     */
+    private void configurarMenuContextualOpcionesCompra() {
+        javafx.scene.control.ContextMenu contextMenu = new javafx.scene.control.ContextMenu();
+
+        javafx.scene.control.MenuItem modificarItem = new javafx.scene.control.MenuItem("Modificar");
+        modificarItem.setOnAction(e -> editarIngreso(new ActionEvent()));
+
+        javafx.scene.control.MenuItem eliminarItem = new javafx.scene.control.MenuItem("Eliminar");
+        eliminarItem.setOnAction(e -> {
+            CocheCompra cocheCompraSeleccionado = tblOpcionesCompra.getSelectionModel().getSelectedItem();
+            if (cocheCompraSeleccionado != null) {
+                boolean confirmado = AlertaEstilizada.confirmar(
+                    "Eliminar Coche",
+                    "¿Estás seguro?",
+                    "¿Deseas eliminar el coche " + cocheCompraSeleccionado.getMarca() + " " + cocheCompraSeleccionado.getModelo() + " (" + cocheCompraSeleccionado.getMatricula() + ")?"
+                );
+                if (confirmado) {
+                    try {
+                        // Buscar el coche completo para obtener el bastidor
+                        CocheCompleto coche = Conexion.buscarCochePorMatricula(cocheCompraSeleccionado.getMatricula());
+                        if (coche != null) {
+                            Conexion.borrarCoche(coche.getNumBastidor());
+                            tblOpcionesCompra.getItems().remove(cocheCompraSeleccionado);
+                            iniciarTablas();
+                            AlertaEstilizada.mostrarInformacion("Coche eliminado", "Éxito", "El coche ha sido eliminado correctamente");
+                        } else {
+                            AlertaEstilizada.mostrarError("Error", "Coche no encontrado", "No se encontró el coche con esa matrícula");
+                        }
+                    } catch (Exception ex) {
+                        AlertaEstilizada.mostrarError("Error al eliminar", "Error", "No se pudo eliminar el coche: " + ex.getMessage());
+                    }
+                }
+            }
+        });
+
+        contextMenu.getItems().addAll(modificarItem, eliminarItem);
+        tblOpcionesCompra.setContextMenu(contextMenu);
     }
 
 }

@@ -399,14 +399,16 @@ public class ValidadorCliente {
         if (control instanceof TextField) {
             TextField textField = (TextField) control;
             textField.textProperty().addListener((obs, oldVal, newVal) -> {
-                actualizarEstiloCampo(control);
+                // Usar Platform.runLater para asegurar que el validador se actualice primero
+                Platform.runLater(() -> actualizarEstiloCampo(control));
             });
         }
         // Listener para cambios en SplitMenuButton
         else if (control instanceof SplitMenuButton) {
             SplitMenuButton menu = (SplitMenuButton) control;
             menu.textProperty().addListener((obs, oldVal, newVal) -> {
-                actualizarEstiloCampo(control);
+                // Usar Platform.runLater para asegurar que el validador se actualice primero
+                Platform.runLater(() -> actualizarEstiloCampo(control));
             });
         }
 

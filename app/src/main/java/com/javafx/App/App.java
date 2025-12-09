@@ -21,9 +21,10 @@ public class App extends Application{
         Parent root = FXMLLoader.load(getClass().getResource("/pantalla1.fxml"));
 
         stage = primeraEscena;
-        Scene scene = new Scene(root);
+        Scene scene = new Scene(root, 850, 600);
         primeraEscena.setScene(scene);
         primeraEscena.setTitle("AutoReach");
+        primeraEscena.setResizable(false);
         primeraEscena.show();
 
 
