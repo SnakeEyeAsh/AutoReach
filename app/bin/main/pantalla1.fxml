@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -10,7 +11,6 @@
 <?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
@@ -26,9 +26,9 @@
    <children>
       <ToolBar depthTest="DISABLE" orientation="VERTICAL" prefHeight="534.0" prefWidth="110.0" style="-fx-background-color: orange; -fx-padding: 2;">
          <items>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox prefHeight="548.0" prefWidth="120.0">
                <children>
-                  <Button fx:id="btnIrAInicio" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAInicio" prefHeight="26.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Inicio">
+                  <Button fx:id="btnIrAInicio" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAInicio" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Inicio">
                      <graphic>
                         <ImageView fx:id="btnInicio" fitHeight="48.0" fitWidth="48.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -40,7 +40,7 @@
                         <Insets bottom="10.0" top="30.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnCitas" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcitas" prefHeight="26.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Citas">
+                  <Button fx:id="btnCitas" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcitas" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Citas">
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -52,7 +52,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnAlquiler" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAalquiler" prefHeight="26.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Alquiler">
+                  <Button fx:id="btnAlquiler" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAalquiler" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Alquiler">
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -64,7 +64,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnCompras" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcompras" prefHeight="26.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Compras">
+                  <Button fx:id="btnCompras" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcompras" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Compras">
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -76,7 +76,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnIrAIngreso" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAIngresos" prefHeight="26.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Ingresos">
+                  <Button fx:id="btnIrAIngreso" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAIngresos" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Ingresos">
                      <graphic>
                         <ImageView fx:id="btnInicio1" fitHeight="48.0" fitWidth="48.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -88,7 +88,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnCerrarSesion" contentDisplay="TOP" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="78.0" prefWidth="111.0" style="-fx-background-color: darkorange;" text="Salir">
+                  <Button fx:id="btnCerrarSesion" contentDisplay="TOP" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="78.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Salir">
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="51.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -127,128 +127,10 @@
                               <Insets bottom="30.0" />
                            </VBox.margin>
                         </TextField>
-                        <Button fx:id="btnInicioSesion" mnemonicParsing="false" onAction="#IniciarSesion" text="Aceptar" />
+                        <Button fx:id="btnInicioSesion" defaultButton="true" onAction="#IniciarSesion" text="_Aceptar" />
                      </children>
                   </VBox>
                </children>
-            </Pane>
-            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="702.0" visible="false" StackPane.alignment="CENTER_RIGHT">
-               <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
-                           <children>
-                              <Button fx:id="btnNuevoCliente" mnemonicParsing="false" onAction="#crearCliente" prefHeight="18.0" prefWidth="118.0" text="Nuevo Cliente" />
-                              <AnchorPane fx:id="panelNuevoCliente" prefHeight="450.0" prefWidth="289.0">
-                                 <children>
-                                    <Label layoutX="14.0" layoutY="26.0" prefHeight="18.0" prefWidth="62.0" text="NOMBRE">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Label layoutX="14.0" layoutY="188.0" prefHeight="18.0" prefWidth="75.0" text="TELEFONO">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Label layoutX="14.0" layoutY="242.0" prefHeight="18.0" prefWidth="82.0" text="FECHA NAC">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <TextField fx:id="txtNombre" layoutX="116.0" layoutY="22.0" prefHeight="18.0" prefWidth="170.0" />
-                                    <TextField fx:id="txtTelefono" layoutX="116.0" layoutY="184.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <TextField fx:id="txtFechaNac" layoutX="116.0" layoutY="238.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <Button fx:id="btnAñadirNuevoCliente" layoutX="158.0" layoutY="460.0" mnemonicParsing="false" onAction="#añadirCliente" text="Añadir" />
-                                    <Label layoutX="14.0" layoutY="79.0" prefHeight="18.0" prefWidth="82.0" text="APELLIDOS">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Label layoutX="14.0" layoutY="133.0" prefHeight="18.0" prefWidth="82.0" text="DIRECCION">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <TextField fx:id="txtApellidos" layoutX="116.0" layoutY="75.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <TextField fx:id="txtDireccion" layoutX="116.0" layoutY="129.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <Button fx:id="btnCancelarNuevoCliente" layoutX="227.0" layoutY="460.0" mnemonicParsing="false" onAction="#cancelarNuevoCliente" text="Cancelar" />
-                                    <Label layoutX="14.0" layoutY="293.0" prefHeight="18.0" prefWidth="82.0" text="DNI">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <TextField fx:id="txtDni" layoutX="116.0" layoutY="289.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <Label layoutX="14.0" layoutY="386.0" prefHeight="18.0" prefWidth="82.0" text="Email">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <TextField fx:id="txtEmail" layoutX="116.0" layoutY="382.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <Label layoutX="14.0" layoutY="343.0" prefHeight="18.0" prefWidth="82.0" text="SEXO">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <SplitMenuButton fx:id="splitMenuSexo" layoutX="119.0" layoutY="340.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="170.0" text="Sexo">
-                                      <items>
-                                        <MenuItem fx:id="opMasculino" mnemonicParsing="false" onAction="#elegirMasculino" text="Masculino" />
-                                        <MenuItem fx:id="opFemenino" mnemonicParsing="false" onAction="#elegirFemenino" text="Femenino" />
-                                      </items>
-                                    </SplitMenuButton>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets right="20.0" top="20.0" />
-                                 </VBox.margin>
-                              </AnchorPane>
-                           </children>
-                           <HBox.margin>
-                              <Insets top="20.0" />
-                           </HBox.margin>
-                        </VBox>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
-                           <children>
-                              <Button fx:id="btnBuscarCliente" mnemonicParsing="false" onAction="#buscarLogin" prefHeight="18.0" prefWidth="118.0" text="Buscar Cliente" />
-                              <AnchorPane fx:id="panelLoginCliente" prefHeight="500.0" prefWidth="315.0">
-                                 <children>
-                                    <Label layoutX="14.0" layoutY="27.0" prefHeight="18.0" prefWidth="62.0" text="NOMBRE">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Label layoutX="14.0" layoutY="80.0" prefHeight="18.0" prefWidth="62.0" text="DNI">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <TextField fx:id="txtNombreVer" layoutX="116.0" layoutY="23.0" prefHeight="26.0" prefWidth="191.0" />
-                                    <TextField fx:id="txtDniVer" layoutX="116.0" layoutY="76.0" prefHeight="26.0" prefWidth="191.0" />
-                                    <Button fx:id="btnSeleccionCLiente" layoutX="47.0" layoutY="459.0" mnemonicParsing="false" onAction="#seleccionarCliente" text="Aceptar" />
-                                    <Button fx:id="btnEditarCliente" layoutX="116.0" layoutY="459.0" mnemonicParsing="false" onAction="#editarCliente" text="Editar" />
-                                    <Button fx:id="btnCancelarSeleccion" layoutX="242.0" layoutY="459.0" mnemonicParsing="false" onAction="#cancelarSeleccion" text="Cancelar" />
-                                    <TableView fx:id="tablaRegistro" layoutX="14.0" layoutY="126.0" prefHeight="322.0" prefWidth="290.0">
-                                      <columns>
-                                        <TableColumn fx:id="clnNombreRegistro" prefWidth="142.39995765686035" text="Nombre" />
-                                        <TableColumn fx:id="clnDniRegistro" prefWidth="130.40004882812502" text="DNI" />
-                                      </columns>
-                                    </TableView>
-                                    <Button fx:id="btnEliminarCliente" layoutX="174.0" layoutY="459.0" mnemonicParsing="false" onAction="#eliminarCliente" text="Eliminar" />
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets top="20.0" />
-                                 </VBox.margin>
-                              </AnchorPane>
-                           </children>
-                           <HBox.margin>
-                              <Insets top="20.0" />
-                           </HBox.margin>
-                        </VBox>
-                     </children>
-                  </HBox>
-               </children>
-               <StackPane.margin>
-                  <Insets left="50.0" />
-               </StackPane.margin>
             </Pane>
             <Pane fx:id="pantallaSesion" prefHeight="200.0" prefWidth="200.0" visible="false">
                <children>
@@ -327,7 +209,7 @@
                      </font>
                   </Label>
                </children></Pane>
-            <Pane fx:id="panelCitas" prefHeight="578.0" prefWidth="766.0" visible="false">
+            <Pane fx:id="panelCitas" prefHeight="578.0" prefWidth="766.0">
                <children>
                   <VBox alignment="CENTER_LEFT" layoutX="19.0" layoutY="21.0" prefHeight="234.0" prefWidth="280.0">
                      <children>
@@ -418,153 +300,7 @@
                         <TableColumn fx:id="clnHora" prefWidth="209.59988403320312" text="Hora" />
                     </columns>
                   </TableView>
-                  <TextArea fx:id="txtAreaCitas" layoutX="306.0" layoutY="80.0" prefHeight="175.0" prefWidth="390.0" />
-                  <Label layoutX="306.0" layoutY="51.0" text="Informacion adicional:" />
-               </children>
-            </Pane>
-            <Pane fx:id="pantallaAlquiler" prefHeight="578.0" prefWidth="768.0" visible="false">
-               <children>
-                  <HBox prefHeight="234.0" prefWidth="724.0">
-                     <children>
-                        <VBox prefHeight="214.0" prefWidth="188.0">
-                           <children>
-                              <Label text="Opciones de Coche">
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" left="20.0" />
-                                 </VBox.margin>
-                                 <font>
-                                    <Font name="System Bold Italic" size="18.0" />
-                                 </font>
-                              </Label>
-                              <Label text="Marca">
-                                 <VBox.margin>
-                                    <Insets left="70.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <TextField fx:id="txtElegirMarca" maxWidth="100.0" prefHeight="26.0" prefWidth="142.0">
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" left="40.0" />
-                                 </VBox.margin>
-                              </TextField>
-                              <Label text="Modelo">
-                                 <VBox.margin>
-                                    <Insets left="70.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <TextField fx:id="txtElegirModelo" maxWidth="100.0" prefHeight="26.0" prefWidth="100.0">
-                                 <VBox.margin>
-                                    <Insets left="40.0" />
-                                 </VBox.margin>
-                              </TextField>
-                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                                 <children>
-                                  <Button fx:id="btnBuscarMatricula" mnemonicParsing="false" onAction="#buscarMatricula" text="Buscar" />
-                                    <Button fx:id="btnCancelarMatricula" mnemonicParsing="false" onAction="#cancelarBusquedaMatricula" text="Cancelar">
-                                       <HBox.margin>
-                                          <Insets left="20.0" />
-                                       </HBox.margin>
-                                    </Button>
-                                 </children>
-                              </HBox>
-                           </children>
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                        </VBox>
-                        <TableView fx:id="TblCoincidencias" prefHeight="214.0" prefWidth="418.0">
-                          <columns>
-                            <TableColumn fx:id="clnAñoCoche" prefWidth="75.0" text="Año" />
-                            <TableColumn fx:id="clnDisponibleCoche" prefWidth="83.2000732421875" text="Disponible" />
-                              <TableColumn fx:id="clnColorCoche" prefWidth="84.80001831054688" text="Color" />
-                              <TableColumn fx:id="clnPrecioCoche" minWidth="0.0" prefWidth="55.199951171875" text="Precio" />
-                              <TableColumn fx:id="clnMatriculaCoche" minWidth="0.0" prefWidth="116.79995727539062" text="Matricula" />
-                          </columns>
-                        </TableView>
-                     </children>
-                     <padding>
-                        <Insets left="20.0" top="20.0" />
-                     </padding>
-                  </HBox>
-                  <HBox layoutX="25.0" layoutY="239.0" prefHeight="322.0" prefWidth="689.0">
-                     <children>
-                        <VBox prefHeight="322.0" prefWidth="180.0">
-                           <children>
-                              <Label text="Fechas y Horarios">
-                                 <font>
-                                    <Font name="System Bold Italic" size="18.0" />
-                                 </font>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" left="15.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Label text="Fecha de recogida">
-                                 <VBox.margin>
-                                    <Insets />
-                                 </VBox.margin>
-                              </Label>
-                              <DatePicker fx:id="cldRecoger">
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
-                              </DatePicker>
-                              <Label text="Hora de Entrega">
-                                 <VBox.margin>
-                                    <Insets />
-                                 </VBox.margin>
-                              </Label>
-                              <TextField fx:id="txtHoraEntrega" prefHeight="26.0" prefWidth="192.0">
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
-                              </TextField>
-                              <Label text="Fecha de Entrega">
-                                 <VBox.margin>
-                                    <Insets />
-                                 </VBox.margin>
-                              </Label>
-                              <DatePicker fx:id="cldEntrega">
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
-                              </DatePicker>
-                           </children>
-                           <HBox.margin>
-                              <Insets right="10.0" />
-                           </HBox.margin>
-                        </VBox>
-                        <TableView fx:id="tblAlquiler" prefHeight="322.0" prefWidth="417.0">
-                          <columns>
-                            <TableColumn fx:id="clnFechaAlq" prefWidth="80.00003355741501" text="Fecha" />
-                            <TableColumn fx:id="clnHoraAlq" prefWidth="92.00006103515625" text="Hora" />
-                              <TableColumn fx:id="clnDNIAlq" prefWidth="95.19996643066406" text="DNI" />
-                              <TableColumn fx:id="clnMatriculaAlq" prefWidth="149.5999755859375" text="Matricula" />
-                          </columns>
-                        </TableView>
-                        <VBox alignment="CENTER" prefHeight="322.0" prefWidth="90.0">
-                           <children>
-                              <Button fx:id="btnConirmarAlquiler" mnemonicParsing="false" onAction="#confirmarAlquiler" text="Confirmar">
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" top="100.0" />
-                                 </VBox.margin>
-                                 <opaqueInsets>
-                                    <Insets />
-                                 </opaqueInsets>
-                              </Button>
-                              <Button fx:id="btnEditarAlquiler" mnemonicParsing="false" onAction="#editarAlq" text="Editar">
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
-                              </Button>
-                              <Button fx:id="btnBorrarAlq" mnemonicParsing="false" onAction="#borrarAlq" text="Borrar">
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
-                              </Button>
-                              <Button fx:id="btnCancelarAlquiler" mnemonicParsing="false" onAction="#cancelarAlquiler" text="Cancelar" />
-                           </children>
-                        </VBox>
-                     </children>
-                  </HBox>
+                  <Label layoutX="306.0" layoutY="51.0" />
                </children>
             </Pane>
             <Pane fx:id="panelVentas" prefHeight="200.0" prefWidth="200.0" visible="false">
@@ -763,7 +499,7 @@
                   <Button fx:id="btnCompra" layoutX="471.0" layoutY="529.0" mnemonicParsing="false" onAction="#efectuarCompra" prefHeight="26.0" prefWidth="106.0" text="Aceptar" />
                   <Button fx:id="btnCancelarCompra" layoutX="589.0" layoutY="529.0" mnemonicParsing="false" onAction="#cancelarCompra" prefHeight="26.0" prefWidth="95.0" text="Cancelar" />
                </children></Pane>
-            <Pane fx:id="panelIngreso" prefHeight="200.0" prefWidth="200.0">
+            <Pane fx:id="panelIngreso" prefHeight="200.0" prefWidth="200.0" visible="false">
                <children>
                   <HBox layoutX="1.0" prefHeight="38.0" prefWidth="724.0">
                      <children>
@@ -777,7 +513,7 @@
                         </Label>
                      </children>
                   </HBox>
-                  <HBox layoutX="7.0" layoutY="52.0" prefHeight="517.0" prefWidth="677.0">
+                  <HBox layoutX="7.0" layoutY="52.0" prefHeight="517.0" prefWidth="708.0">
                      <children>
                         <VBox prefHeight="518.0" prefWidth="113.0">
                            <children>
@@ -849,9 +585,9 @@
                               <Insets left="10.0" />
                            </HBox.margin>
                         </VBox>
-                        <VBox prefHeight="518.0" prefWidth="159.0">
+                        <VBox prefHeight="518.0" prefWidth="172.0">
                            <children>
-                              <TextField fx:id="ingresoMarca" prefHeight="14.0" prefWidth="175.0">
+                              <TextField fx:id="ingresoMarca" prefHeight="26.0" prefWidth="150.0">
                                  <VBox.margin>
                                     <Insets bottom="10.0" top="35.0" />
                                  </VBox.margin>
@@ -908,12 +644,12 @@
                               <TextField fx:id="ingresoMatricula" />
                               <HBox prefHeight="45.0" prefWidth="159.0">
                                  <children>
-                                    <Button fx:id="btnAceptarIngreso" mnemonicParsing="false" onAction="#aceptarIngreso" prefHeight="26.0" prefWidth="58.0" text="Aceptar">
+                                    <Button fx:id="btnAceptarIngreso" onAction="#aceptarIngreso" prefHeight="26.0" prefWidth="58.0" text="_Aceptar">
                                        <HBox.margin>
                                           <Insets left="10.0" right="10.0" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button fx:id="btnCancelarIngresos" mnemonicParsing="false" onAction="#cancelarIngreso" text="Cancelar">
+                                    <Button fx:id="btnCancelarIngresos" onAction="#cancelarIngreso" text="_Cancelar">
                                        <HBox.margin>
                                           <Insets />
                                        </HBox.margin>
@@ -925,35 +661,40 @@
                               </HBox>
                            </children>
                         </VBox>
-                        <VBox prefHeight="518.0" prefWidth="434.0">
+                        <VBox prefHeight="518.0" prefWidth="393.0">
                            <children>
-                              <TableView fx:id="TablaCoches" prefHeight="498.0" prefWidth="402.0">
+                              <TableView fx:id="TablaCoches" prefHeight="489.0" prefWidth="363.0">
                                 <columns>
-                                  <TableColumn fx:id="clnMarca" prefWidth="75.0" text="Marca" />
-                                  <TableColumn fx:id="clnBastidor" prefWidth="75.0" text="Bastidor" />
-                                    <TableColumn fx:id="clnModelo" prefWidth="75.0" text="Modelo" />
-                                    <TableColumn fx:id="clnAño" prefWidth="75.0" text="Año" />
-                                    <TableColumn fx:id="clnColor" prefWidth="100.00002441406252" text="Color" />
+                                  <TableColumn fx:id="clnMarca" prefWidth="63.20004880428314" text="Marca" />
+                                  <TableColumn fx:id="clnBastidor" prefWidth="123.20001983642578" text="Bastidor" />
+                                    <TableColumn fx:id="clnModelo" prefWidth="72.0" text="Modelo" />
+                                    <TableColumn fx:id="clnAño" prefWidth="48.00006103515625" text="Año" />
+                                    <TableColumn fx:id="clnColor" prefWidth="56.0" text="Color" />
                                 </columns>
                                  <VBox.margin>
-                                    <Insets left="20.0" />
+                                    <Insets left="30.0" />
                                  </VBox.margin>
                               </TableView>
                               <HBox prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <Button fx:id="btnEditarCoche" mnemonicParsing="false" onAction="#editarCoche" text="Aceptar">
+                                    <Button fx:id="btnEditarCoche" onAction="#editarCoche" text="_Aceptar">
                                        <HBox.margin>
-                                          <Insets left="200.0" top="20.0" />
+                                          <Insets left="120.0" top="20.0" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button fx:id="btnEditarIngreso" mnemonicParsing="false" onAction="#editarIngreso" text="Editar">
+                                    <Button fx:id="btnEditarIngreso" onAction="#editarIngreso" text="_Editar">
                                        <HBox.margin>
                                           <Insets left="20.0" right="20.0" top="20.0" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button fx:id="btnBorrarIngreso" mnemonicParsing="false" onAction="#borrarIngreso" text="Borrar">
+                                    <Button fx:id="btnBorrarIngreso" onAction="#borrarIngreso" text="_Borrar">
                                        <HBox.margin>
                                           <Insets top="20.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                    <Button fx:id="btnCancelarEdicionIngreso" mnemonicParsing="false" onAction="#cancelarEdicionIngreso" text="Cancelar">
+                                       <HBox.margin>
+                                          <Insets left="20.0" top="20.0" />
                                        </HBox.margin>
                                     </Button>
                                  </children>
@@ -963,6 +704,256 @@
                      </children>
                   </HBox>
                </children>
+            </Pane>
+            <Pane fx:id="pantallaAlquiler" prefHeight="578.0" prefWidth="768.0" visible="false">
+               <children>
+                  <HBox prefHeight="234.0" prefWidth="724.0">
+                     <children>
+                        <VBox prefHeight="214.0" prefWidth="188.0">
+                           <children>
+                              <Label text="Opciones de Coche">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" left="20.0" />
+                                 </VBox.margin>
+                                 <font>
+                                    <Font name="System Bold Italic" size="18.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Marca">
+                                 <VBox.margin>
+                                    <Insets left="70.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <MenuButton fx:id="mnElegirMarca" maxWidth="100.0" mnemonicParsing="false" text="Marca">
+                                 <VBox.margin>
+                                    <Insets bottom="15.0" left="40.0" />
+                                 </VBox.margin>
+                              </MenuButton>
+                              <Label text="Modelo">
+                                 <VBox.margin>
+                                    <Insets left="70.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <ComboBox fx:id="cmbElegirModelo" prefHeight="26.0" prefWidth="105.0">
+                                 <VBox.margin>
+                                    <Insets left="40.0" />
+                                 </VBox.margin>
+                              </ComboBox>
+                           </children>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </VBox>
+                        <TableView fx:id="TblCoincidencias" prefHeight="214.0" prefWidth="413.0">
+                          <columns>
+                            <TableColumn fx:id="clnAñoCoche" prefWidth="75.0" text="Año" />
+                            <TableColumn fx:id="clnDisponibleCoche" prefWidth="83.2000732421875" text="Disponible" />
+                              <TableColumn fx:id="clnColorCoche" prefWidth="84.80001831054688" text="Color" />
+                              <TableColumn fx:id="clnPrecioCoche" minWidth="0.0" prefWidth="55.199951171875" text="Precio" />
+                              <TableColumn fx:id="clnMatriculaCoche" minWidth="0.0" prefWidth="116.79995727539062" text="Matricula" />
+                          </columns>
+                           <HBox.margin>
+                              <Insets left="5.0" />
+                           </HBox.margin>
+                        </TableView>
+                     </children>
+                     <padding>
+                        <Insets left="20.0" top="20.0" />
+                     </padding>
+                  </HBox>
+                  <HBox layoutX="25.0" layoutY="239.0" prefHeight="322.0" prefWidth="689.0">
+                     <children>
+                        <VBox prefHeight="322.0" prefWidth="180.0">
+                           <children>
+                              <Label text="Fechas y Horarios">
+                                 <font>
+                                    <Font name="System Bold Italic" size="18.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" left="15.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Label text="Fecha de recogida">
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                              </Label>
+                              <DatePicker fx:id="cldRecoger">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                              </DatePicker>
+                              <Label text="Hora de Entrega">
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                              </Label>
+                              <TextField fx:id="txtHoraEntrega" prefHeight="26.0" prefWidth="192.0">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                              </TextField>
+                              <Label text="Fecha de Entrega">
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                              </Label>
+                              <DatePicker fx:id="cldEntrega">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                              </DatePicker>
+                           </children>
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <TableView fx:id="tblAlquiler" prefHeight="322.0" prefWidth="417.0">
+                          <columns>
+                            <TableColumn fx:id="clnFechaAlq" prefWidth="80.00003355741501" text="Fecha" />
+                            <TableColumn fx:id="clnHoraAlq" prefWidth="92.00006103515625" text="Hora" />
+                              <TableColumn fx:id="clnDNIAlq" prefWidth="95.19996643066406" text="DNI" />
+                              <TableColumn fx:id="clnMatriculaAlq" prefWidth="149.5999755859375" text="Matricula" />
+                          </columns>
+                        </TableView>
+                        <VBox alignment="CENTER" prefHeight="322.0" prefWidth="90.0">
+                           <children>
+                              <Button fx:id="btnConirmarAlquiler" onAction="#confirmarAlquiler" text="_Confirmar">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" top="100.0" />
+                                 </VBox.margin>
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                              </Button>
+                              <Button fx:id="btnEditarAlquiler" onAction="#editarAlq" text="_Editar">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                              </Button>
+                              <Button fx:id="btnBorrarAlq" onAction="#borrarAlq" text="_Borrar">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                              </Button>
+                              <Button fx:id="btnCancelarAlquiler" onAction="#cancelarAlquiler" text="_Cancelar" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </Pane>
+            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="702.0" visible="false" StackPane.alignment="CENTER_RIGHT">
+               <children>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <Button fx:id="btnNuevoCliente" onAction="#crearCliente" prefHeight="18.0" prefWidth="118.0" text="Nuevo Cliente" />
+                              <AnchorPane fx:id="panelNuevoCliente" prefHeight="450.0" prefWidth="289.0">
+                                 <children>
+                                    <Label layoutX="14.0" layoutY="26.0" prefHeight="18.0" prefWidth="62.0" text="NOMBRE">
+                                       <font>
+                                          <Font name="Arial Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label layoutX="14.0" layoutY="188.0" prefHeight="18.0" prefWidth="75.0" text="TELEFONO">
+                                       <font>
+                                          <Font name="Arial Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label layoutX="14.0" layoutY="242.0" prefHeight="18.0" prefWidth="82.0" text="FECHA NAC">
+                                       <font>
+                                          <Font name="Arial Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="txtNombre" layoutX="116.0" layoutY="22.0" prefHeight="18.0" prefWidth="170.0" />
+                                    <TextField fx:id="txtTelefono" layoutX="116.0" layoutY="184.0" prefHeight="26.0" prefWidth="170.0" />
+                                    <TextField fx:id="txtFechaNac" layoutX="116.0" layoutY="238.0" prefHeight="26.0" prefWidth="170.0" />
+                                    <Button fx:id="btnAñadirNuevoCliente" layoutX="158.0" layoutY="460.0" onAction="#añadirCliente" text="_Añadir" />
+                                    <Label layoutX="14.0" layoutY="79.0" prefHeight="18.0" prefWidth="82.0" text="APELLIDOS">
+                                       <font>
+                                          <Font name="Arial Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label layoutX="14.0" layoutY="133.0" prefHeight="18.0" prefWidth="82.0" text="DIRECCION">
+                                       <font>
+                                          <Font name="Arial Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="txtApellidos" layoutX="116.0" layoutY="75.0" prefHeight="26.0" prefWidth="170.0" />
+                                    <TextField fx:id="txtDireccion" layoutX="116.0" layoutY="129.0" prefHeight="26.0" prefWidth="170.0" />
+                                    <Button fx:id="btnCancelarNuevoCliente" layoutX="227.0" layoutY="460.0" onAction="#cancelarNuevoCliente" text="_Cancelar" />
+                                    <Label layoutX="14.0" layoutY="293.0" prefHeight="18.0" prefWidth="82.0" text="DNI">
+                                       <font>
+                                          <Font name="Arial Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="txtDni" layoutX="116.0" layoutY="289.0" prefHeight="26.0" prefWidth="170.0" />
+                                    <Label layoutX="14.0" layoutY="386.0" prefHeight="18.0" prefWidth="82.0" text="Email">
+                                       <font>
+                                          <Font name="Arial Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="txtEmail" layoutX="116.0" layoutY="382.0" prefHeight="26.0" prefWidth="170.0" />
+                                    <Label layoutX="14.0" layoutY="343.0" prefHeight="18.0" prefWidth="82.0" text="SEXO">
+                                       <font>
+                                          <Font name="Arial Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <SplitMenuButton fx:id="splitMenuSexo" layoutX="119.0" layoutY="340.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="170.0" text="Sexo">
+                                      <items>
+                                        <MenuItem fx:id="opMasculino" mnemonicParsing="false" onAction="#elegirMasculino" text="Masculino" />
+                                        <MenuItem fx:id="opFemenino" mnemonicParsing="false" onAction="#elegirFemenino" text="Femenino" />
+                                      </items>
+                                    </SplitMenuButton>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets right="20.0" top="20.0" />
+                                 </VBox.margin>
+                              </AnchorPane>
+                           </children>
+                           <HBox.margin>
+                              <Insets top="20.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <Button fx:id="btnBuscarCliente" mnemonicParsing="false" onAction="#buscarLogin" prefHeight="18.0" prefWidth="118.0" text="Buscar Cliente" />
+                              <AnchorPane fx:id="panelLoginCliente" prefHeight="500.0" prefWidth="315.0">
+                                 <children>
+                                    <Label layoutX="16.0" layoutY="21.0" prefHeight="18.0" prefWidth="62.0" text="DNI">
+                                       <font>
+                                          <Font name="Arial Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Button fx:id="btnSeleccionCLiente" layoutX="47.0" layoutY="459.0" onAction="#seleccionarCliente" text="_Aceptar" />
+                                    <Button fx:id="btnEditarCliente" layoutX="116.0" layoutY="459.0" onAction="#editarCliente" text="_Editar" />
+                                    <Button fx:id="btnCancelarSeleccion" layoutX="242.0" layoutY="459.0" onAction="#cancelarSeleccion" text="_Cancelar" />
+                                    <TableView fx:id="tablaRegistro" layoutX="14.0" layoutY="54.0" prefHeight="394.0" prefWidth="290.0">
+                                      <columns>
+                                        <TableColumn fx:id="clnNombreRegistro" prefWidth="142.39995765686035" text="Nombre" />
+                                        <TableColumn fx:id="clnDniRegistro" prefWidth="147.19998779296873" text="DNI" />
+                                      </columns>
+                                    </TableView>
+                                    <Button fx:id="btnEliminarCliente" layoutX="174.0" layoutY="459.0" onAction="#eliminarCliente" text="_Eliminar" />
+                                    <ComboBox fx:id="comboDni" layoutX="94.0" layoutY="17.0" prefHeight="26.0" prefWidth="209.0" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="20.0" />
+                                 </VBox.margin>
+                              </AnchorPane>
+                           </children>
+                           <HBox.margin>
+                              <Insets top="20.0" />
+                           </HBox.margin>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+               <StackPane.margin>
+                  <Insets left="50.0" />
+               </StackPane.margin>
             </Pane>
          </children>
       </StackPane>

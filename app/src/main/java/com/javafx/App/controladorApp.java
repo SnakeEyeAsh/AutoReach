@@ -201,16 +201,11 @@ public class controladorApp implements Initializable {
     private TableColumn<Disponible, String> clnPrecioCoche;
 
     @FXML
-    private Button btnBuscarMatricula;
-
-    @FXML
     private Button btnEliminarCliente;
 
     @FXML
     private Button btnEditarCoche;
 
-    @FXML
-    private Button btnCancelarMatricula;
     @FXML
     private MenuButton mnElegirMarca;
 
@@ -510,24 +505,71 @@ public class controladorApp implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        Conexion.realizarConexion();
-        Platform.runLater(() -> {
-            Stage s = (Stage) btnIrAInicio.getScene().getWindow();
-            s.getIcons().add(new Image("Assets/autoIcon.png"));
+        boolean conexionExitosa = Conexion.realizarConexion();
 
-            // Cargar hoja de estilos CSS
-            try {
-                URL cssURL = getClass().getResource("/styles.css");
-                if (cssURL != null) {
-                    String css = cssURL.toExternalForm();
-                    s.getScene().getStylesheets().add(css);
-                    System.out.println("✓ CSS cargado exitosamente: " + css);
-                } else {
-                    System.err.println("✗ No se encontró el archivo styles.css en resources");
+        if (!conexionExitosa) {
+            // Mostrar alerta de error de conexión
+            Platform.runLater(() -> {
+                AlertaEstilizada.mostrarError(
+                    "Error de conexión",
+                    "No se pudo conectar a la base de datos",
+                    "Revisa la configuración de la base de datos en Application.properties.\n\n" +
+                    "Posibles causas:\n" +
+                    "• Credenciales incorrectas\n" +
+                    "• Base de datos no disponible\n" +
+                    "• Problemas de red o firewall\n\n" +
+                    "Verifica los logs de la consola para más detalles."
+                );
+            });
+        }
+
+        Platform.runLater(() -> {
+            // Verificar que la escena esté disponible antes de acceder a ella
+            if (btnIrAInicio.getScene() != null) {
+                Stage s = (Stage) btnIrAInicio.getScene().getWindow();
+                if (s != null) {
+                    s.getIcons().add(new Image("Assets/autoIcon.png"));
+
+                    // Cargar hoja de estilos CSS
+                    try {
+                        URL cssURL = getClass().getResource("/styles.css");
+                        if (cssURL != null) {
+                            String css = cssURL.toExternalForm();
+                            s.getScene().getStylesheets().add(css);
+                            System.out.println("✓ CSS cargado exitosamente: " + css);
+                        } else {
+                            System.err.println("✗ No se encontró el archivo styles.css en resources");
+                        }
+                    } catch (Exception e) {
+                        System.err.println("✗ Error al cargar styles.css: " + e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
-            } catch (Exception e) {
-                System.err.println("✗ Error al cargar styles.css: " + e.getMessage());
-                e.printStackTrace();
+            } else {
+                // Si la escena no está disponible aún, intentar de nuevo
+                Platform.runLater(() -> {
+                    if (btnIrAInicio.getScene() != null) {
+                        Stage s = (Stage) btnIrAInicio.getScene().getWindow();
+                        if (s != null) {
+                            s.getIcons().add(new Image("Assets/autoIcon.png"));
+
+                            // Cargar hoja de estilos CSS
+                            try {
+                                URL cssURL = getClass().getResource("/styles.css");
+                                if (cssURL != null) {
+                                    String css = cssURL.toExternalForm();
+                                    s.getScene().getStylesheets().add(css);
+                                    System.out.println("✓ CSS cargado exitosamente: " + css);
+                                } else {
+                                    System.err.println("✗ No se encontró el archivo styles.css en resources");
+                                }
+                            } catch (Exception e) {
+                                System.err.println("✗ Error al cargar styles.css: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
             }
         });
         validador = new ValidadorCliente();
@@ -898,6 +940,8 @@ public class controladorApp implements Initializable {
         btnNuevoCliente.setDisable(false);
         btnBuscarCliente.setDisable(false);
         btnSeleccionCLiente.setDisable(false);
+        btnEditarCliente.setDisable(false);
+        btnEliminarCliente.setDisable(false);
     }
 
     ////////////////////////// -----ELEGIR
@@ -1005,8 +1049,6 @@ public class controladorApp implements Initializable {
                 }
                 mnElegirMarca.setDisable(false);
                 cmbElegirModelo.setDisable(false);
-                btnBuscarMatricula.setDisable(false);
-                btnCancelarMatricula.setDisable(false);
                 cldRecoger.getEditor().clear();
                 txtHoraEntrega.clear();
                 cldEntrega.getEditor().clear();
@@ -1036,8 +1078,6 @@ public class controladorApp implements Initializable {
 
             mnElegirMarca.setDisable(true);
             cmbElegirModelo.setDisable(true);
-            btnBuscarMatricula.setDisable(true);
-            btnCancelarMatricula.setDisable(true);
 
             Timestamp fechaR = a.getFechaRecogida();
             Timestamp fechaE = a.getFechaDevolucion();
@@ -1133,6 +1173,35 @@ public class controladorApp implements Initializable {
         mnElegirMarca.setText("Marca");
         cmbElegirModelo.getSelectionModel().clearSelection();
         TblCoincidencias.getItems().clear();
+    }
+
+    /**
+     * Búsqueda automática de coincidencias cuando se selecciona un modelo
+     * Se ejecuta desde el listener del ComboBox de modelos
+     */
+    private void buscarCoincidenciasAutomatico() {
+        String marca = mnElegirMarca.getText();
+        String modelo = cmbElegirModelo.getSelectionModel().getSelectedItem();
+
+        // Validar que hay marca seleccionada
+        if (marca == null || marca.equals("Marca") || marca.trim().isEmpty()) {
+            TblCoincidencias.getItems().clear();
+            return;
+        }
+
+        // Buscar por marca y modelo si ambos están seleccionados, sino solo por marca
+        if (modelo != null && !modelo.trim().isEmpty()) {
+            TblCoincidencias.setItems(Conexion.mostrarCoincidencias(marca, modelo));
+        } else {
+            TblCoincidencias.setItems(Conexion.mostrarCoincidencias(marca));
+        }
+
+        // Configurar las columnas de la tabla
+        clnAñoCoche.setCellValueFactory(new PropertyValueFactory<>("año"));
+        clnDisponibleCoche.setCellValueFactory(new PropertyValueFactory<>("Disponible"));
+        clnColorCoche.setCellValueFactory(new PropertyValueFactory<>("Color"));
+        clnPrecioCoche.setCellValueFactory(new PropertyValueFactory<>("Precio"));
+        clnMatriculaCoche.setCellValueFactory(new PropertyValueFactory<>("matricula"));
     }
 
     ///
@@ -1341,6 +1410,17 @@ public class controladorApp implements Initializable {
     @FXML
     void borrarIngreso(ActionEvent event) {
         Coche c = TablaCoches.getSelectionModel().getSelectedItem();
+
+        // Validar que haya un coche seleccionado
+        if (c == null) {
+            AlertaEstilizada.mostrarAdvertencia(
+                "Selección requerida",
+                "No hay ningún coche seleccionado",
+                "Por favor, seleccione un coche de la tabla antes de intentar eliminarlo."
+            );
+            return;
+        }
+
         try {
             Conexion.borrarCoche(c.getBastidor());
 
@@ -1519,10 +1599,12 @@ public class controladorApp implements Initializable {
             }
         });
 
-        // Listener para la selección
+        // Listener para la selección - Ejecuta búsqueda automática
         cmbElegirModelo.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 txtComboModelo.positionCaret(txtComboModelo.getText().length());
+                // Ejecutar búsqueda automática
+                buscarCoincidenciasAutomatico();
             }
         });
     }
@@ -1758,27 +1840,38 @@ public class controladorApp implements Initializable {
 
     private void iniciarTablas() {
 
-        tablaRegistro.setItems(Conexion.mostrarClientes());
-        clnNombreRegistro.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        clnDniRegistro.setCellValueFactory(new PropertyValueFactory<>("dni"));
+        // Verificar que la conexión esté disponible antes de cargar datos
+        if (Conexion.getConnection() == null) {
+            System.err.println("✗ No se pueden cargar las tablas: conexión a base de datos no disponible");
+            return;
+        }
 
-        tblCitas.setItems(Conexion.mostrarCitas());
-        clnMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
-        clnFecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-        clnHora.setCellValueFactory(new PropertyValueFactory<>("hora"));
+        try {
+            tablaRegistro.setItems(Conexion.mostrarClientes());
+            clnNombreRegistro.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+            clnDniRegistro.setCellValueFactory(new PropertyValueFactory<>("dni"));
 
-        tblAlquiler.setItems(Conexion.mostrarAlquiler());
-        clnFechaAlq.setCellValueFactory(new PropertyValueFactory<>("fechaDevolucion"));
-        clnHoraAlq.setCellValueFactory(new PropertyValueFactory<>("horaDevolucion"));
-        clnDNIAlq.setCellValueFactory(new PropertyValueFactory<>("dni"));
-        clnMatriculaAlq.setCellValueFactory(new PropertyValueFactory<>("matricula"));
+            tblCitas.setItems(Conexion.mostrarCitas());
+            clnMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
+            clnFecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
+            clnHora.setCellValueFactory(new PropertyValueFactory<>("hora"));
 
-        TablaCoches.setItems(Conexion.mostrarCoches());
-        clnMarca.setCellValueFactory(new PropertyValueFactory<>("Marca"));
-        clnModelo.setCellValueFactory(new PropertyValueFactory<>("Modelo"));
-        clnAño.setCellValueFactory(new PropertyValueFactory<>("Año"));
-        clnBastidor.setCellValueFactory(new PropertyValueFactory<>("Bastidor"));
-        clnColor.setCellValueFactory(new PropertyValueFactory<>("Color"));
+            tblAlquiler.setItems(Conexion.mostrarAlquiler());
+            clnFechaAlq.setCellValueFactory(new PropertyValueFactory<>("fechaDevolucion"));
+            clnHoraAlq.setCellValueFactory(new PropertyValueFactory<>("horaDevolucion"));
+            clnDNIAlq.setCellValueFactory(new PropertyValueFactory<>("dni"));
+            clnMatriculaAlq.setCellValueFactory(new PropertyValueFactory<>("matricula"));
+
+            TablaCoches.setItems(Conexion.mostrarCoches());
+            clnMarca.setCellValueFactory(new PropertyValueFactory<>("Marca"));
+            clnModelo.setCellValueFactory(new PropertyValueFactory<>("Modelo"));
+            clnAño.setCellValueFactory(new PropertyValueFactory<>("Año"));
+            clnBastidor.setCellValueFactory(new PropertyValueFactory<>("Bastidor"));
+            clnColor.setCellValueFactory(new PropertyValueFactory<>("Color"));
+        } catch (Exception e) {
+            System.err.println("✗ Error al inicializar las tablas: " + e.getMessage());
+            e.printStackTrace();
+        }
 
     }
 

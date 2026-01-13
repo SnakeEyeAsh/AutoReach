@@ -11,7 +11,6 @@
 <?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
@@ -128,7 +127,7 @@
                               <Insets bottom="30.0" />
                            </VBox.margin>
                         </TextField>
-                        <Button fx:id="btnInicioSesion" onAction="#IniciarSesion" text="_Aceptar" />
+                        <Button fx:id="btnInicioSesion" defaultButton="true" onAction="#IniciarSesion" text="_Aceptar" />
                      </children>
                   </VBox>
                </children>
@@ -210,7 +209,7 @@
                      </font>
                   </Label>
                </children></Pane>
-            <Pane fx:id="panelCitas" prefHeight="578.0" prefWidth="766.0" visible="false">
+            <Pane fx:id="panelCitas" prefHeight="578.0" prefWidth="766.0">
                <children>
                   <VBox alignment="CENTER_LEFT" layoutX="19.0" layoutY="21.0" prefHeight="234.0" prefWidth="280.0">
                      <children>
@@ -301,8 +300,7 @@
                         <TableColumn fx:id="clnHora" prefWidth="209.59988403320312" text="Hora" />
                     </columns>
                   </TableView>
-                  <TextArea fx:id="txtAreaCitas" layoutX="306.0" layoutY="80.0" prefHeight="175.0" prefWidth="390.0" />
-                  <Label layoutX="306.0" layoutY="51.0" text="Informacion adicional:" />
+                  <Label layoutX="306.0" layoutY="51.0" />
                </children>
             </Pane>
             <Pane fx:id="panelVentas" prefHeight="200.0" prefWidth="200.0" visible="false">
@@ -741,16 +739,6 @@
                                     <Insets left="40.0" />
                                  </VBox.margin>
                               </ComboBox>
-                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                                 <children>
-                                  <Button fx:id="btnBuscarMatricula" onAction="#buscarMatricula" text="_Buscar" />
-                                    <Button fx:id="btnCancelarMatricula" onAction="#cancelarBusquedaMatricula" text="_Cancelar">
-                                       <HBox.margin>
-                                          <Insets left="20.0" />
-                                       </HBox.margin>
-                                    </Button>
-                                 </children>
-                              </HBox>
                            </children>
                            <opaqueInsets>
                               <Insets />
@@ -855,7 +843,7 @@
                   </HBox>
                </children>
             </Pane>
-            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="702.0" StackPane.alignment="CENTER_RIGHT">
+            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="702.0" visible="false" StackPane.alignment="CENTER_RIGHT">
                <children>
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>

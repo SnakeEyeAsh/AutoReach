@@ -35,21 +35,34 @@ public class Conexion {
 
     }
 
-    protected static Connection getConnection() {
+    public static Connection getConnection() {
         return conexion;
     }
 
-    public static void realizarConexion() {
+    public static boolean realizarConexion() {
         url = Config.get("db.url");
         user = Config.get("db.user");
         password = Config.get("db.password");
 
         try {
             conexion = DriverManager.getConnection(url, user, password);
-            System.out.println("conexion realizada");
+            System.out.println("✓ Conexión a la base de datos realizada exitosamente");
+            return true;
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage() + "el problemas es la conexion");
+            System.err.println("✗ ERROR al conectar a la base de datos:");
+            System.err.println("  Mensaje: " + e.getMessage());
+            System.err.println("  URL: " + url);
+            System.err.println("  Usuario: " + user);
+            System.err.println("\nPosibles causas:");
+            System.err.println("  1. Credenciales incorrectas (usuario/contraseña)");
+            System.err.println("  2. Base de datos no disponible o inaccesible");
+            System.err.println("  3. URL de conexión incorrecta");
+            System.err.println("  4. Firewall bloqueando la conexión");
+            System.err.println("  5. Tenant o proyecto no encontrado (verifica que el tenant sea correcto)");
+            e.printStackTrace();
+            conexion = null;
+            return false;
         }
     }
 
