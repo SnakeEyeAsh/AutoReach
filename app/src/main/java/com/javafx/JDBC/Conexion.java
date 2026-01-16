@@ -10,10 +10,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.postgresql.core.SqlCommand;
-
 import com.javafx.Model.Alquiler;
-import com.javafx.Model.Cita;
 import com.javafx.Model.Cliente;
 import com.javafx.Model.Coche;
 import com.javafx.Model.CocheCompleto;
@@ -109,30 +106,6 @@ public class Conexion {
             System.out.println(e.getMessage());
         }
         return lista;
-    }
-
-    public static ObservableList<Cita> mostrarCitas() {
-
-        ObservableList<Cita> lista = FXCollections.observableArrayList();
-
-        try {
-            Statement consulta = conexion.createStatement();
-            ResultSet resultado = consulta.executeQuery("SELECT * FROM cita;");
-            while (resultado.next()) {
-                String num_bastidor = resultado.getString("matricula");
-                String fecha = resultado.getString("fecha");
-                String hora = resultado.getString("hora");
-
-                Cita c = new Cita(num_bastidor, fecha, hora);
-
-                lista.add(c);
-            }
-
-        } catch (SQLException error) {
-            System.out.println("Error en la consulta de citas " + error.getMessage());
-        }
-        return lista;
-
     }
 
     public static ObservableList<Alquiler> mostrarAlquiler() {
@@ -298,33 +271,6 @@ public class Conexion {
 
         }
     }
-
-    /////////////////////////////////////////////////////////////////////////////////
-    /// 
-    /// CITAS
-    /// 
-    /// ///////////////////////////////////////////////////////////////////////////
-    public static void crearCita(String fecha, String hora, String informe, String matricula) throws SQLException {
-
-        String sql = "INSERT INTO cita(fecha,hora,informe,matricula) VALUES(?,?,?,?)";
-
-        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setString(1, fecha);
-            ps.setString(2, hora);
-            ps.setString(3, informe);
-            ps.setString(4, matricula);
-
-            int filas = ps.executeUpdate();
-            System.out.println("Filas afectadas " + filas);
-
-        } catch (SQLException error) {
-
-            System.out.println("Error al incertar cita " + error.getMessage());
-
-        }
-
-    }
-    ////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////--ALQUILER
     public static void crearAlquiler(
@@ -615,6 +561,83 @@ public class Conexion {
             e.printStackTrace();
         }
         // System.out.println(lista);
+        return lista;
+    }
+
+    /**
+     * Busca coches con criterios flexibles (opcional: marca, modelo, color, diseño interior, material)
+     * Los parámetros vacíos o null son ignorados en la búsqueda
+     */
+    public static ObservableList<CocheCompra> buscarCocheFlexible(
+            String marca,
+            String modelo,
+            String color,
+            String diseñoInterior,
+            String materialInterior) {
+
+        ObservableList<CocheCompra> lista = FXCollections.observableArrayList();
+
+        // Construir la consulta SQL dinámicamente
+        StringBuilder sql = new StringBuilder("SELECT * FROM coche WHERE disponible_ventas = true");
+        List<String> parametros = new ArrayList<>();
+
+        // Agregar condiciones solo si el parámetro no está vacío
+        if (marca != null && !marca.trim().isEmpty() && !marca.equals("Marca")) {
+            sql.append(" AND marca = ?");
+            parametros.add(marca);
+        }
+
+        if (modelo != null && !modelo.trim().isEmpty()) {
+            sql.append(" AND modelo = ?");
+            parametros.add(modelo);
+        }
+
+        if (color != null && !color.trim().isEmpty() && !color.equals("Color")) {
+            sql.append(" AND color = ?");
+            parametros.add(color);
+        }
+
+        if (diseñoInterior != null && !diseñoInterior.trim().isEmpty() && !diseñoInterior.equals("Diseño Interior")) {
+            sql.append(" AND diseño_interior = ?");
+            parametros.add(diseñoInterior);
+        }
+
+        if (materialInterior != null && !materialInterior.trim().isEmpty() && !materialInterior.equals("Material Interior")) {
+            sql.append(" AND material_interior = ?");
+            parametros.add(materialInterior);
+        }
+
+        try (PreparedStatement pst = conexion.prepareStatement(sql.toString())) {
+            // Establecer parámetros dinámicamente
+            for (int i = 0; i < parametros.size(); i++) {
+                pst.setString(i + 1, parametros.get(i));
+            }
+
+            ResultSet resultado = pst.executeQuery();
+
+            while (resultado.next()) {
+                String marcaResult = resultado.getString("marca");
+                String modeloResult = resultado.getString("modelo");
+                String añoResult = resultado.getString("año");
+                String precioResult = resultado.getString("precio_base");
+                String colorResult = resultado.getString("color");
+                String diseñoRuedas = resultado.getString("diseño_llantas");
+                String diametroLlantas = resultado.getString("diametro_llantas");
+                String interiorResult = resultado.getString("diseño_interior");
+                String materialResult = resultado.getString("material_interior");
+
+                CocheCompra c = new CocheCompra(
+                    marcaResult, modeloResult, añoResult, precioResult, colorResult,
+                    diseñoRuedas, materialResult, diametroLlantas, interiorResult, materialResult
+                );
+
+                lista.add(c);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar coches flexibles: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         return lista;
     }
 

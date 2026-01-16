@@ -40,12 +40,20 @@ public class controladorCompra implements Initializable{
 
     @FXML
     void efectuarCompra(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        AlertaEstilizada.mostrarInformacion(
+            "Función en desarrollo",
+            "Próximamente",
+            "Esta funcionalidad estará disponible en una versión futura"
+        );
     }
 
     @FXML
     void revertirCompra(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        AlertaEstilizada.mostrarInformacion(
+            "Función en desarrollo",
+            "Próximamente",
+            "Esta funcionalidad estará disponible en una versión futura"
+        );
     }
 
     @Override

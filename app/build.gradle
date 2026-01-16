@@ -29,7 +29,8 @@ application { //Definimos clase principal del proyecto
     mainClass = 'com.javafx.App.App'
     applicationDefaultJvmArgs = [
         '--add-opens', 'javafx.graphics/javafx.scene=org.controlsfx.controls',
-        '--add-opens', 'javafx.graphics/javafx.scene=ALL-UNNAMED'
+        '--add-opens', 'javafx.graphics/javafx.scene=ALL-UNNAMED',
+        
     ]
 }
 
@@ -37,7 +38,7 @@ sourceSets {
   main {
     resources {
         srcDirs = ["src/main/resources"]
-        includes = ["**/*.fxml","**/*.png","**/*.properties"]  //Importante para poder abrir una extensión no reconocida
+        includes = ["**/*.fxml","**/*.png","**/*.properties","**/*.jrxml","**/*.jasper"]  //Importante para poder abrir una extensión no reconocida
     }
   }
 }
@@ -46,6 +47,9 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.3'
     implementation 'org.controlsfx:controlsfx:11.2.1'
     implementation 'io.github.mkpaz:atlantafx-base:2.0.1'
+    implementation 'net.sf.jasperreports:jasperreports:7.0.1'
+    implementation 'net.sf.jasperreports:jasperreports-pdf:7.0.1'
+    implementation 'net.sf.jasperreports:jasperreports-charts:7.0.1'
 }
 
 

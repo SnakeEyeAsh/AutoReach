@@ -40,18 +40,6 @@
                         <Insets bottom="10.0" top="30.0" />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="btnCitas" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcitas" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Citas">
-                     <graphic>
-                        <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@Assets/blog.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
-                  </Button>
                   <Button fx:id="btnAlquiler" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAalquiler" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Alquiler">
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
@@ -209,100 +197,6 @@
                      </font>
                   </Label>
                </children></Pane>
-            <Pane fx:id="panelCitas" prefHeight="578.0" prefWidth="766.0">
-               <children>
-                  <VBox alignment="CENTER_LEFT" layoutX="19.0" layoutY="21.0" prefHeight="234.0" prefWidth="280.0">
-                     <children>
-                        <Label text="CONCERTAR CITA">
-                           <VBox.margin>
-                              <Insets bottom="20.0" left="55.0" />
-                           </VBox.margin>
-                           <font>
-                              <Font name="System Bold Italic" size="20.0" />
-                           </font>
-                        </Label>
-                        <HBox alignment="CENTER" prefHeight="50.0" prefWidth="175.0">
-                           <children>
-                              <Label text="Matricula">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Label>
-                              <SplitMenuButton fx:id="slcMatCita" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" popupSide="TOP" text="Matricula">
-                                <items>
-                                  <MenuItem mnemonicParsing="false" text="17:00" />
-                                  <MenuItem mnemonicParsing="false" text="15:00" />
-                                </items>
-                                 <HBox.margin>
-                                    <Insets left="45.0" />
-                                 </HBox.margin>
-                              </SplitMenuButton>
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" prefHeight="50.0" prefWidth="175.0">
-                           <children>
-                              <Label text="Hora">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Label>
-                              <SplitMenuButton fx:id="slcHoraCita" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" popupSide="TOP" text="Hora">
-                                 <items>
-                                    <MenuItem mnemonicParsing="false" text="17:00" />
-                                    <MenuItem mnemonicParsing="false" text="15:00" />
-                                 </items>
-                                 <HBox.margin>
-                                    <Insets left="90.0" />
-                                 </HBox.margin>
-                              </SplitMenuButton>
-                           </children>
-                           <VBox.margin>
-                              <Insets bottom="10.0" />
-                           </VBox.margin>
-                        </HBox>
-                        <DatePicker fx:id="cldCita" prefHeight="26.0" prefWidth="191.0">
-                           <VBox.margin>
-                              <Insets left="35.0" />
-                           </VBox.margin>
-                        </DatePicker>
-                        <HBox prefHeight="26.0" prefWidth="238.0">
-                           <children>
-                              <Button fx:id="btnGuardarCita" mnemonicParsing="false" onAction="#guardarCita" text="Guardar">
-                                 <HBox.margin>
-                                    <Insets left="10.0" />
-                                 </HBox.margin></Button>
-                              <Button fx:id="btnEditar" mnemonicParsing="false" onAction="#editarCita" text="Editar">
-                                 <HBox.margin>
-                                    <Insets left="10.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button fx:id="btnBorrarCita" mnemonicParsing="false" onAction="#borrarCita" text="Borrar">
-                                 <HBox.margin>
-                                    <Insets left="10.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button fx:id="btnCancelarCita" mnemonicParsing="false" onAction="#cancelarCita" prefHeight="26.0" prefWidth="61.0" text="Cancelar">
-                                 <HBox.margin>
-                                    <Insets left="10.0" />
-                                 </HBox.margin>
-                              </Button>
-                           </children>
-                           <VBox.margin>
-                              <Insets top="20.0" />
-                           </VBox.margin>
-                        </HBox>
-                     </children>
-                  </VBox>
-                  <TableView fx:id="tblCitas" layoutX="22.0" layoutY="289.0" prefHeight="266.0" prefWidth="674.0">
-                    <columns>
-                      <TableColumn fx:id="clnMatricula" prefWidth="228.80002403259277" text="Numero Bastidor" />
-                      <TableColumn fx:id="clnFecha" prefWidth="235.19992065429688" text="Fecha" />
-                        <TableColumn fx:id="clnHora" prefWidth="209.59988403320312" text="Hora" />
-                    </columns>
-                  </TableView>
-                  <Label layoutX="306.0" layoutY="51.0" />
-               </children>
-            </Pane>
             <Pane fx:id="panelVentas" prefHeight="200.0" prefWidth="200.0" visible="false">
                <children>
                   <HBox prefHeight="251.0" prefWidth="724.0">
@@ -324,11 +218,11 @@
                                           <Insets right="50.0" />
                                        </HBox.margin>
                                     </Label>
-                                    <TextField fx:id="txtMarcaCompra" prefHeight="26.0" prefWidth="150.0">
+                                    <MenuButton fx:id="mnMarcaCompra" mnemonicParsing="false" prefHeight="26.0" prefWidth="150.0" text="Marca">
                                        <HBox.margin>
                                           <Insets left="28.0" />
                                        </HBox.margin>
-                                    </TextField>
+                                    </MenuButton>
                                  </children>
                                  <VBox.margin>
                                     <Insets bottom="10.0" top="30.0" />
@@ -341,28 +235,11 @@
                                           <Insets right="50.0" />
                                        </HBox.margin>
                                     </Label>
-                                    <TextField fx:id="txtModeloCompra">
+                                    <ComboBox fx:id="cmbModeloCompra" prefHeight="26.0" prefWidth="150.0">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
-                                    </TextField>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox prefHeight="12.0" prefWidth="306.0">
-                                 <children>
-                                    <Label text="Año">
-                                       <HBox.margin>
-                                          <Insets right="50.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <TextField fx:id="txtAñoCompra">
-                                       <HBox.margin>
-                                          <Insets left="40.0" />
-                                       </HBox.margin>
-                                    </TextField>
+                                    </ComboBox>
                                  </children>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />

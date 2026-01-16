@@ -13,7 +13,6 @@ import java.util.ResourceBundle;
 import com.javafx.Data.Datos;
 import com.javafx.JDBC.Conexion;
 import com.javafx.Model.Alquiler;
-import com.javafx.Model.Cita;
 import com.javafx.Model.Cliente;
 import com.javafx.Model.Coche;
 import com.javafx.Model.CocheCompleto;
@@ -46,7 +45,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -144,13 +142,10 @@ public class controladorApp implements Initializable {
     private MenuButton slcMaterialCompra;
 
     @FXML
-    private TextField txtAñoCompra;
+    private MenuButton mnMarcaCompra;
 
     @FXML
-    private TextField txtMarcaCompra;
-
-    @FXML
-    private TextField txtModeloCompra;
+    private ComboBox<String> cmbModeloCompra;
 
     @FXML
     private TableView<CocheCompra> tblOpcionesCompra;
@@ -255,9 +250,6 @@ public class controladorApp implements Initializable {
     private Button btnBorrarIngreso;
 
     @FXML
-    private Button btnBorrarCita;
-
-    @FXML
     private Button btnBorrarAlq;
 
     @FXML
@@ -288,9 +280,6 @@ public class controladorApp implements Initializable {
     private Button btnCancelarBCompra;
 
     @FXML
-    private Button btnCancelarCita;
-
-    @FXML
     private Button btnCancelarCompra;
 
     @FXML
@@ -303,9 +292,6 @@ public class controladorApp implements Initializable {
     private Button btnCerrarSesion;
 
     @FXML
-    private Button btnCitas;
-
-    @FXML
     private Button btnCompra;
 
     @FXML
@@ -316,9 +302,6 @@ public class controladorApp implements Initializable {
 
     @FXML
     private Button btnEditarCliente;
-
-    @FXML
-    private Button btnGuardarCita;
 
     @FXML
     private ImageView btnInicio;
@@ -336,9 +319,6 @@ public class controladorApp implements Initializable {
     private Button btnSeleccionCLiente;
 
     @FXML
-    private DatePicker cldCita;
-
-    @FXML
     private DatePicker cldEntrega;
 
     @FXML
@@ -346,9 +326,6 @@ public class controladorApp implements Initializable {
 
     @FXML
     private TableColumn<Alquiler, String> clnDNIAlq;
-
-    @FXML
-    private TableColumn<Cita, String> clnFecha;
 
     @FXML
     private TableColumn<Alquiler, String> clnFechaAlq;
@@ -408,9 +385,6 @@ public class controladorApp implements Initializable {
     private Pane paneLogin;
 
     @FXML
-    private Pane panelCitas;
-
-    @FXML
     private AnchorPane panelLoginCliente;
 
     @FXML
@@ -438,9 +412,6 @@ public class controladorApp implements Initializable {
     private MenuButton sclColorCompra;
 
     @FXML
-    private SplitMenuButton slcMatCita;
-
-    @FXML
     private MenuButton slcMatriculaLogin;
 
     @FXML
@@ -454,9 +425,6 @@ public class controladorApp implements Initializable {
 
     @FXML
     private TableView<Alquiler> tblAlquiler;
-
-    @FXML
-    private TableView<Cita> tblCitas;
 
     @FXML
     private TextField txtApellidos;
@@ -493,9 +461,6 @@ public class controladorApp implements Initializable {
 
     @FXML
     private VBox ventanaLogin;
-
-    @FXML
-    private TextArea txtAreaCitas;
 
     private ValidadorCliente validador;
     private ValidadorCoche validadorC;
@@ -613,12 +578,17 @@ public class controladorApp implements Initializable {
         mostrarPanel(paneLogin);
         deshabilitarBotonesCliente();
         llenarMenuMarcas();
+        llenarMenuMarcasCompra(); // Llenar marcas para pantalla de compra
         configurarComboDni(); // Configurar ComboBox de DNI con filtrado
         btnEditarCoche.setDisable(true); // Deshabilitar btnEditarCoche inicialmente
 
         // Deshabilitar ComboBox de modelo hasta que se seleccione una marca
         cmbElegirModelo.setDisable(true);
         cmbElegirModelo.setEditable(true);
+
+        // Deshabilitar ComboBox de modelo de compra hasta que se seleccione una marca
+        cmbModeloCompra.setDisable(true);
+        cmbModeloCompra.setEditable(true);
 
         cliente = new Cliente("Ana", "Rodriguez", "12345678B", 623162788,
                 "ana.rodriguez@email.com", "Avenida de la Constitución 42, Barcelona");
@@ -640,10 +610,9 @@ public class controladorApp implements Initializable {
             mostrarPanel(panelRegistro);
             btnAlquiler.setDisable(false);
             btnIrAInicio.setDisable(false);
-            // btnCitas.setDisable(false);
-            // btnCompras.setDisable(false);
             btnCerrarSesion.setDisable(false);
             btnIrAIngreso.setDisable(false);
+            btnCompras.setDisable(false);
 
             // Limpiar estilos de error si el login fue exitoso
             txtUser.setStyle("");
@@ -957,32 +926,6 @@ public class controladorApp implements Initializable {
         splitMenuSexo.setText(opMasculino.getText());
     }
 
-    ////////////////////////////////////////////////////////////////////////////////// -
-    /// ----------CITAS-----------------//////////////////////////
-    /// / //////////////////////////////////////////////////////////////////////////////////
-
-    @FXML
-    void guardarCita(ActionEvent event) {
-        alertaDesarrollo.mostrar();
-    }
-
-    @FXML
-    void editarCita(ActionEvent event) {
-        alertaDesarrollo.mostrar();
-    }
-
-    @FXML
-    void borrarCita(ActionEvent event) {
-        alertaDesarrollo.mostrar();
-
-    }
-
-    @FXML
-    void cancelarCita(ActionEvent event) {
-        alertaDesarrollo.mostrar();
-
-    }
-
     //////////////////////////////////////////////////////////////////////////////// -
     /// -------Alquiler--------///////////////////////////////// /
     /// /////////////////////////////////////////////////////////////////////////
@@ -1231,44 +1174,32 @@ public class controladorApp implements Initializable {
 
     @FXML
     void cancelarCompra(ActionEvent event) {
-        alertaDesarrollo.mostrar();
+        AlertaEstilizada.mostrarInformacion(
+            "Función en desarrollo",
+            "Próximamente",
+            "Esta funcionalidad estará disponible en una versión futura"
+        );
     }
 
     @FXML
     void BuscarCompra(ActionEvent event) {
-
-        String marca = txtMarcaCompra.getText();
-        String modelo = txtModeloCompra.getText();
-        String año = txtAñoCompra.getText();
-        String patron = slcPatronCompra.getText();
-        String material = slcMaterialCompra.getText();
-        String color = sclColorCompra.getText();
-
-        if (año.isEmpty() || !año.matches("\\d+")) {
-            // Mostrar alerta al usuario
-            System.err.println("Por favor ingrese un año válido");
-            return;
-        }
-
-        CocheCompra c = new CocheCompra(marca, modelo, año, "0", color, "", "", "", patron, material);
-
-        tblOpcionesCompra.getItems().clear();
-        tblOpcionesCompra.setItems(Conexion.buscarCoche(c));
-
-        clnMarcaCompra.setCellValueFactory(new PropertyValueFactory<>("Marca"));
-        clnModeloCompra.setCellValueFactory(new PropertyValueFactory<>("Modelo"));
-        clnAñoCompra.setCellValueFactory(new PropertyValueFactory<>("Año"));
-        clnColorCompra.setCellValueFactory(new PropertyValueFactory<>("Color"));
-        clnPrecioCompra.setCellValueFactory(new PropertyValueFactory<>("Precio"));
-        clnDiseñoRCompra.setCellValueFactory(new PropertyValueFactory<>("DiseñoRuedas"));
-        clnDiametroCompra.setCellValueFactory(new PropertyValueFactory<>("DiametroLlantas"));
-        clnInteriorCompra.setCellValueFactory(new PropertyValueFactory<>("Interior"));
-        clnMatIntCompra.setCellValueFactory(new PropertyValueFactory<>("Material"));
+        // Simplemente ejecutar la búsqueda automática
+        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void CancelarBusquedaCompra(ActionEvent event) {
+        // Limpiar criterios de búsqueda
+        mnMarcaCompra.setText("Marca");
+        cmbModeloCompra.getSelectionModel().clearSelection();
+        cmbModeloCompra.getEditor().clear();
+        cmbModeloCompra.setDisable(true);
+        slcPatronCompra.setText("Diseño Interior");
+        slcMaterialCompra.setText("Material Interior");
+        sclColorCompra.setText("Color");
 
+        // Limpiar tabla
+        tblOpcionesCompra.getItems().clear();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -
@@ -1473,7 +1404,7 @@ public class controladorApp implements Initializable {
     @FXML
     void irAInicio(ActionEvent event) {
         mostrarPanel(panelRegistro);
-        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnCitas, btnIrAIngreso);
+        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso);
     }
 
     @FXML
@@ -1487,25 +1418,19 @@ public class controladorApp implements Initializable {
             return;
         }
         mostrarPanel(pantallaAlquiler);
-        cambiarColores.cambiar(btnAlquiler, btnIrAInicio, btnCompras, btnCitas, btnIrAIngreso);
-    }
-
-    @FXML
-    void irAcitas(ActionEvent event) {
-        mostrarPanel(panelCitas);
-        cambiarColores.cambiar(btnCitas, btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso);
+        cambiarColores.cambiar(btnAlquiler, btnIrAInicio, btnCompras, btnIrAIngreso);
     }
 
     @FXML
     void irAcompras(ActionEvent event) {
         mostrarPanel(panelVentas);
-        cambiarColores.cambiar(btnCompras, btnIrAInicio, btnAlquiler, btnCitas, btnIrAIngreso);
+        cambiarColores.cambiar(btnCompras, btnIrAInicio, btnAlquiler, btnIrAIngreso);
     }
 
     @FXML
     void irAIngresos(ActionEvent event) {
         mostrarPanel(panelIngreso);
-        cambiarColores.cambiar(btnIrAIngreso, btnCompras, btnIrAInicio, btnAlquiler, btnCitas);
+        cambiarColores.cambiar(btnIrAIngreso, btnCompras, btnIrAInicio, btnAlquiler);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////// -
@@ -1538,6 +1463,37 @@ public class controladorApp implements Initializable {
                 });
 
                 mnElegirMarca.getItems().add(m);
+            }
+        }
+    }
+
+    /**
+     * Llena el MenuButton de marcas para la pantalla de compra
+     */
+    private void llenarMenuMarcasCompra() {
+        List<String> lista = Conexion.obtenerMarcas();
+
+        for (int i = 0; i < lista.size(); i++) {
+            String nombreMarca = lista.get(i);
+
+            // Verificar si la marca ya existe en el menú
+            boolean marcaExiste = mnMarcaCompra.getItems().stream()
+                    .anyMatch(item -> item.getText().equals(nombreMarca));
+
+            if (!marcaExiste) {
+                MenuItem m = new MenuItem(nombreMarca);
+
+                // Cuando se pulse, actualizar el texto del MenuButton y cargar modelos
+                m.setOnAction(e -> {
+                    mnMarcaCompra.setText(nombreMarca);
+                    System.out.println("Marca seleccionada para compra: " + nombreMarca);
+                    // Habilitar y cargar modelos para esta marca
+                    cargarModelosPorMarcaCompra(nombreMarca);
+                    // Actualizar búsqueda automáticamente al seleccionar marca
+                    actualizarBusquedaCompraAutomatica();
+                });
+
+                mnMarcaCompra.getItems().add(m);
             }
         }
     }
@@ -1605,6 +1561,73 @@ public class controladorApp implements Initializable {
                 txtComboModelo.positionCaret(txtComboModelo.getText().length());
                 // Ejecutar búsqueda automática
                 buscarCoincidenciasAutomatico();
+            }
+        });
+    }
+
+    /**
+     * Carga los modelos disponibles para una marca específica en el ComboBox de compra
+     */
+    private void cargarModelosPorMarcaCompra(String marca) {
+        // Limpiar selección anterior
+        cmbModeloCompra.getSelectionModel().clearSelection();
+        cmbModeloCompra.getEditor().clear();
+
+        // Obtener modelos de la marca seleccionada
+        List<String> modelos = Conexion.obtenerModelosPorMarca(marca);
+
+        // Crear lista filtrable con los modelos
+        FilteredList<String> filteredModelos = new FilteredList<>(
+            javafx.collections.FXCollections.observableArrayList(modelos),
+            p -> true
+        );
+
+        // Configurar el ComboBox con la lista filtrada
+        cmbModeloCompra.setItems(filteredModelos);
+        cmbModeloCompra.setEditable(true);
+        cmbModeloCompra.setDisable(false); // Habilitar el ComboBox
+
+        // Obtener el editor del ComboBox
+        TextField txtComboModeloCompra = cmbModeloCompra.getEditor();
+
+        // EventFilter: bloquear el espacio
+        txtComboModeloCompra.addEventFilter(KeyEvent.KEY_TYPED, event -> {
+            if (event.getCharacter().equals(" ")) {
+                event.consume();
+            }
+        });
+
+        // Listener para filtrar mientras se escribe
+        txtComboModeloCompra.textProperty().addListener((obs, oldValue, newValue) -> {
+            final String selected = cmbModeloCompra.getSelectionModel().getSelectedItem();
+
+            // Si está vacío, restaurar filtro y ocultar
+            if (newValue == null || newValue.trim().isEmpty()) {
+                filteredModelos.setPredicate(p -> true);
+                cmbModeloCompra.hide();
+                return;
+            }
+
+            // Si no hay nada seleccionado o se está escribiendo algo diferente
+            if (selected == null || !selected.equals(newValue)) {
+                // Filtrar modelos que empiecen o contengan el texto
+                filteredModelos.setPredicate(p ->
+                    p.toLowerCase().startsWith(newValue.toLowerCase().trim()) ||
+                    p.toLowerCase().contains(newValue.toLowerCase().trim())
+                );
+                cmbModeloCompra.setVisibleRowCount(5);
+                cmbModeloCompra.show();
+            } else {
+                filteredModelos.setPredicate(p -> true);
+            }
+        });
+
+        // Listener para la selección
+        cmbModeloCompra.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                txtComboModeloCompra.positionCaret(txtComboModeloCompra.getText().length());
+                // Actualizar búsqueda automáticamente al seleccionar modelo
+                actualizarBusquedaCompraAutomatica();
             }
         });
     }
@@ -1742,7 +1765,6 @@ public class controladorApp implements Initializable {
     private boolean esClicEnAlgunaTabla(Object target) {
         return esHijoDeTabla(target, tablaRegistro) ||
                esHijoDeTabla(target, TablaCoches) ||
-               esHijoDeTabla(target, tblCitas) ||
                esHijoDeTabla(target, tblAlquiler) ||
                esHijoDeTabla(target, TblCoincidencias) ||
                esHijoDeTabla(target, tblOpcionesCompra);
@@ -1757,9 +1779,6 @@ public class controladorApp implements Initializable {
         }
         if (TablaCoches != null) {
             TablaCoches.getSelectionModel().clearSelection();
-        }
-        if (tblCitas != null) {
-            tblCitas.getSelectionModel().clearSelection();
         }
         if (tblAlquiler != null) {
             tblAlquiler.getSelectionModel().clearSelection();
@@ -1811,7 +1830,6 @@ public class controladorApp implements Initializable {
     }
 
     private void ocultarTodos() {
-        panelCitas.setVisible(false);
         panelVentas.setVisible(false);
         pantallaAlquiler.setVisible(false);
         pantallaSesion.setVisible(false);
@@ -1831,11 +1849,10 @@ public class controladorApp implements Initializable {
     private void desactivarBotones() {
         btnAlquiler.setDisable(true);
         btnIrAInicio.setDisable(true);
-        btnCitas.setDisable(true);
         btnCompras.setDisable(true);
         btnCerrarSesion.setDisable(true);
         btnIrAIngreso.setDisable(true);
-        
+
     }
 
     private void iniciarTablas() {
@@ -1850,11 +1867,6 @@ public class controladorApp implements Initializable {
             tablaRegistro.setItems(Conexion.mostrarClientes());
             clnNombreRegistro.setCellValueFactory(new PropertyValueFactory<>("nombre"));
             clnDniRegistro.setCellValueFactory(new PropertyValueFactory<>("dni"));
-
-            tblCitas.setItems(Conexion.mostrarCitas());
-            clnMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
-            clnFecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-            clnHora.setCellValueFactory(new PropertyValueFactory<>("hora"));
 
             tblAlquiler.setItems(Conexion.mostrarAlquiler());
             clnFechaAlq.setCellValueFactory(new PropertyValueFactory<>("fechaDevolucion"));
@@ -1904,51 +1916,88 @@ public class controladorApp implements Initializable {
     @FXML
     void setAlcantara(ActionEvent event) {
         slcMaterialCompra.setText(alcantara.getText());
+        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setCuero(ActionEvent event) {
         slcMaterialCompra.setText(cuero.getText());
+        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setTela(ActionEvent event) {
         slcMaterialCompra.setText(tela.getText());
+        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setAzul(ActionEvent event) {
         sclColorCompra.setText(azul.getText());
+        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setBlanco(ActionEvent event) {
         sclColorCompra.setText(blanco.getText());
+        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setNegro(ActionEvent event) {
         sclColorCompra.setText(negro.getText());
+        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setGris(ActionEvent event) {
         sclColorCompra.setText(gris.getText());
+        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setConfort(ActionEvent event) {
         slcPatronCompra.setText(confort.getText());
+        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setDeportivo(ActionEvent event) {
         slcPatronCompra.setText(deportivo.getText());
+        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setLujo(ActionEvent event) {
         slcPatronCompra.setText(lujo.getText());
+        actualizarBusquedaCompraAutomatica();
+    }
+
+    /**
+     * Actualiza automáticamente la tabla de búsqueda de compra
+     * según los criterios seleccionados en los MenuButton
+     */
+    private void actualizarBusquedaCompraAutomatica() {
+        String marca = mnMarcaCompra.getText();
+        String modelo = cmbModeloCompra.getSelectionModel().getSelectedItem();
+        String patron = slcPatronCompra.getText();
+        String material = slcMaterialCompra.getText();
+        String color = sclColorCompra.getText();
+
+        // Realizar búsqueda flexible con los criterios actuales
+        tblOpcionesCompra.getItems().clear();
+        tblOpcionesCompra.setItems(Conexion.buscarCocheFlexible(marca, modelo, color, patron, material));
+
+        // Configurar las columnas de la tabla
+        clnMarcaCompra.setCellValueFactory(new PropertyValueFactory<>("Marca"));
+        clnModeloCompra.setCellValueFactory(new PropertyValueFactory<>("Modelo"));
+        clnAñoCompra.setCellValueFactory(new PropertyValueFactory<>("Año"));
+        clnColorCompra.setCellValueFactory(new PropertyValueFactory<>("Color"));
+        clnPrecioCompra.setCellValueFactory(new PropertyValueFactory<>("Precio"));
+        clnDiseñoRCompra.setCellValueFactory(new PropertyValueFactory<>("DiseñoRuedas"));
+        clnDiametroCompra.setCellValueFactory(new PropertyValueFactory<>("DiametroLlantas"));
+        clnInteriorCompra.setCellValueFactory(new PropertyValueFactory<>("Interior"));
+        clnMatIntCompra.setCellValueFactory(new PropertyValueFactory<>("Material"));
     }
 
     /**
@@ -2051,9 +2100,6 @@ public class controladorApp implements Initializable {
         // Menú contextual para tabla de Clientes
         configurarMenuContextualClientes();
 
-        // Menú contextual para tabla de Citas
-        configurarMenuContextualCitas();
-
         // Menú contextual para tabla de Alquileres
         configurarMenuContextualAlquileres();
 
@@ -2081,22 +2127,6 @@ public class controladorApp implements Initializable {
 
         contextMenu.getItems().addAll(modificarItem, eliminarItem);
         tablaRegistro.setContextMenu(contextMenu);
-    }
-
-    /**
-     * Configura el menú contextual para la tabla de Citas
-     */
-    private void configurarMenuContextualCitas() {
-        javafx.scene.control.ContextMenu contextMenu = new javafx.scene.control.ContextMenu();
-
-        javafx.scene.control.MenuItem modificarItem = new javafx.scene.control.MenuItem("Modificar");
-        modificarItem.setOnAction(e -> editarCita(new ActionEvent()));
-
-        javafx.scene.control.MenuItem eliminarItem = new javafx.scene.control.MenuItem("Eliminar");
-        eliminarItem.setOnAction(e -> borrarCita(new ActionEvent()));
-
-        contextMenu.getItems().addAll(modificarItem, eliminarItem);
-        tblCitas.setContextMenu(contextMenu);
     }
 
     /**
