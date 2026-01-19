@@ -1,0 +1,622 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" 
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" 
+              name="informe_inventario_coches" 
+              pageWidth="595" 
+              pageHeight="842" 
+              columnWidth="535" 
+              leftMargin="30" 
+              rightMargin="30" 
+              topMargin="20" 
+              bottomMargin="20">
+    
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+    
+    <!-- Estilos corporativos AutoReach -->
+    <style name="Table_Header" mode="Opaque" backcolor="#1E3A8A" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle" fontSize="11" isBold="true">
+        <box>
+            <pen lineWidth="0.0"/>
+            <topPen lineWidth="2.0" lineColor="#F97316"/>
+            <bottomPen lineWidth="2.0" lineColor="#F97316"/>
+        </box>
+    </style>
+    
+    <style name="Table_Row_Even" mode="Opaque" backcolor="#F0F9FF" hTextAlign="Left" vTextAlign="Middle" fontSize="10">
+        <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+            <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+        </box>
+    </style>
+    
+    <style name="Table_Row_Odd" mode="Opaque" backcolor="#FFFFFF" hTextAlign="Left" vTextAlign="Middle" fontSize="10">
+        <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+            <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+        </box>
+    </style>
+    
+    <!-- Parámetros -->
+    <parameter name="REPORT_TITLE" class="java.lang.String" isForPrompting="false">
+        <defaultValueExpression><![CDATA["INVENTARIO DE VEHÍCULOS"]]></defaultValueExpression>
+    </parameter>
+    
+    <parameter name="REPORT_SUBTITLE" class="java.lang.String" isForPrompting="false">
+        <defaultValueExpression><![CDATA["Catálogo Completo de Coches"]]></defaultValueExpression>
+    </parameter>
+
+    <!-- Campos de la base de datos -->
+    <field name="num_bastidor" class="java.lang.String"/>
+    <field name="marca" class="java.lang.String"/>
+    <field name="modelo" class="java.lang.String"/>
+    <field name="año" class="java.lang.Integer"/>
+    <field name="matricula" class="java.lang.String"/>
+    
+    <!-- Variables -->
+    <variable name="TotalVehiculos" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{num_bastidor}]]></variableExpression>
+    </variable>
+    
+    <variable name="RowNumber" class="java.lang.Integer" resetType="Page" calculation="Count">
+        <variableExpression><![CDATA[$F{num_bastidor}]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    
+    <!-- BACKGROUND - Elementos decorativos -->
+    <background>
+        <band height="802">
+            <ellipse>
+                <reportElement x="450" y="-50" width="200" height="200" forecolor="#E0F2FE" backcolor="#E0F2FE"/>
+            </ellipse>
+            <ellipse>
+                <reportElement x="-80" y="650" width="180" height="180" forecolor="#FED7AA" backcolor="#FED7AA"/>
+            </ellipse>
+        </band>
+    </background>
+    
+    <!-- TÍTULO / HEADER -->
+    <title>
+        <band height="160" splitType="Stretch">
+            <!-- Barra superior degradado -->
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="535" height="12" backcolor="#1E3A8A"/>
+            </rectangle>
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="12" width="535" height="4" backcolor="#2563EB"/>
+            </rectangle>
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="16" width="535" height="2" backcolor="#3B82F6"/>
+            </rectangle>
+            
+            <!-- Logo/Nombre AutoReach -->
+            <textField>
+                <reportElement x="15" y="30" width="200" height="32" forecolor="#F97316"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="26" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["AutoReach"]]></textFieldExpression>
+            </textField>
+            
+            <!-- Elementos decorativos -->
+            <rectangle radius="4">
+                <reportElement mode="Opaque" x="220" y="38" width="6" height="20" backcolor="#F97316"/>
+            </rectangle>
+            <rectangle radius="4">
+                <reportElement mode="Opaque" x="229" y="38" width="6" height="20" backcolor="#1E3A8A"/>
+            </rectangle>
+            
+            <!-- Tagline -->
+            <staticText>
+                <reportElement x="15" y="62" width="220" height="14" forecolor="#6B7280"/>
+                <textElement>
+                    <font size="9" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Soluciones Técnicas Automotrices]]></text>
+            </staticText>
+            
+            <!-- Título del reporte -->
+            <textField>
+                <reportElement x="15" y="90" width="420" height="32" forecolor="#1E3A8A"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="24" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Subtítulo -->
+            <rectangle>
+                <reportElement mode="Opaque" x="15" y="126" width="4" height="18" backcolor="#F97316"/>
+            </rectangle>
+            <textField>
+                <reportElement x="25" y="126" width="350" height="18" forecolor="#6B7280"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="12" isBold="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{REPORT_SUBTITLE}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Panel de fecha -->
+            <rectangle radius="8">
+                <reportElement mode="Opaque" x="440" y="30" width="95" height="70" backcolor="#FFF7ED"/>
+                <graphicElement>
+                    <pen lineWidth="1.5" lineColor="#F97316"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="448" y="38" width="80" height="12" forecolor="#F97316"/>
+                <textElement textAlignment="Center">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[GENERADO]]></text>
+            </staticText>
+            <textField pattern="dd/MM/yyyy">
+                <reportElement x="448" y="54" width="80" height="16" forecolor="#1E3A8A"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>
+            <textField pattern="HH:mm">
+                <reportElement x="448" y="72" width="80" height="14" forecolor="#6B7280"/>
+                <textElement textAlignment="Center">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>
+            
+            <!-- Línea separadora -->
+            <line>
+                <reportElement x="0" y="155" width="535" height="1" forecolor="#DBEAFE"/>
+                <graphicElement>
+                    <pen lineWidth="2.0"/>
+                </graphicElement>
+            </line>
+            <line>
+                <reportElement x="0" y="158" width="120" height="1" forecolor="#F97316"/>
+                <graphicElement>
+                    <pen lineWidth="3.0"/>
+                </graphicElement>
+            </line>
+        </band>
+    </title>
+    
+    <!-- ENCABEZADO DE COLUMNAS -->
+    <columnHeader>
+        <band height="40">
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="8" width="535" height="32" backcolor="#1E3A8A"/>
+            </rectangle>
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="5" width="535" height="3" backcolor="#F97316"/>
+            </rectangle>
+            
+            <!-- N° -->
+            <staticText>
+                <reportElement mode="Opaque" x="0" y="8" width="45" height="32" backcolor="#1E3A8A" forecolor="#FFFFFF"/>
+                <box leftPadding="5" rightPadding="5">
+                    <topPen lineWidth="2.0" lineColor="#F97316"/>
+                    <bottomPen lineWidth="2.0" lineColor="#F97316"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[N°]]></text>
+            </staticText>
+            
+            <!-- MARCA -->
+            <staticText>
+                <reportElement mode="Opaque" x="45" y="8" width="130" height="32" backcolor="#1E3A8A" forecolor="#FFFFFF"/>
+                <box leftPadding="5" rightPadding="5">
+                    <topPen lineWidth="2.0" lineColor="#F97316"/>
+                    <bottomPen lineWidth="2.0" lineColor="#F97316"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[MARCA]]></text>
+            </staticText>
+            
+            <!-- MODELO -->
+            <staticText>
+                <reportElement mode="Opaque" x="175" y="8" width="170" height="32" backcolor="#1E3A8A" forecolor="#FFFFFF"/>
+                <box leftPadding="5" rightPadding="5">
+                    <topPen lineWidth="2.0" lineColor="#F97316"/>
+                    <bottomPen lineWidth="2.0" lineColor="#F97316"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[MODELO]]></text>
+            </staticText>
+            
+            <!-- MATRÍCULA -->
+            <staticText>
+                <reportElement mode="Opaque" x="345" y="8" width="100" height="32" backcolor="#1E3A8A" forecolor="#FFFFFF"/>
+                <box leftPadding="5" rightPadding="5">
+                    <topPen lineWidth="2.0" lineColor="#F97316"/>
+                    <bottomPen lineWidth="2.0" lineColor="#F97316"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[MATRÍCULA]]></text>
+            </staticText>
+            
+            <!-- AÑO -->
+            <staticText>
+                <reportElement mode="Opaque" x="445" y="8" width="90" height="32" backcolor="#1E3A8A" forecolor="#FFFFFF"/>
+                <box leftPadding="5" rightPadding="5">
+                    <topPen lineWidth="2.0" lineColor="#F97316"/>
+                    <bottomPen lineWidth="2.0" lineColor="#F97316"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[AÑO]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    
+    <!-- DETALLE / FILAS -->
+    <detail>
+        <band height="30">
+            <!-- Número - Par -->
+            <textField>
+                <reportElement mode="Opaque" x="0" y="0" width="45" height="30" backcolor="#F0F9FF">
+                    <printWhenExpression><![CDATA[$V{RowNumber} % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+                    <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+                    <leftPen lineWidth="3.0" lineColor="#3B82F6"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{RowNumber}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Número - Impar -->
+            <textField>
+                <reportElement mode="Opaque" x="0" y="0" width="45" height="30" backcolor="#FFFFFF">
+                    <printWhenExpression><![CDATA[$V{RowNumber} % 2 == 1]]></printWhenExpression>
+                </reportElement>
+                <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+                    <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+                    <leftPen lineWidth="3.0" lineColor="#F97316"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{RowNumber}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Marca - Par -->
+            <textField>
+                <reportElement mode="Opaque" x="45" y="0" width="130" height="30" backcolor="#F0F9FF">
+                    <printWhenExpression><![CDATA[$V{RowNumber} % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+                    <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+                </box>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{marca}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Marca - Impar -->
+            <textField>
+                <reportElement mode="Opaque" x="45" y="0" width="130" height="30" backcolor="#FFFFFF">
+                    <printWhenExpression><![CDATA[$V{RowNumber} % 2 == 1]]></printWhenExpression>
+                </reportElement>
+                <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+                    <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+                </box>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{marca}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Modelo - Par -->
+            <textField>
+                <reportElement mode="Opaque" x="175" y="0" width="170" height="30" backcolor="#F0F9FF">
+                    <printWhenExpression><![CDATA[$V{RowNumber} % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+                    <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+                </box>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{modelo}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Modelo - Impar -->
+            <textField>
+                <reportElement mode="Opaque" x="175" y="0" width="170" height="30" backcolor="#FFFFFF">
+                    <printWhenExpression><![CDATA[$V{RowNumber} % 2 == 1]]></printWhenExpression>
+                </reportElement>
+                <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+                    <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+                </box>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{modelo}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Matrícula - Par -->
+            <textField>
+                <reportElement mode="Opaque" x="345" y="0" width="100" height="30" backcolor="#F0F9FF">
+                    <printWhenExpression><![CDATA[$V{RowNumber} % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+                    <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{matricula}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Matrícula - Impar -->
+            <textField>
+                <reportElement mode="Opaque" x="345" y="0" width="100" height="30" backcolor="#FFFFFF">
+                    <printWhenExpression><![CDATA[$V{RowNumber} % 2 == 1]]></printWhenExpression>
+                </reportElement>
+                <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+                    <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{matricula}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Año - Par -->
+            <textField>
+                <reportElement mode="Opaque" x="445" y="0" width="90" height="30" backcolor="#F0F9FF">
+                    <printWhenExpression><![CDATA[$V{RowNumber} % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+                    <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+                    <rightPen lineWidth="3.0" lineColor="#3B82F6"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{año}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Año - Impar -->
+            <textField>
+                <reportElement mode="Opaque" x="445" y="0" width="90" height="30" backcolor="#FFFFFF">
+                    <printWhenExpression><![CDATA[$V{RowNumber} % 2 == 1]]></printWhenExpression>
+                </reportElement>
+                <box leftPadding="8" rightPadding="8" topPadding="6" bottomPadding="6">
+                    <pen lineWidth="0.5" lineColor="#DBEAFE"/>
+                    <rightPen lineWidth="3.0" lineColor="#F97316"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{año}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    
+    <!-- PIE DE PÁGINA -->
+    <pageFooter>
+        <band height="80">
+            <line>
+                <reportElement x="0" y="10" width="535" height="1" forecolor="#DBEAFE"/>
+                <graphicElement>
+                    <pen lineWidth="1.5"/>
+                </graphicElement>
+            </line>
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="15" width="180" height="3" backcolor="#F97316"/>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="25" width="350" height="14" forecolor="#374151"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[AutoReach - Soluciones Técnicas Automotrices]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="10" y="40" width="350" height="12" forecolor="#6B7280"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <text><![CDATA[www.autoreach.com | contacto@autoreach.com | Tel: +34 XXX XXX XXX]]></text>
+            </staticText>
+            
+            <!-- Número de página -->
+            <rectangle radius="4">
+                <reportElement mode="Opaque" x="440" y="25" width="95" height="26" backcolor="#FFF7ED"/>
+                <graphicElement>
+                    <pen lineWidth="1.0" lineColor="#F97316"/>
+                </graphicElement>
+            </rectangle>
+            <textField>
+                <reportElement x="448" y="29" width="80" height="18" forecolor="#1E3A8A"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="10" y="58" width="515" height="16" forecolor="#9CA3AF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Este documento es confidencial y está destinado únicamente para uso interno. Generado automáticamente por el sistema AutoReach.]]></text>
+            </staticText>
+            
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="76" width="535" height="2" backcolor="#3B82F6"/>
+            </rectangle>
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="78" width="535" height="2" backcolor="#1E3A8A"/>
+            </rectangle>
+        </band>
+    </pageFooter>
+    
+    <!-- RESUMEN CON GRÁFICOS -->
+    <summary>
+        <band height="450">
+            <line>
+                <reportElement x="0" y="15" width="535" height="1" forecolor="#DBEAFE"/>
+                <graphicElement>
+                    <pen lineWidth="2.0"/>
+                </graphicElement>
+            </line>
+            
+            <!-- Título de estadísticas -->
+            <staticText>
+                <reportElement x="15" y="30" width="300" height="25" forecolor="#1E3A8A"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="16" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Estadísticas del Inventario]]></text>
+            </staticText>
+            <rectangle>
+                <reportElement mode="Opaque" x="15" y="58" width="80" height="3" backcolor="#F97316"/>
+            </rectangle>
+            
+            <!-- Panel de total -->
+            <rectangle radius="12">
+                <reportElement mode="Opaque" x="15" y="75" width="240" height="70" backcolor="#1E3A8A"/>
+            </rectangle>
+            <rectangle radius="8">
+                <reportElement mode="Opaque" x="20" y="80" width="230" height="6" backcolor="#F97316"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="30" y="95" width="150" height="20" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="13" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Total de Vehículos:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="185" y="95" width="60" height="20" forecolor="#F97316"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{TotalVehiculos}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="30" y="118" width="215" height="18" forecolor="#E0F2FE"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Unidades en inventario]]></text>
+            </staticText>
+            
+            <!-- GRÁFICO 1: Distribución por Marca -->
+            <barChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="15" y="165" width="255" height="270"/>
+                    <box>
+                        <pen lineWidth="2.0" lineColor="#DBEAFE"/>
+                        <topPen lineWidth="2.0" lineColor="#F97316"/>
+                    </box>
+                    <chartTitle>
+                        <font size="13" isBold="true"/>
+                        <titleExpression><![CDATA["Vehículos por Marca"]]></titleExpression>
+                    </chartTitle>
+                    <chartSubtitle>
+                        <font size="9"/>
+                        <subtitleExpression><![CDATA["Distribución del inventario"]]></subtitleExpression>
+                    </chartSubtitle>
+                    <chartLegend position="Bottom">
+                        <font size="8"/>
+                    </chartLegend>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Unidades"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{marca} != null ? $F{marca} : "Sin Marca"]]></categoryExpression>
+                        <valueExpression><![CDATA[Integer.valueOf(1)]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot>
+                    <plot backgroundAlpha="0.95" foregroundAlpha="0.95">
+                        <seriesColor seriesOrder="0" color="#F97316"/>
+                    </plot>
+                    <itemLabel>
+                        <font size="9" isBold="true"/>
+                    </itemLabel>
+                    <categoryAxisFormat>
+                        <axisFormat labelColor="#374151" tickLabelColor="#374151" axisLineColor="#DBEAFE">
+                            <labelFont>
+                                <font size="9" isBold="true"/>
+                            </labelFont>
+                        </axisFormat>
+                    </categoryAxisFormat>
+                    <valueAxisFormat>
+                        <axisFormat labelColor="#374151" tickLabelColor="#374151" axisLineColor="#DBEAFE">
+                            <labelFont>
+                                <font size="9" isBold="true"/>
+                            </labelFont>
+                        </axisFormat>
+                    </valueAxisFormat>
+                </barPlot>
+            </barChart>
+            
+            <!-- GRÁFICO 2: Distribución por Año -->
+            <barChart>
+                <chart evaluationTime="Report">
+                    <reportElement x="280" y="165" width="255" height="270"/>
+                    <box>
+                        <pen lineWidth="2.0" lineColor="#DBEAFE"/>
+                        <topPen lineWidth="2.0" lineColor="#F97316"/>
+                    </box>
+                    <chartTitle>
+                        <font size="13" isBold="true"/>
+                        <titleExpression><![CDATA["Vehículos por Año"]]></titleExpression>
+                    </chartTitle>
+                    <chartSubtitle>
+                        <font size="9"/>
+                        <subtitleExpression><![CDATA["Antigüedad del parque móvil"]]></subtitleExpression>
+                    </chartSubtitle>
+                    <chartLegend position="Bottom">
+                        <font size="8"/>
+                    </chartLegend>
+                </chart>
+                <categoryDataset>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Unidades"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{año} != null ? $F{año}.toString() : "Sin Año"]]></categoryExpression>
+                        <valueExpression><![CDATA[Integer.valueOf(1)]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot>
+                    <plot backgroundAlpha="0.95" foregroundAlpha="0.95">
+                        <seriesColor seriesOrder="0" color="#3B82F6"/>
+                    </plot>
+                    <itemLabel>
+                        <font size="9" isBold="true"/>
+                    </itemLabel>
+                    <categoryAxisFormat>
+                        <axisFormat labelColor="#374151" tickLabelColor="#374151" axisLineColor="#DBEAFE">
+                            <labelFont>
+                                <font size="9" isBold="true"/>
+                            </labelFont>
+                        </axisFormat>
+                    </categoryAxisFormat>
+                    <valueAxisFormat>
+                        <axisFormat labelColor="#374151" tickLabelColor="#374151" axisLineColor="#DBEAFE">
+                            <labelFont>
+                                <font size="9" isBold="true"/>
+                            </labelFont>
+                        </axisFormat>
+                    </valueAxisFormat>
+                </barPlot>
+            </barChart>
+        </band>
+    </summary>
+</jasperReport>

@@ -44,13 +44,11 @@ public class ValidadorCoche {
      * @param diametroLlantas Campo de diámetro de llantas
      * @param diseñoLlantas Campo de diseño de llantas
      * @param color Campo de color
-     * @param material Campo de material interior
-     * @param diseñoInterior Campo de diseño interior
      * @param matricula Campo de matrícula
      */
     public void inicializarValidadores(Control marca, Control modelo, Control año, Control kms,
             Control bastidor, Control precio, Control diametroLlantas, Control diseñoLlantas,
-            Control color, Control material, Control diseñoInterior, Control matricula) {
+            Control color, Control matricula) {
 
         // Crear validador único
         validador = new ValidationSupport();
@@ -66,8 +64,6 @@ public class ValidadorCoche {
         registrarValidadorDiametroLlantas(diametroLlantas);
         registrarValidadorDiseñoLlantas(diseñoLlantas);
         registrarValidadorColor(color);
-        registrarValidadorMaterial(material);
-        registrarValidadorDiseñoInterior(diseñoInterior);
         registrarValidadorMatricula(matricula);
 
         // Aplicar estilos CSS a los campos
@@ -80,8 +76,6 @@ public class ValidadorCoche {
         aplicarEstilosDinamicos(diametroLlantas);
         aplicarEstilosDinamicos(diseñoLlantas);
         aplicarEstilosDinamicos(color);
-        aplicarEstilosDinamicos(material);
-        aplicarEstilosDinamicos(diseñoInterior);
         aplicarEstilosDinamicos(matricula);
 
         // Inicializar decoraciones visuales
@@ -318,42 +312,6 @@ public class ValidadorCoche {
             }
             if (texto.length() > 30) {
                 return ValidationResult.fromError(c, "El color no puede exceder 30 caracteres");
-            }
-            return ValidationResult.fromInfo(c, "");
-        });
-    }
-
-    /**
-     * Valida el campo de material interior.
-     */
-    private void registrarValidadorMaterial(Control control) {
-        validador.registerValidator(control, (Control c, String texto) -> {
-            if (esTextoVacio(texto)) {
-                return ValidationResult.fromError(c, "El material interior es obligatorio");
-            }
-            if (texto.length() < 3) {
-                return ValidationResult.fromError(c, "El material debe tener al menos 3 caracteres");
-            }
-            if (texto.length() > 50) {
-                return ValidationResult.fromError(c, "El material no puede exceder 50 caracteres");
-            }
-            return ValidationResult.fromInfo(c, "");
-        });
-    }
-
-    /**
-     * Valida el campo de diseño interior.
-     */
-    private void registrarValidadorDiseñoInterior(Control control) {
-        validador.registerValidator(control, (Control c, String texto) -> {
-            if (esTextoVacio(texto)) {
-                return ValidationResult.fromError(c, "El diseño interior es obligatorio");
-            }
-            if (texto.length() < 2) {
-                return ValidationResult.fromError(c, "El diseño debe tener al menos 2 caracteres");
-            }
-            if (texto.length() > 50) {
-                return ValidationResult.fromError(c, "El diseño no puede exceder 50 caracteres");
             }
             return ValidationResult.fromInfo(c, "");
         });

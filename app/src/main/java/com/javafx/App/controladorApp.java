@@ -1,13 +1,32 @@
 package com.javafx.App;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
+import javafx.collections.ObservableList;
+import java.util.ArrayList;
+
+import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 
 
 import com.javafx.Data.Datos;
@@ -48,6 +67,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -79,9 +102,6 @@ public class controladorApp implements Initializable {
     private TextField ingresoColor;
 
     @FXML
-    private TextField ingresoDiseñoInterior;
-
-    @FXML
     private TextField ingresoDiseñoLlantas;
 
     @FXML
@@ -94,9 +114,6 @@ public class controladorApp implements Initializable {
     private TextField ingresoMarca;
 
     @FXML
-    private TextField ingresoMaterial;
-
-    @FXML
     private TextField ingresoMatricula;
 
     @FXML
@@ -104,24 +121,6 @@ public class controladorApp implements Initializable {
 
     @FXML
     private TextField ingresoPrecio;
-
-    @FXML
-    private MenuItem lujo;
-
-    @FXML
-    private MenuItem confort;
-
-    @FXML
-    private MenuItem deportivo;
-
-    @FXML
-    private MenuItem alcantara;
-
-    @FXML
-    private MenuItem cuero;
-
-    @FXML
-    private MenuItem tela;
 
     @FXML
     private MenuItem blanco;
@@ -136,46 +135,28 @@ public class controladorApp implements Initializable {
     private MenuItem gris;
 
     @FXML
-    private MenuButton slcPatronCompra;
-
-    @FXML
-    private MenuButton slcMaterialCompra;
-
-    @FXML
     private MenuButton mnMarcaCompra;
 
     @FXML
     private ComboBox<String> cmbModeloCompra;
 
     @FXML
-    private TableView<CocheCompra> tblOpcionesCompra;
+    private TableView<CocheCompra> tblCochesCompra;
 
     @FXML
-    private TableColumn<Coche, String> clnMarcaCompra;
+    private TableColumn<CocheCompra, String> colMatriculaCompra;
 
     @FXML
-    private TableColumn<Coche, String> clnModeloCompra;
+    private TableColumn<CocheCompra, String> colMarcaCompra;
 
     @FXML
-    private TableColumn<Coche, String> clnPrecioCompra;
+    private TableColumn<CocheCompra, String> colModeloCompra;
 
     @FXML
-    private TableColumn<Coche, String> clnAñoCompra;
+    private TableColumn<CocheCompra, String> colAñoCompra;
 
     @FXML
-    private TableColumn<Coche, String> clnColorCompra;
-
-    @FXML
-    private TableColumn<Coche, String> clnDiametroCompra;
-
-    @FXML
-    private TableColumn<Coche, String> clnInteriorCompra;
-
-    @FXML
-    private TableColumn<Coche, String> clnMatIntCompra;
-
-    @FXML
-    private TableColumn<Coche, String> clnDiseñoRCompra;
+    private TableColumn<CocheCompra, String> colPrecioCompra;
 
     @FXML
     private TableView<Disponible> TblCoincidencias;
@@ -212,6 +193,15 @@ public class controladorApp implements Initializable {
 
     @FXML
     private TableView<Coche> TablaCoches;
+
+    @FXML
+    private BarChart<String, Number> chartCochesPorAño;
+
+    @FXML
+    private CategoryAxis xAxisAño;
+
+    @FXML
+    private NumberAxis yAxisAño;
 
     @FXML
     private MenuItem opFemenino;
@@ -271,16 +261,28 @@ public class controladorApp implements Initializable {
     private Button btnCancelarEdicionIngreso;
 
     @FXML
-    private Button btnBuscarCliente;
+    private Button btnVerReporte;
 
     @FXML
-    private Button btnBuscarCompra;
+    private Button btnDescargarPDF;
+
+    @FXML
+    private Button btnBuscarCliente;
 
     @FXML
     private Button btnCancelarBCompra;
 
     @FXML
     private Button btnCancelarCompra;
+
+    @FXML
+    private WebView webViewInformeCompra;
+
+    @FXML
+    private Button btnVerInformeCompra;
+
+    @FXML
+    private Button btnDescargarInformeCompra;
 
     @FXML
     private Button btnCancelarNuevoCliente;
@@ -543,8 +545,7 @@ public class controladorApp implements Initializable {
 
         validadorAlquiler.inicializarValidadores(cldRecoger, cldEntrega, txtHoraEntrega);
         validadorC.inicializarValidadores(ingresoMarca, ingresoModelo, ingresoAño, ingresoKms, ingresoBastidor,
-                ingresoPrecio, ingresoDllantas, ingresoDiseñoLlantas, ingresoColor, ingresoMaterial,
-                ingresoDiseñoInterior, ingresoMatricula);
+                ingresoPrecio, ingresoDllantas, ingresoDiseñoLlantas, ingresoColor, ingresoMatricula);
         validador.inicializarValidadores(txtNombre, txtApellidos, txtDireccion, txtTelefono, txtFechaNac, txtDni,
                 txtEmail, splitMenuSexo);
 
@@ -561,12 +562,10 @@ public class controladorApp implements Initializable {
         ingresoAño.setTooltip(new Tooltip("Año del vehículo (ejemplo: 2023)"));
         ingresoBastidor.setTooltip(new Tooltip("Número de bastidor VIN de 17 caracteres (ejemplo: 1HGBH41JXMN109186)"));
         ingresoColor.setTooltip(new Tooltip("Color del vehículo (ejemplo: Rojo, Azul Metalizado, Negro)"));
-        ingresoDiseñoInterior.setTooltip(new Tooltip("Diseño interior (ejemplo: Deportivo, Clásico, Moderno)"));
         ingresoDiseñoLlantas.setTooltip(new Tooltip("Diseño de llantas (ejemplo: Aleación, Radial, Deportiva)"));
         ingresoDllantas.setTooltip(new Tooltip("Diámetro de llantas en pulgadas (ejemplo: 16, 17, 18)"));
         ingresoKms.setTooltip(new Tooltip("Kilometraje del vehículo (ejemplo: 15000.5)"));
         ingresoMarca.setTooltip(new Tooltip("Marca del vehículo (ejemplo: Toyota, BMW, Ford)"));
-        ingresoMaterial.setTooltip(new Tooltip("Material del interior (ejemplo: Cuero, Tela, Alcantara)"));
         ingresoMatricula.setTooltip(new Tooltip("Matrícula del vehículo: 4 números + 3 letras (ejemplo: 1234ABC)"));
         ingresoModelo.setTooltip(new Tooltip("Modelo del vehículo (ejemplo: Corolla, Serie 3, Focus)"));
         ingresoPrecio.setTooltip(new Tooltip("Precio base del vehículo (ejemplo: 25000.00)"));
@@ -589,6 +588,9 @@ public class controladorApp implements Initializable {
         // Deshabilitar ComboBox de modelo de compra hasta que se seleccione una marca
         cmbModeloCompra.setDisable(true);
         cmbModeloCompra.setEditable(true);
+
+        // Inicializar tabla de coches para compra
+        inicializarTablaCochesCompra();
 
         cliente = new Cliente("Ana", "Rodriguez", "12345678B", 623162788,
                 "ana.rodriguez@email.com", "Avenida de la Constitución 42, Barcelona");
@@ -1184,7 +1186,6 @@ public class controladorApp implements Initializable {
     @FXML
     void BuscarCompra(ActionEvent event) {
         // Simplemente ejecutar la búsqueda automática
-        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
@@ -1194,12 +1195,192 @@ public class controladorApp implements Initializable {
         cmbModeloCompra.getSelectionModel().clearSelection();
         cmbModeloCompra.getEditor().clear();
         cmbModeloCompra.setDisable(true);
-        slcPatronCompra.setText("Diseño Interior");
-        slcMaterialCompra.setText("Material Interior");
         sclColorCompra.setText("Color");
 
-        // Limpiar tabla
-        tblOpcionesCompra.getItems().clear();
+        // Limpiar la tabla y el WebView
+        if (tblCochesCompra != null) {
+            tblCochesCompra.getItems().clear();
+        }
+        if (webViewInformeCompra != null) {
+            webViewInformeCompra.getEngine().loadContent("<html><body style='display:flex;justify-content:center;align-items:center;height:100%;color:#6B7280;font-family:sans-serif;'><p>Seleccione un vehículo de la tabla</p></body></html>");
+        }
+    }
+
+    private void inicializarTablaCochesCompra() {
+        // Configurar columnas de la tabla
+        colMatriculaCompra.setCellValueFactory(new PropertyValueFactory<>("matricula"));
+        colMarcaCompra.setCellValueFactory(new PropertyValueFactory<>("marca"));
+        colModeloCompra.setCellValueFactory(new PropertyValueFactory<>("modelo"));
+        colAñoCompra.setCellValueFactory(new PropertyValueFactory<>("año"));
+        colPrecioCompra.setCellValueFactory(new PropertyValueFactory<>("precio"));
+
+        // Listener para mostrar detalles al seleccionar un coche
+        tblCochesCompra.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                mostrarDetallesCocheCompra(newSelection);
+            }
+        });
+
+        // Listener para actualizar tabla cuando se selecciona un modelo
+        cmbModeloCompra.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                actualizarTablaCochesCompra();
+            }
+        });
+    }
+
+    private void actualizarTablaCochesCompra() {
+        String marca = mnMarcaCompra.getText();
+        String modelo = cmbModeloCompra.getSelectionModel().getSelectedItem();
+
+        // Buscar coches con los criterios
+        ObservableList<CocheCompra> coches = Conexion.buscarCocheFlexible(marca, modelo, null, null, null);
+
+        // Actualizar la tabla
+        tblCochesCompra.setItems(coches);
+
+        if (coches.isEmpty()) {
+            webViewInformeCompra.getEngine().loadContent(
+                "<html><body style='display:flex;justify-content:center;align-items:center;height:100%;color:#F97316;font-family:sans-serif;'>" +
+                "<p>No se encontraron vehículos</p></body></html>"
+            );
+        } else {
+            webViewInformeCompra.getEngine().loadContent(
+                "<html><body style='display:flex;justify-content:center;align-items:center;height:100%;color:#059669;font-family:sans-serif;'>" +
+                "<p>Se encontraron " + coches.size() + " vehículos. Seleccione uno para ver detalles.</p></body></html>"
+            );
+        }
+    }
+
+    private void mostrarDetallesCocheCompra(CocheCompra coche) {
+        StringBuilder html = new StringBuilder();
+        html.append("<html><head><style>");
+        html.append("body { font-family: 'Segoe UI', sans-serif; margin: 8px; background: #FAFAFA; }");
+        html.append("h3 { color: #1E3A8A; margin: 0 0 8px 0; font-size: 14px; border-bottom: 2px solid #F97316; padding-bottom: 4px; }");
+        html.append(".info { font-size: 11px; margin: 4px 0; }");
+        html.append(".label { color: #6B7280; }");
+        html.append(".value { color: #1F2937; font-weight: bold; }");
+        html.append(".precio { color: #059669; font-size: 16px; font-weight: bold; margin-top: 10px; }");
+        html.append("</style></head><body>");
+        html.append("<h3>").append(coche.getMarca()).append(" ").append(coche.getModelo()).append("</h3>");
+        html.append("<p class='info'><span class='label'>Año:</span> <span class='value'>").append(coche.getAño()).append("</span></p>");
+        html.append("<p class='info'><span class='label'>Color:</span> <span class='value'>").append(coche.getColor()).append("</span></p>");
+        html.append("<p class='info'><span class='label'>Llantas:</span> <span class='value'>").append(coche.getDiseñoRuedas()).append(" - ").append(coche.getDiametroLlantas()).append("\"</span></p>");
+        html.append("<p class='info'><span class='label'>Matrícula:</span> <span class='value'>").append(coche.getMatricula()).append("</span></p>");
+        html.append("<p class='precio'>").append(coche.getPrecio()).append(" €</p>");
+        html.append("</body></html>");
+
+        webViewInformeCompra.getEngine().loadContent(html.toString());
+    }
+
+    @FXML
+    void verInformeCocheCompra(ActionEvent event) {
+        // Mostrar detalles del coche seleccionado en la tabla
+        CocheCompra cocheSeleccionado = tblCochesCompra.getSelectionModel().getSelectedItem();
+        if (cocheSeleccionado != null) {
+            mostrarDetallesCocheCompra(cocheSeleccionado);
+        } else {
+            // Si no hay selección, actualizar tabla
+            actualizarTablaCochesCompra();
+        }
+    }
+
+    @FXML
+    void descargarInformeCocheCompra(ActionEvent event) {
+        try {
+            // Obtener solo marca y modelo
+            String marca = mnMarcaCompra.getText();
+            String modelo = cmbModeloCompra.getSelectionModel().getSelectedItem();
+
+            // Verificar que se haya seleccionado al menos la marca
+            if (marca == null || marca.equals("Marca")) {
+                AlertaEstilizada.mostrarAdvertencia(
+                    "Sin selección",
+                    "Seleccione criterios",
+                    "Por favor, seleccione al menos una marca para generar el informe PDF"
+                );
+                return;
+            }
+
+            // Buscar coches solo por marca y modelo
+            ObservableList<CocheCompra> cochesEncontrados = Conexion.buscarCocheFlexible(marca, modelo, null, null, null);
+
+            if (cochesEncontrados == null || cochesEncontrados.isEmpty()) {
+                AlertaEstilizada.mostrarAdvertencia(
+                    "Sin resultados",
+                    "No hay vehículos",
+                    "No se encontraron vehículos con los criterios seleccionados"
+                );
+                return;
+            }
+
+            // Cargar el archivo .jasper compilado desde resources
+            InputStream reportStream = getClass().getResourceAsStream("/informes/informe_inventario_coches_autoreach.jasper");
+
+            if (reportStream == null) {
+                AlertaEstilizada.mostrarError(
+                    "Error de reporte",
+                    "Archivo no encontrado",
+                    "No se encontró el archivo de reporte"
+                );
+                return;
+            }
+
+            // Convertir a lista de Maps con los nombres de campo correctos para el reporte
+            List<Map<String, Object>> datosReporte = new ArrayList<>();
+            for (CocheCompra c : cochesEncontrados) {
+                Map<String, Object> fila = new HashMap<>();
+                fila.put("num_bastidor", c.getMatricula()); // Usar matrícula como identificador
+                fila.put("marca", c.getMarca());
+                fila.put("modelo", c.getModelo());
+                try {
+                    fila.put("año", Integer.parseInt(c.getAño().replaceAll("[^0-9]", "")));
+                } catch (NumberFormatException e) {
+                    fila.put("año", 0);
+                }
+                fila.put("matricula", c.getMatricula());
+                datosReporte.add(fila);
+            }
+
+            // Crear DataSource con los datos
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(datosReporte);
+
+            // Parámetros del reporte
+            Map<String, Object> parametros = new HashMap<>();
+            parametros.put("REPORT_TITLE", "VEHÍCULOS SELECCIONADOS");
+            parametros.put("REPORT_SUBTITLE", "Búsqueda: " + marca + (modelo != null ? " - " + modelo : ""));
+
+            // Llenar el reporte con el DataSource
+            JasperPrint jasperPrint = JasperFillManager.fillReport(reportStream, parametros, dataSource);
+
+            // Abrir diálogo para seleccionar ubicación de guardado
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Guardar Informe de Vehículos");
+            fileChooser.setInitialFileName("informe_vehiculos_" + marca.toLowerCase() + ".pdf");
+            fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf")
+            );
+
+            File archivoDestino = fileChooser.showSaveDialog(btnDescargarInformeCompra.getScene().getWindow());
+
+            if (archivoDestino != null) {
+                JasperExportManager.exportReportToPdfFile(jasperPrint, archivoDestino.getAbsolutePath());
+
+                AlertaEstilizada.mostrarInformacion(
+                    "Informe exportado",
+                    "Éxito",
+                    "El informe se ha guardado correctamente en:\n" + archivoDestino.getAbsolutePath()
+                );
+            }
+
+        } catch (Exception e) {
+            AlertaEstilizada.mostrarError(
+                "Error al exportar",
+                "No se pudo generar el informe",
+                "Error: " + e.getMessage()
+            );
+            e.printStackTrace();
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -
@@ -1218,8 +1399,6 @@ public class controladorApp implements Initializable {
             String diametro = ingresoDllantas.getText();
             String diseñoLlantas = ingresoDiseñoLlantas.getText();
             String color = ingresoColor.getText();
-            String material = ingresoMaterial.getText();
-            String diseñoInterior = ingresoDiseñoInterior.getText();
             String matricula = ingresoMatricula.getText();
 
             // Verificar si ya existe un coche con esa matrícula
@@ -1246,8 +1425,6 @@ public class controladorApp implements Initializable {
                         color,
                         diseñoLlantas,
                         diametro,
-                        diseñoInterior,
-                        material,
                         matricula);
 
                 AlertaEstilizada.mostrarInformacion(
@@ -1302,8 +1479,6 @@ public class controladorApp implements Initializable {
         ingresoDllantas.setText(cc.getDiametroLlantas() + "");
         ingresoDiseñoLlantas.setText(cc.getDisenoLlantas());
         ingresoColor.setText(cc.getColor());
-        ingresoMaterial.setText(cc.getMaterialInterior());
-        ingresoDiseñoInterior.setText(cc.getDisenoInterior());
         ingresoMatricula.setText(cc.getMatricula());
 
     }
@@ -1322,8 +1497,6 @@ public class controladorApp implements Initializable {
                     ingresoColor.getText(),
                     ingresoDiseñoLlantas.getText(),
                     ingresoDllantas.getText(),
-                    ingresoDiseñoInterior.getText(),
-                    ingresoMaterial.getText(),
                     ingresoMatricula.getText());
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -1376,6 +1549,252 @@ public class controladorApp implements Initializable {
         btnCancelarIngresos.setDisable(false);
         btnBorrarIngreso.setDisable(false);
         btnEditarCoche.setDisable(true);
+    }
+
+    @FXML
+    void verReporteInventario(ActionEvent event) {
+        try {
+            // Obtener datos de la tabla de coches
+            ObservableList<Coche> listaCoches = Conexion.mostrarCoches();
+
+            if (listaCoches == null || listaCoches.isEmpty()) {
+                AlertaEstilizada.mostrarAdvertencia(
+                    "Reporte vacío",
+                    "Sin datos",
+                    "No hay coches en la base de datos para mostrar en el reporte."
+                );
+                return;
+            }
+
+            // Contar coches por año para la gráfica
+            Map<String, Integer> cochesPorAño = new HashMap<>();
+            for (Coche c : listaCoches) {
+                String año = c.getAño();
+                cochesPorAño.put(año, cochesPorAño.getOrDefault(año, 0) + 1);
+            }
+
+            // Encontrar el máximo para escalar las barras
+            int maxCoches = cochesPorAño.values().stream().mapToInt(Integer::intValue).max().orElse(1);
+
+            // Generar HTML del reporte con gráfica
+            StringBuilder html = new StringBuilder();
+            html.append("<!DOCTYPE html><html><head><meta charset='UTF-8'><style>");
+            html.append("body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: #f5f5f5; }");
+            html.append(".header { background: linear-gradient(135deg, #1E3A8A, #3B82F6); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }");
+            html.append(".header h1 { margin: 0; font-size: 24px; }");
+            html.append(".header p { margin: 5px 0 0 0; opacity: 0.9; }");
+            html.append(".section { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }");
+            html.append(".section h2 { color: #1E3A8A; border-bottom: 3px solid #F97316; padding-bottom: 10px; margin-top: 0; }");
+            html.append(".chart-container { display: flex; align-items: flex-end; gap: 15px; height: 200px; padding: 20px 10px 40px 10px; }");
+            html.append(".bar-wrapper { display: flex; flex-direction: column; align-items: center; flex: 1; }");
+            html.append(".bar { background: linear-gradient(to top, #F97316, #FBBF24); border-radius: 5px 5px 0 0; width: 100%; min-width: 40px; transition: all 0.3s; }");
+            html.append(".bar:hover { background: linear-gradient(to top, #EA580C, #F59E0B); transform: scaleY(1.02); }");
+            html.append(".bar-label { margin-top: 8px; font-weight: bold; color: #374151; font-size: 12px; }");
+            html.append(".bar-value { color: white; font-weight: bold; font-size: 14px; text-align: center; padding: 5px; }");
+            html.append("table { width: 100%; border-collapse: collapse; margin-top: 10px; }");
+            html.append("th { background: #1E3A8A; color: white; padding: 12px; text-align: left; }");
+            html.append("td { padding: 10px; border-bottom: 1px solid #E5E7EB; }");
+            html.append("tr:hover { background: #F3F4F6; }");
+            html.append(".total { background: #DBEAFE; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px; }");
+            html.append(".total span { font-size: 28px; font-weight: bold; color: #1E3A8A; }");
+            html.append("</style></head><body>");
+
+            // Header
+            html.append("<div class='header'>");
+            html.append("<h1>Reporte de Inventario - AutoReach</h1>");
+            html.append("<p>Fecha: ").append(LocalDate.now()).append("</p>");
+            html.append("</div>");
+
+            // Sección de gráfica
+            html.append("<div class='section'>");
+            html.append("<h2>Vehículos por Año de Fabricación</h2>");
+            html.append("<div class='chart-container'>");
+
+            // Generar barras ordenadas por año
+            cochesPorAño.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> {
+                    int altura = (int) ((entry.getValue() * 150.0) / maxCoches);
+                    html.append("<div class='bar-wrapper'>");
+                    html.append("<div class='bar' style='height: ").append(Math.max(altura, 20)).append("px;'>");
+                    html.append("<div class='bar-value'>").append(entry.getValue()).append("</div>");
+                    html.append("</div>");
+                    html.append("<div class='bar-label'>").append(entry.getKey()).append("</div>");
+                    html.append("</div>");
+                });
+
+            html.append("</div></div>");
+
+            // Sección de tabla
+            html.append("<div class='section'>");
+            html.append("<h2>Listado de Vehículos</h2>");
+            html.append("<table><tr><th>Matrícula</th><th>Marca</th><th>Modelo</th><th>Año</th><th>Color</th><th>Bastidor</th></tr>");
+
+            for (Coche c : listaCoches) {
+                html.append("<tr>");
+                html.append("<td>").append(c.getMatricula()).append("</td>");
+                html.append("<td>").append(c.getMarca()).append("</td>");
+                html.append("<td>").append(c.getModelo()).append("</td>");
+                html.append("<td>").append(c.getAño()).append("</td>");
+                html.append("<td>").append(c.getColor()).append("</td>");
+                html.append("<td>").append(c.getBastidor()).append("</td>");
+                html.append("</tr>");
+            }
+
+            html.append("</table>");
+            html.append("<div class='total'>Total de vehículos: <span>").append(listaCoches.size()).append("</span></div>");
+            html.append("</div>");
+
+            html.append("</body></html>");
+
+            // Crear ventana con WebView para mostrar el reporte
+            Stage reporteStage = new Stage();
+            reporteStage.setTitle("Reporte de Inventario - AutoReach");
+            reporteStage.initModality(Modality.WINDOW_MODAL);
+            reporteStage.initOwner(btnVerReporte.getScene().getWindow());
+
+            WebView webView = new WebView();
+            webView.getEngine().loadContent(html.toString());
+
+            Scene scene = new Scene(webView, 900, 700);
+            reporteStage.setScene(scene);
+            reporteStage.show();
+
+        } catch (Exception e) {
+            AlertaEstilizada.mostrarError(
+                "Error al generar reporte",
+                "No se pudo generar el reporte",
+                "Error: " + e.getMessage()
+            );
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void descargarReportePDF(ActionEvent event) {
+        try {
+            // Obtener datos de la tabla de coches
+            ObservableList<Coche> listaCoches = Conexion.mostrarCoches();
+
+            if (listaCoches == null || listaCoches.isEmpty()) {
+                AlertaEstilizada.mostrarAdvertencia(
+                    "Reporte vacío",
+                    "Sin datos",
+                    "No hay coches en la base de datos para exportar."
+                );
+                return;
+            }
+
+            // Contar coches por año para la gráfica
+            Map<String, Integer> cochesPorAño = new HashMap<>();
+            for (Coche c : listaCoches) {
+                String año = c.getAño();
+                cochesPorAño.put(año, cochesPorAño.getOrDefault(año, 0) + 1);
+            }
+
+            int maxCoches = cochesPorAño.values().stream().mapToInt(Integer::intValue).max().orElse(1);
+
+            // Generar HTML del reporte con gráfica (igual que verReporteInventario)
+            StringBuilder html = new StringBuilder();
+            html.append("<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Reporte de Inventario</title><style>");
+            html.append("@media print { body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }");
+            html.append("body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: #f5f5f5; }");
+            html.append(".header { background: linear-gradient(135deg, #1E3A8A, #3B82F6); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }");
+            html.append(".header h1 { margin: 0; font-size: 24px; }");
+            html.append(".header p { margin: 5px 0 0 0; opacity: 0.9; }");
+            html.append(".section { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }");
+            html.append(".section h2 { color: #1E3A8A; border-bottom: 3px solid #F97316; padding-bottom: 10px; margin-top: 0; }");
+            html.append(".chart-container { display: flex; align-items: flex-end; gap: 15px; height: 200px; padding: 20px 10px 40px 10px; }");
+            html.append(".bar-wrapper { display: flex; flex-direction: column; align-items: center; flex: 1; }");
+            html.append(".bar { background: linear-gradient(to top, #F97316, #FBBF24); border-radius: 5px 5px 0 0; width: 100%; min-width: 40px; }");
+            html.append(".bar-label { margin-top: 8px; font-weight: bold; color: #374151; font-size: 12px; }");
+            html.append(".bar-value { color: white; font-weight: bold; font-size: 14px; text-align: center; padding: 5px; }");
+            html.append("table { width: 100%; border-collapse: collapse; margin-top: 10px; }");
+            html.append("th { background: #1E3A8A; color: white; padding: 12px; text-align: left; }");
+            html.append("td { padding: 10px; border-bottom: 1px solid #E5E7EB; }");
+            html.append("tr:nth-child(even) { background: #F9FAFB; }");
+            html.append(".total { background: #DBEAFE; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px; }");
+            html.append(".total span { font-size: 28px; font-weight: bold; color: #1E3A8A; }");
+            html.append("</style></head><body>");
+
+            html.append("<div class='header'>");
+            html.append("<h1>Reporte de Inventario - AutoReach</h1>");
+            html.append("<p>Fecha: ").append(LocalDate.now()).append("</p>");
+            html.append("</div>");
+
+            html.append("<div class='section'>");
+            html.append("<h2>Vehículos por Año de Fabricación</h2>");
+            html.append("<div class='chart-container'>");
+
+            cochesPorAño.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> {
+                    int altura = (int) ((entry.getValue() * 150.0) / maxCoches);
+                    html.append("<div class='bar-wrapper'>");
+                    html.append("<div class='bar' style='height: ").append(Math.max(altura, 20)).append("px;'>");
+                    html.append("<div class='bar-value'>").append(entry.getValue()).append("</div>");
+                    html.append("</div>");
+                    html.append("<div class='bar-label'>").append(entry.getKey()).append("</div>");
+                    html.append("</div>");
+                });
+
+            html.append("</div></div>");
+
+            html.append("<div class='section'>");
+            html.append("<h2>Listado de Vehículos</h2>");
+            html.append("<table><tr><th>Matrícula</th><th>Marca</th><th>Modelo</th><th>Año</th><th>Color</th><th>Bastidor</th></tr>");
+
+            for (Coche c : listaCoches) {
+                html.append("<tr>");
+                html.append("<td>").append(c.getMatricula()).append("</td>");
+                html.append("<td>").append(c.getMarca()).append("</td>");
+                html.append("<td>").append(c.getModelo()).append("</td>");
+                html.append("<td>").append(c.getAño()).append("</td>");
+                html.append("<td>").append(c.getColor()).append("</td>");
+                html.append("<td>").append(c.getBastidor()).append("</td>");
+                html.append("</tr>");
+            }
+
+            html.append("</table>");
+            html.append("<div class='total'>Total de vehículos: <span>").append(listaCoches.size()).append("</span></div>");
+            html.append("</div>");
+            html.append("</body></html>");
+
+            // Abrir diálogo para seleccionar ubicación de guardado
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Guardar Reporte PDF");
+            fileChooser.setInitialFileName("reporte_inventario_coches.pdf");
+            fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Archivo PDF", "*.pdf")
+            );
+
+            File archivoDestino = fileChooser.showSaveDialog(btnDescargarPDF.getScene().getWindow());
+
+            if (archivoDestino != null) {
+                // Generar PDF usando OpenHTMLToPDF
+                try (OutputStream os = new FileOutputStream(archivoDestino)) {
+                    PdfRendererBuilder builder = new PdfRendererBuilder();
+                    builder.useFastMode();
+                    builder.withHtmlContent(html.toString(), null);
+                    builder.toStream(os);
+                    builder.run();
+                }
+
+                AlertaEstilizada.mostrarInformacion(
+                    "Reporte exportado",
+                    "Éxito",
+                    "El reporte PDF se ha guardado correctamente.\n\n" + archivoDestino.getAbsolutePath()
+                );
+            }
+
+        } catch (Exception e) {
+            AlertaEstilizada.mostrarError(
+                "Error al exportar reporte",
+                "No se pudo exportar el reporte",
+                "Error: " + e.getMessage()
+            );
+            e.printStackTrace();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////// /
@@ -1486,11 +1905,10 @@ public class controladorApp implements Initializable {
                 // Cuando se pulse, actualizar el texto del MenuButton y cargar modelos
                 m.setOnAction(e -> {
                     mnMarcaCompra.setText(nombreMarca);
-                    System.out.println("Marca seleccionada para compra: " + nombreMarca);
                     // Habilitar y cargar modelos para esta marca
                     cargarModelosPorMarcaCompra(nombreMarca);
-                    // Actualizar búsqueda automáticamente al seleccionar marca
-                    actualizarBusquedaCompraAutomatica();
+                    // Actualizar tabla automáticamente al seleccionar marca
+                    actualizarTablaCochesCompra();
                 });
 
                 mnMarcaCompra.getItems().add(m);
@@ -1627,8 +2045,7 @@ public class controladorApp implements Initializable {
             if (newValue != null) {
                 txtComboModeloCompra.positionCaret(txtComboModeloCompra.getText().length());
                 // Actualizar búsqueda automáticamente al seleccionar modelo
-                actualizarBusquedaCompraAutomatica();
-            }
+                    }
         });
     }
 
@@ -1766,8 +2183,7 @@ public class controladorApp implements Initializable {
         return esHijoDeTabla(target, tablaRegistro) ||
                esHijoDeTabla(target, TablaCoches) ||
                esHijoDeTabla(target, tblAlquiler) ||
-               esHijoDeTabla(target, TblCoincidencias) ||
-               esHijoDeTabla(target, tblOpcionesCompra);
+               esHijoDeTabla(target, TblCoincidencias);
     }
 
     /**
@@ -1785,9 +2201,6 @@ public class controladorApp implements Initializable {
         }
         if (TblCoincidencias != null) {
             TblCoincidencias.getSelectionModel().clearSelection();
-        }
-        if (tblOpcionesCompra != null) {
-            tblOpcionesCompra.getSelectionModel().clearSelection();
         }
     }
 
@@ -1880,11 +2293,43 @@ public class controladorApp implements Initializable {
             clnAño.setCellValueFactory(new PropertyValueFactory<>("Año"));
             clnBastidor.setCellValueFactory(new PropertyValueFactory<>("Bastidor"));
             clnColor.setCellValueFactory(new PropertyValueFactory<>("Color"));
+
+            // Actualizar gráfica de coches por año
+            actualizarGraficaCochesPorAño();
         } catch (Exception e) {
             System.err.println("✗ Error al inicializar las tablas: " + e.getMessage());
             e.printStackTrace();
         }
 
+    }
+
+    private void actualizarGraficaCochesPorAño() {
+        if (chartCochesPorAño == null) return;
+
+        // Limpiar datos anteriores
+        chartCochesPorAño.getData().clear();
+
+        // Obtener coches de la tabla
+        ObservableList<Coche> coches = TablaCoches.getItems();
+        if (coches == null || coches.isEmpty()) return;
+
+        // Contar coches por año
+        Map<String, Integer> cochesPorAño = new HashMap<>();
+        for (Coche coche : coches) {
+            String año = coche.getAño();
+            cochesPorAño.put(año, cochesPorAño.getOrDefault(año, 0) + 1);
+        }
+
+        // Crear serie de datos
+        XYChart.Series<String, Number> serie = new XYChart.Series<>();
+        serie.setName("Vehículos");
+
+        // Ordenar años y agregar datos
+        cochesPorAño.entrySet().stream()
+            .sorted(Map.Entry.comparingByKey())
+            .forEach(entry -> serie.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue())));
+
+        chartCochesPorAño.getData().add(serie);
     }
 
     private void limpiarCliente() {
@@ -1908,96 +2353,27 @@ public class controladorApp implements Initializable {
         ingresoDllantas.clear();
         ingresoDiseñoLlantas.clear();
         ingresoColor.clear();
-        ingresoMaterial.clear();
-        ingresoDiseñoInterior.clear();
         ingresoMatricula.clear();
-    }
-
-    @FXML
-    void setAlcantara(ActionEvent event) {
-        slcMaterialCompra.setText(alcantara.getText());
-        actualizarBusquedaCompraAutomatica();
-    }
-
-    @FXML
-    void setCuero(ActionEvent event) {
-        slcMaterialCompra.setText(cuero.getText());
-        actualizarBusquedaCompraAutomatica();
-    }
-
-    @FXML
-    void setTela(ActionEvent event) {
-        slcMaterialCompra.setText(tela.getText());
-        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setAzul(ActionEvent event) {
         sclColorCompra.setText(azul.getText());
-        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setBlanco(ActionEvent event) {
         sclColorCompra.setText(blanco.getText());
-        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setNegro(ActionEvent event) {
         sclColorCompra.setText(negro.getText());
-        actualizarBusquedaCompraAutomatica();
     }
 
     @FXML
     void setGris(ActionEvent event) {
         sclColorCompra.setText(gris.getText());
-        actualizarBusquedaCompraAutomatica();
-    }
-
-    @FXML
-    void setConfort(ActionEvent event) {
-        slcPatronCompra.setText(confort.getText());
-        actualizarBusquedaCompraAutomatica();
-    }
-
-    @FXML
-    void setDeportivo(ActionEvent event) {
-        slcPatronCompra.setText(deportivo.getText());
-        actualizarBusquedaCompraAutomatica();
-    }
-
-    @FXML
-    void setLujo(ActionEvent event) {
-        slcPatronCompra.setText(lujo.getText());
-        actualizarBusquedaCompraAutomatica();
-    }
-
-    /**
-     * Actualiza automáticamente la tabla de búsqueda de compra
-     * según los criterios seleccionados en los MenuButton
-     */
-    private void actualizarBusquedaCompraAutomatica() {
-        String marca = mnMarcaCompra.getText();
-        String modelo = cmbModeloCompra.getSelectionModel().getSelectedItem();
-        String patron = slcPatronCompra.getText();
-        String material = slcMaterialCompra.getText();
-        String color = sclColorCompra.getText();
-
-        // Realizar búsqueda flexible con los criterios actuales
-        tblOpcionesCompra.getItems().clear();
-        tblOpcionesCompra.setItems(Conexion.buscarCocheFlexible(marca, modelo, color, patron, material));
-
-        // Configurar las columnas de la tabla
-        clnMarcaCompra.setCellValueFactory(new PropertyValueFactory<>("Marca"));
-        clnModeloCompra.setCellValueFactory(new PropertyValueFactory<>("Modelo"));
-        clnAñoCompra.setCellValueFactory(new PropertyValueFactory<>("Año"));
-        clnColorCompra.setCellValueFactory(new PropertyValueFactory<>("Color"));
-        clnPrecioCompra.setCellValueFactory(new PropertyValueFactory<>("Precio"));
-        clnDiseñoRCompra.setCellValueFactory(new PropertyValueFactory<>("DiseñoRuedas"));
-        clnDiametroCompra.setCellValueFactory(new PropertyValueFactory<>("DiametroLlantas"));
-        clnInteriorCompra.setCellValueFactory(new PropertyValueFactory<>("Interior"));
-        clnMatIntCompra.setCellValueFactory(new PropertyValueFactory<>("Material"));
     }
 
     /**
@@ -2084,8 +2460,6 @@ public class controladorApp implements Initializable {
             tablaDeInformacion.getItems().clear();
             tablaDeInformacion.getItems().add("Color: " + coche.getColor());
             tablaDeInformacion.getItems().add("Precio: " + coche.getPrecioBase() + "€");
-            tablaDeInformacion.getItems().add("Diseño Interior: " + coche.getDisenoInterior());
-            tablaDeInformacion.getItems().add("Material Interior: " + coche.getMaterialInterior());
             tablaDeInformacion.getItems().add("Diseño Llantas: " + coche.getDisenoLlantas());
             tablaDeInformacion.getItems().add("Diámetro Llantas: " + coche.getDiametroLlantas() + "\"");
             tablaDeInformacion.getItems().add("Disponible Venta: " + (coche.getDisponibleVentas() ? "Sí" : "No"));
@@ -2108,9 +2482,6 @@ public class controladorApp implements Initializable {
 
         // Menú contextual para tabla de Coincidencias
         configurarMenuContextualCoincidencias();
-
-        // Menú contextual para tabla de Opciones de Compra
-        configurarMenuContextualOpcionesCompra();
     }
 
     /**
@@ -2231,47 +2602,6 @@ public class controladorApp implements Initializable {
 
         contextMenu.getItems().add(eliminarItem);
         TblCoincidencias.setContextMenu(contextMenu);
-    }
-
-    /**
-     * Configura el menú contextual para la tabla de Opciones de Compra
-     */
-    private void configurarMenuContextualOpcionesCompra() {
-        javafx.scene.control.ContextMenu contextMenu = new javafx.scene.control.ContextMenu();
-
-        javafx.scene.control.MenuItem modificarItem = new javafx.scene.control.MenuItem("Modificar");
-        modificarItem.setOnAction(e -> editarIngreso(new ActionEvent()));
-
-        javafx.scene.control.MenuItem eliminarItem = new javafx.scene.control.MenuItem("Eliminar");
-        eliminarItem.setOnAction(e -> {
-            CocheCompra cocheCompraSeleccionado = tblOpcionesCompra.getSelectionModel().getSelectedItem();
-            if (cocheCompraSeleccionado != null) {
-                boolean confirmado = AlertaEstilizada.confirmar(
-                    "Eliminar Coche",
-                    "¿Estás seguro?",
-                    "¿Deseas eliminar el coche " + cocheCompraSeleccionado.getMarca() + " " + cocheCompraSeleccionado.getModelo() + " (" + cocheCompraSeleccionado.getMatricula() + ")?"
-                );
-                if (confirmado) {
-                    try {
-                        // Buscar el coche completo para obtener el bastidor
-                        CocheCompleto coche = Conexion.buscarCochePorMatricula(cocheCompraSeleccionado.getMatricula());
-                        if (coche != null) {
-                            Conexion.borrarCoche(coche.getNumBastidor());
-                            tblOpcionesCompra.getItems().remove(cocheCompraSeleccionado);
-                            iniciarTablas();
-                            AlertaEstilizada.mostrarInformacion("Coche eliminado", "Éxito", "El coche ha sido eliminado correctamente");
-                        } else {
-                            AlertaEstilizada.mostrarError("Error", "Coche no encontrado", "No se encontró el coche con esa matrícula");
-                        }
-                    } catch (Exception ex) {
-                        AlertaEstilizada.mostrarError("Error al eliminar", "Error", "No se pudo eliminar el coche: " + ex.getMessage());
-                    }
-                }
-            }
-        });
-
-        contextMenu.getItems().addAll(modificarItem, eliminarItem);
-        tblOpcionesCompra.setContextMenu(contextMenu);
     }
 
 }

@@ -577,8 +577,8 @@ public class Conexion {
 
         ObservableList<CocheCompra> lista = FXCollections.observableArrayList();
 
-        // Construir la consulta SQL dinámicamente
-        StringBuilder sql = new StringBuilder("SELECT * FROM coche WHERE disponible_ventas = true");
+        // Construir la consulta SQL dinámicamente (sin columnas de interior)
+        StringBuilder sql = new StringBuilder("SELECT num_bastidor, marca, modelo, año, precio_base, color, diseño_llantas, diametro_llantas, matricula FROM coche WHERE disponible_ventas = true");
         List<String> parametros = new ArrayList<>();
 
         // Agregar condiciones solo si el parámetro no está vacío
@@ -597,15 +597,7 @@ public class Conexion {
             parametros.add(color);
         }
 
-        if (diseñoInterior != null && !diseñoInterior.trim().isEmpty() && !diseñoInterior.equals("Diseño Interior")) {
-            sql.append(" AND diseño_interior = ?");
-            parametros.add(diseñoInterior);
-        }
-
-        if (materialInterior != null && !materialInterior.trim().isEmpty() && !materialInterior.equals("Material Interior")) {
-            sql.append(" AND material_interior = ?");
-            parametros.add(materialInterior);
-        }
+        // Los parámetros de interior ya no se usan
 
         try (PreparedStatement pst = conexion.prepareStatement(sql.toString())) {
             // Establecer parámetros dinámicamente
@@ -623,12 +615,11 @@ public class Conexion {
                 String colorResult = resultado.getString("color");
                 String diseñoRuedas = resultado.getString("diseño_llantas");
                 String diametroLlantas = resultado.getString("diametro_llantas");
-                String interiorResult = resultado.getString("diseño_interior");
-                String materialResult = resultado.getString("material_interior");
+                String matriculaResult = resultado.getString("matricula");
 
                 CocheCompra c = new CocheCompra(
                     marcaResult, modeloResult, añoResult, precioResult, colorResult,
-                    diseñoRuedas, materialResult, diametroLlantas, interiorResult, materialResult
+                    diseñoRuedas, matriculaResult, diametroLlantas, "", ""
                 );
 
                 lista.add(c);
@@ -665,11 +656,9 @@ public class Conexion {
             String color,
             String diseñoLlantas,
             String diametroLlantas,
-            String diseñoInterior,
-            String materialInterior,
             String matricula) throws SQLException {
 
-        String sql = "INSERT INTO coche (num_bastidor, marca, modelo, año, kilometraje, disponible_ventas, disponible_alquiler, precio_base, color, diseño_llantas, diametro_llantas, diseño_interior, material_interior, matricula) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO coche (num_bastidor, marca, modelo, año, kilometraje, disponible_ventas, disponible_alquiler, precio_base, color, diseño_llantas, diametro_llantas, matricula) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, numBastidor);
@@ -683,9 +672,7 @@ public class Conexion {
             ps.setString(9, color);
             ps.setString(10, diseñoLlantas);
             ps.setInt(11, Integer.parseInt(diametroLlantas));
-            ps.setString(12, diseñoInterior);
-            ps.setString(13, materialInterior);
-            ps.setString(14, matricula);
+            ps.setString(12, matricula);
 
             int filas = ps.executeUpdate();
             System.out.println("Filas insertadas: " + filas);
@@ -747,13 +734,11 @@ public class Conexion {
             String color,
             String diseñoLlantas,
             String diametroLlantas,
-            String diseñoInterior,
-            String materialInterior,
             String matricula) throws SQLException {
 
         String sql = "UPDATE coche SET marca=?, modelo=?, año=?, kilometraje=?, disponible_ventas=?, " +
                 "disponible_alquiler=?, precio_base=?, color=?, diseño_llantas=?, diametro_llantas=?, " +
-                "diseño_interior=?, material_interior=?, matricula=? WHERE num_bastidor=?";
+                "matricula=? WHERE num_bastidor=?";
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             // SET clause - en el orden del SQL
@@ -767,12 +752,10 @@ public class Conexion {
             ps.setString(8, color); // color
             ps.setString(9, diseñoLlantas); // diseño_llantas
             ps.setInt(10, Integer.parseInt(diametroLlantas)); // diametro_llantas (INTEGER)
-            ps.setString(11, diseñoInterior); // diseño_interior
-            ps.setString(12, materialInterior); // material_interior
-            ps.setString(13, matricula); // matricula
+            ps.setString(11, matricula); // matricula
 
             // WHERE clause - al final
-            ps.setString(14, numBastidor); // num_bastidor
+            ps.setString(12, numBastidor); // num_bastidor
 
             int filas = ps.executeUpdate();
 
