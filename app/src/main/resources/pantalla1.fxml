@@ -309,6 +309,7 @@
                               <Insets top="10.0" />
                            </VBox.margin>
                            <children>
+                              <Button fx:id="btnInformeVehiculo" disable="true" mnemonicParsing="false" onAction="#descargarInformeVehiculo" prefHeight="26.0" prefWidth="130.0" text="Informe Vehiculo" />
                               <Button fx:id="btnCompra" mnemonicParsing="false" onAction="#efectuarCompra" prefHeight="26.0" prefWidth="106.0" text="Comprar" />
                               <Button fx:id="btnCancelarCompra" mnemonicParsing="false" onAction="#cancelarCompra" prefHeight="26.0" prefWidth="95.0" text="Cancelar" />
                            </children>

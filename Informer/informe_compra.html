@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Informe de Compra - AutoReach</title>
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            padding: 30px;
+        }
+
+        /* Header */
+        .header {
+            background: #1E3A8A;
+            border-radius: 10px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+        }
+        .header h1 {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .header .fecha {
+            color: white;
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+
+        /* Secciones */
+        .section {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1E3A8A;
+            margin-bottom: 5px;
+        }
+        .section-bar {
+            width: 150px;
+            height: 3px;
+            background: #F97316;
+            margin-bottom: 20px;
+        }
+
+        /* Filas de informacion */
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #374151;
+            width: 120px;
+            font-size: 11px;
+        }
+        .info-value {
+            color: #1E3A8A;
+            flex: 1;
+            font-size: 11px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: #6B7280;
+            font-size: 10px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Informe de Compra - AutoReach</h1>
+        <div class="fecha">Fecha: {{FECHA}}</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Datos Bancarios</div>
+        <div class="section-bar"></div>
+
+        <div class="info-row">
+            <span class="info-label">Banco:</span>
+            <span class="info-value">{{BANCO}}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">IBAN:</span>
+            <span class="info-value">{{IBAN}}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Titular:</span>
+            <span class="info-value">{{TITULAR}}</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Detalles de Financiacion</div>
+        <div class="section-bar"></div>
+
+        <div class="info-row">
+            <span class="info-label">Cuota Inicial:</span>
+            <span class="info-value">{{CUOTA_INICIAL}} EUR</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Cuota Final:</span>
+            <span class="info-value">{{CUOTA_FINAL}} EUR</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Cuota Mensual:</span>
+            <span class="info-value">{{CUOTA_MENSUAL}} EUR</span>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Documento generado automaticamente por AutoReach</p>
+    </div>
+</body>
+</html>

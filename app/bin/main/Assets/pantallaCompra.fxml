@@ -113,14 +113,24 @@
             </TextField>
          </children>
       </HBox>
-      <HBox alignment="CENTER_LEFT" prefHeight="39.0" prefWidth="422.0">
+      <HBox alignment="CENTER" prefHeight="39.0" prefWidth="422.0">
          <VBox.margin>
-            <Insets top="60.0" />
+            <Insets top="40.0" />
          </VBox.margin>
          <children>
+            <Button fx:id="btnDescargarInfoVehiculo" mnemonicParsing="false" onAction="#descargarInformeVehiculo" text="Informe Vehiculo">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="btnDescargarPDF" mnemonicParsing="false" onAction="#descargarInformePDF" text="Informe Compra">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Button>
             <Button fx:id="btnRealizarCompra" mnemonicParsing="false" onAction="#efectuarCompra" text="Aceptar">
                <HBox.margin>
-                  <Insets left="220.0" right="30.0" />
+                  <Insets right="10.0" />
                </HBox.margin>
             </Button>
             <Button fx:id="btnRevetirCompra" mnemonicParsing="false" onAction="#revertirCompra" text="Cancelar" />

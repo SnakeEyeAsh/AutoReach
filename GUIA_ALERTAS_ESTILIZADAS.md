@@ -1,11 +1,11 @@
 # Guía de uso de AlertaEstilizada
 
-## ✨ Características
+##  Características
 - **Tema profesional**: Nord Dark (elegante y moderno)
 - **Solo las alertas tienen estilo**: Tu aplicación mantiene su aspecto original
 - **Fácil de usar**: Métodos simples y concisos
 
-## 📋 Uso
+##  Uso
 
 ### Antes (Alert tradicional):
 ```java
@@ -21,7 +21,7 @@ alerta.showAndWait();
 AlertaEstilizada.mostrarAdvertencia("Título", "Encabezado", "Contenido");
 ```
 
-## 🎯 Métodos disponibles
+##  Métodos disponibles
 
 ### 1. Alerta de Información
 ```java
@@ -72,7 +72,7 @@ if (confirmado) {
 | `Alert alerta = new Alert(AlertType.ERROR);`<br>`...`<br>`alerta.showAndWait();` | `AlertaEstilizada.mostrarError(titulo, header, content);` |
 | `Alert confirmacion = new Alert(AlertType.CONFIRMATION);`<br>`...`<br>`if (confirmacion.showAndWait().get() == ButtonType.OK)` | `if (AlertaEstilizada.confirmar(titulo, header, content))` |
 
-## 🎨 Cambiar tema
+##  Cambiar tema
 
 Si quieres cambiar el tema profesional, edita `AlertaEstilizada.java` línea 14:
 
@@ -87,7 +87,7 @@ new CupertinoLight()  // macOS claro
 new Dracula()         // Dracula theme
 ```
 
-## ✅ Ejemplos ya actualizados en tu código:
+##  Ejemplos ya actualizados en tu código:
 
 1. **borrarAlq()** - línea 999
 2. **eliminarCliente()** - línea 794

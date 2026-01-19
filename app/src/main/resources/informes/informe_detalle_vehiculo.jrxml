@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="informe_detalle_vehiculo"
+              pageWidth="595" pageHeight="842"
+              columnWidth="535"
+              leftMargin="30" rightMargin="30" topMargin="30" bottomMargin="30"
+              uuid="22222222-2222-2222-2222-222222222200">
+
+    <style name="TituloHeader" fontSize="22" isBold="true" forecolor="#FFFFFF"/>
+    <style name="Matricula" fontSize="28" isBold="true" forecolor="#FFFFFF"/>
+    <style name="TituloSeccion" fontSize="12" isBold="true" forecolor="#1E3A8A"/>
+    <style name="LabelCampo" fontSize="10" isBold="true" forecolor="#6B7280"/>
+    <style name="ValorCampo" fontSize="12" isBold="true" forecolor="#1E3A8A"/>
+    <style name="Precio" fontSize="24" isBold="true" forecolor="#1E3A8A"/>
+    <style name="Footer" fontSize="9" forecolor="#6B7280"/>
+
+    <parameter name="FECHA" class="java.lang.String"/>
+    <parameter name="MATRICULA" class="java.lang.String"/>
+    <parameter name="MARCA" class="java.lang.String"/>
+    <parameter name="MODELO" class="java.lang.String"/>
+    <parameter name="ANO" class="java.lang.String"/>
+    <parameter name="COLOR" class="java.lang.String"/>
+    <parameter name="PRECIO" class="java.lang.String"/>
+    <parameter name="DIAMETRO_LLANTAS" class="java.lang.String"/>
+    <parameter name="DISENO_RUEDAS" class="java.lang.String"/>
+    <parameter name="INTERIOR" class="java.lang.String"/>
+    <parameter name="MATERIAL" class="java.lang.String"/>
+
+    <title>
+        <band height="120">
+            <rectangle radius="10">
+                <reportElement x="0" y="0" width="535" height="110" backcolor="#1E3A8A" uuid="22222222-2222-2222-2222-222222222201"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="TituloHeader" x="20" y="15" width="300" height="30" uuid="22222222-2222-2222-2222-222222222202"/>
+                <text><![CDATA[Ficha del Vehiculo]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="Matricula" x="20" y="50" width="300" height="40" uuid="22222222-2222-2222-2222-222222222203"/>
+                <textFieldExpression><![CDATA[$P{MATRICULA}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="400" y="15" width="120" height="20" forecolor="#FFFFFF" uuid="22222222-2222-2222-2222-222222222204"/>
+                <textElement textAlignment="Right">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Fecha: " + $P{FECHA}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <detail>
+        <band height="480">
+            <textField>
+                <reportElement x="0" y="15" width="535" height="35" forecolor="#1E3A8A" uuid="22222222-2222-2222-2222-222222222205"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="20" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{MARCA} + " " + $P{MODELO}]]></textFieldExpression>
+            </textField>
+
+            <line>
+                <reportElement x="150" y="55" width="235" height="1" forecolor="#E5E7EB" uuid="22222222-2222-2222-2222-222222222206"/>
+                <graphicElement>
+                    <pen lineWidth="2"/>
+                </graphicElement>
+            </line>
+
+            <rectangle radius="8">
+                <reportElement x="0" y="70" width="535" height="140" backcolor="#F9FAFB" uuid="22222222-2222-2222-2222-222222222207"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            <rectangle>
+                <reportElement x="0" y="70" width="4" height="140" backcolor="#F97316" uuid="22222222-2222-2222-2222-222222222208"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="20" y="85" width="100" height="15" uuid="22222222-2222-2222-2222-222222222209"/>
+                <text><![CDATA[MARCA]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="20" y="100" width="230" height="25" uuid="22222222-2222-2222-2222-222222222210"/>
+                <textFieldExpression><![CDATA[$P{MARCA}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="280" y="85" width="100" height="15" uuid="22222222-2222-2222-2222-222222222211"/>
+                <text><![CDATA[MODELO]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="280" y="100" width="240" height="25" uuid="22222222-2222-2222-2222-222222222212"/>
+                <textFieldExpression><![CDATA[$P{MODELO}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="20" y="135" width="100" height="15" uuid="22222222-2222-2222-2222-222222222213"/>
+                <text><![CDATA[ANO]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="20" y="150" width="230" height="25" uuid="22222222-2222-2222-2222-222222222214"/>
+                <textFieldExpression><![CDATA[$P{ANO}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="280" y="135" width="100" height="15" uuid="22222222-2222-2222-2222-222222222215"/>
+                <text><![CDATA[COLOR]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="280" y="150" width="240" height="25" uuid="22222222-2222-2222-2222-222222222216"/>
+                <textFieldExpression><![CDATA[$P{COLOR}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="TituloSeccion" x="0" y="230" width="200" height="20" uuid="22222222-2222-2222-2222-222222222217"/>
+                <text><![CDATA[ESPECIFICACIONES TECNICAS]]></text>
+            </staticText>
+            <line>
+                <reportElement x="0" y="252" width="535" height="1" forecolor="#E5E7EB" uuid="22222222-2222-2222-2222-222222222218"/>
+                <graphicElement>
+                    <pen lineWidth="1"/>
+                </graphicElement>
+            </line>
+
+            <rectangle radius="6">
+                <reportElement x="0" y="265" width="170" height="60" backcolor="#F0F9FF" uuid="22222222-2222-2222-2222-222222222219"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="275" width="140" height="15" uuid="22222222-2222-2222-2222-222222222220"/>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[DIAMETRO LLANTAS]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="15" y="292" width="140" height="25" forecolor="#0369A1" uuid="22222222-2222-2222-2222-222222222221"/>
+                <textElement textAlignment="Center">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{DIAMETRO_LLANTAS} + " pulg"]]></textFieldExpression>
+            </textField>
+
+            <rectangle radius="6">
+                <reportElement x="182" y="265" width="170" height="60" backcolor="#F0F9FF" uuid="22222222-2222-2222-2222-222222222222"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="LabelCampo" x="197" y="275" width="140" height="15" uuid="22222222-2222-2222-2222-222222222223"/>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[DISENO RUEDAS]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="197" y="292" width="140" height="25" forecolor="#0369A1" uuid="22222222-2222-2222-2222-222222222224"/>
+                <textElement textAlignment="Center">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{DISENO_RUEDAS}]]></textFieldExpression>
+            </textField>
+
+            <rectangle radius="6">
+                <reportElement x="364" y="265" width="170" height="60" backcolor="#F0F9FF" uuid="22222222-2222-2222-2222-222222222225"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="LabelCampo" x="379" y="275" width="140" height="15" uuid="22222222-2222-2222-2222-222222222226"/>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[INTERIOR]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="379" y="292" width="140" height="25" forecolor="#0369A1" uuid="22222222-2222-2222-2222-222222222227"/>
+                <textElement textAlignment="Center">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{INTERIOR}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="0" y="345" width="100" height="15" uuid="22222222-2222-2222-2222-222222222228"/>
+                <text><![CDATA[MATERIAL]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="0" y="362" width="535" height="25" uuid="22222222-2222-2222-2222-222222222229"/>
+                <textFieldExpression><![CDATA[$P{MATERIAL}]]></textFieldExpression>
+            </textField>
+
+            <rectangle radius="10">
+                <reportElement x="100" y="405" width="335" height="70" backcolor="#DBEAFE" uuid="22222222-2222-2222-2222-222222222230"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="LabelCampo" x="100" y="415" width="335" height="15" uuid="22222222-2222-2222-2222-222222222231"/>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[PRECIO DE VENTA]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="Precio" x="100" y="432" width="335" height="35" uuid="22222222-2222-2222-2222-222222222232"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$P{PRECIO} + " EUR"]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="50">
+            <line>
+                <reportElement x="0" y="10" width="535" height="1" forecolor="#E5E7EB" uuid="22222222-2222-2222-2222-222222222233"/>
+            </line>
+            <staticText>
+                <reportElement style="Footer" x="0" y="20" width="535" height="20" uuid="22222222-2222-2222-2222-222222222234"/>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[AutoReach - Sistema de Gestion de Vehiculos]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+
+</jasperReport>

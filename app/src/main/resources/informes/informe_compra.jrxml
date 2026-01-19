@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="informe_compra"
+              pageWidth="595" pageHeight="842"
+              columnWidth="535"
+              leftMargin="30" rightMargin="30" topMargin="30" bottomMargin="30"
+              uuid="a1b2c3d4-e5f6-7890-abcd-ef1234567890">
+
+    <style name="TituloHeader" fontSize="24" isBold="true" forecolor="#FFFFFF"/>
+    <style name="SubtituloHeader" fontSize="12" forecolor="#FFFFFF"/>
+    <style name="TituloSeccion" fontSize="14" isBold="true" forecolor="#1E3A8A"/>
+    <style name="LabelCampo" fontSize="11" isBold="true" forecolor="#374151"/>
+    <style name="ValorCampo" fontSize="11" forecolor="#1E3A8A"/>
+    <style name="Footer" fontSize="10" forecolor="#6B7280"/>
+
+    <parameter name="FECHA" class="java.lang.String"/>
+    <parameter name="BANCO" class="java.lang.String"/>
+    <parameter name="IBAN" class="java.lang.String"/>
+    <parameter name="TITULAR" class="java.lang.String"/>
+    <parameter name="CUOTA_INICIAL" class="java.lang.String"/>
+    <parameter name="CUOTA_FINAL" class="java.lang.String"/>
+    <parameter name="CUOTA_MENSUAL" class="java.lang.String"/>
+
+    <title>
+        <band height="100">
+            <rectangle radius="10">
+                <reportElement x="0" y="0" width="535" height="90" backcolor="#1E3A8A" uuid="11111111-1111-1111-1111-111111111101"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="TituloHeader" x="20" y="20" width="495" height="35" uuid="11111111-1111-1111-1111-111111111102"/>
+                <text><![CDATA[Informe de Compra - AutoReach]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="SubtituloHeader" x="20" y="55" width="495" height="20" uuid="11111111-1111-1111-1111-111111111103"/>
+                <textFieldExpression><![CDATA["Fecha: " + $P{FECHA}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <detail>
+        <band height="320">
+            <rectangle radius="8">
+                <reportElement x="0" y="10" width="535" height="130" backcolor="#FFFFFF" uuid="11111111-1111-1111-1111-111111111104"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#E5E7EB"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement style="TituloSeccion" x="15" y="20" width="200" height="25" uuid="11111111-1111-1111-1111-111111111105"/>
+                <text><![CDATA[Datos Bancarios]]></text>
+            </staticText>
+            <line>
+                <reportElement x="15" y="45" width="150" height="1" forecolor="#F97316" uuid="11111111-1111-1111-1111-111111111106"/>
+                <graphicElement>
+                    <pen lineWidth="3"/>
+                </graphicElement>
+            </line>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="55" width="100" height="20" uuid="11111111-1111-1111-1111-111111111107"/>
+                <text><![CDATA[Banco:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="120" y="55" width="400" height="20" uuid="11111111-1111-1111-1111-111111111108"/>
+                <textFieldExpression><![CDATA[$P{BANCO} != null && !$P{BANCO}.isEmpty() ? $P{BANCO} : "-"]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="80" width="100" height="20" uuid="11111111-1111-1111-1111-111111111109"/>
+                <text><![CDATA[IBAN:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="120" y="80" width="400" height="20" uuid="11111111-1111-1111-1111-111111111110"/>
+                <textFieldExpression><![CDATA[$P{IBAN} != null && !$P{IBAN}.isEmpty() ? $P{IBAN} : "-"]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="105" width="100" height="20" uuid="11111111-1111-1111-1111-111111111111"/>
+                <text><![CDATA[Titular:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="120" y="105" width="400" height="20" uuid="11111111-1111-1111-1111-111111111112"/>
+                <textFieldExpression><![CDATA[$P{TITULAR} != null && !$P{TITULAR}.isEmpty() ? $P{TITULAR} : "-"]]></textFieldExpression>
+            </textField>
+
+            <rectangle radius="8">
+                <reportElement x="0" y="160" width="535" height="150" backcolor="#FFFFFF" uuid="11111111-1111-1111-1111-111111111113"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#E5E7EB"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement style="TituloSeccion" x="15" y="170" width="250" height="25" uuid="11111111-1111-1111-1111-111111111114"/>
+                <text><![CDATA[Detalles de Financiacion]]></text>
+            </staticText>
+            <line>
+                <reportElement x="15" y="195" width="200" height="1" forecolor="#F97316" uuid="11111111-1111-1111-1111-111111111115"/>
+                <graphicElement>
+                    <pen lineWidth="3"/>
+                </graphicElement>
+            </line>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="210" width="120" height="20" uuid="11111111-1111-1111-1111-111111111116"/>
+                <text><![CDATA[Cuota Inicial:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="140" y="210" width="380" height="20" uuid="11111111-1111-1111-1111-111111111117"/>
+                <textFieldExpression><![CDATA[$P{CUOTA_INICIAL} != null && !$P{CUOTA_INICIAL}.isEmpty() ? $P{CUOTA_INICIAL} + " EUR" : "-"]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="235" width="120" height="20" uuid="11111111-1111-1111-1111-111111111118"/>
+                <text><![CDATA[Cuota Final:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="140" y="235" width="380" height="20" uuid="11111111-1111-1111-1111-111111111119"/>
+                <textFieldExpression><![CDATA[$P{CUOTA_FINAL} != null && !$P{CUOTA_FINAL}.isEmpty() ? $P{CUOTA_FINAL} + " EUR" : "-"]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="260" width="120" height="20" uuid="11111111-1111-1111-1111-111111111120"/>
+                <text><![CDATA[Cuota Mensual:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="140" y="260" width="380" height="20" uuid="11111111-1111-1111-1111-111111111121"/>
+                <textFieldExpression><![CDATA[$P{CUOTA_MENSUAL} != null && !$P{CUOTA_MENSUAL}.isEmpty() ? $P{CUOTA_MENSUAL} + " EUR" : "-"]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="40">
+            <staticText>
+                <reportElement style="Footer" x="0" y="10" width="535" height="20" uuid="11111111-1111-1111-1111-111111111122"/>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[Documento generado automaticamente por AutoReach]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+
+</jasperReport>
