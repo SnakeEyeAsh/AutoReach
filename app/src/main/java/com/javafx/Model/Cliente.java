@@ -3,23 +3,23 @@ package com.javafx.Model;
 
 
 public class Cliente {
-    
+
     private String nombre;
     private String apellidos;
     private String dni;
-    private double telefono;
+    private long telefono;  // Cambiado de double a long para evitar perdida de precision
     private String email;
     private String direccion;
 
-    public Cliente( String nombre, String apellidos, String dni, double telefono, String email,String direccion) {
-        
+    public Cliente(String nombre, String apellidos, String dni, long telefono, String email, String direccion) {
+
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.dni = dni;
         this.telefono = telefono;
         this.email = email;
-        this.direccion=direccion;
-        
+        this.direccion = direccion;
+
     }
 
     
@@ -48,11 +48,11 @@ public class Cliente {
         this.dni = dni;
     }
 
-    public double getTelefono() {
+    public long getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(double telefono) {
+    public void setTelefono(long telefono) {
         this.telefono = telefono;
     }
 

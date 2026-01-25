@@ -32,6 +32,69 @@ public class Conexion {
 
     }
 
+    /**
+     * Verifica si la conexion esta activa y disponible
+     * @return true si la conexion esta disponible, false en caso contrario
+     */
+    public static boolean isConexionActiva() {
+        try {
+            return conexion != null && !conexion.isClosed();
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Parsea un String a Integer de forma segura
+     * @param value el valor a parsear
+     * @param defaultValue valor por defecto si falla el parseo
+     * @return el valor parseado o el valor por defecto
+     */
+    public static int parseIntSafe(String value, int defaultValue) {
+        if (value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value.trim().replaceAll("[^0-9-]", ""));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Parsea un String a Double de forma segura
+     * @param value el valor a parsear
+     * @param defaultValue valor por defecto si falla el parseo
+     * @return el valor parseado o el valor por defecto
+     */
+    public static double parseDoubleSafe(String value, double defaultValue) {
+        if (value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Double.parseDouble(value.trim().replaceAll("[^0-9.-]", ""));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Parsea un String a Long de forma segura (util para telefonos)
+     * @param value el valor a parsear
+     * @param defaultValue valor por defecto si falla el parseo
+     * @return el valor parseado o el valor por defecto
+     */
+    public static long parseLongSafe(String value, long defaultValue) {
+        if (value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Long.parseLong(value.trim().replaceAll("[^0-9]", ""));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
     public static Connection getConnection() {
         return conexion;
     }
@@ -78,9 +141,14 @@ public class Conexion {
 
         ObservableList<Cliente> lista = FXCollections.observableArrayList();
 
-        try {
-            Statement consulta = conexion.createStatement();
-            ResultSet resultado = consulta.executeQuery("SELECT * FROM cliente;");
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return lista;
+        }
+
+        try (Statement consulta = conexion.createStatement();
+             ResultSet resultado = consulta.executeQuery("SELECT * FROM cliente;")) {
+
             while (resultado.next()) {
                 String nombre = resultado.getString("nombre");
                 String apellidos = resultado.getString("apellidos");
@@ -89,13 +157,8 @@ public class Conexion {
                 String mail = resultado.getString("email");
                 String direccion = resultado.getString("direccion");
 
-                // o como obtengas el valor
-                long valor;
-                if (telefono != null && !telefono.trim().isEmpty()) {
-                    valor = Long.parseLong(telefono.trim());
-                } else {
-                    valor = 0L; // valor por defecto
-                }
+                // Parseo seguro del telefono
+                long valor = parseLongSafe(telefono, 0L);
 
                 Cliente c = new Cliente(nombre, apellidos, dni, valor, mail, direccion);
 
@@ -103,7 +166,7 @@ public class Conexion {
 
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.err.println("Error al mostrar clientes: " + e.getMessage());
         }
         return lista;
     }
@@ -112,10 +175,14 @@ public class Conexion {
 
         ObservableList<Alquiler> lista = FXCollections.observableArrayList();
 
-        try {
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return lista;
+        }
 
-            Statement consulta = conexion.createStatement();
-            ResultSet resultado = consulta.executeQuery("SELECT * FROM transaccion WHERE fecha_fin IS NOT NULL;");
+        try (Statement consulta = conexion.createStatement();
+             ResultSet resultado = consulta.executeQuery("SELECT * FROM transaccion WHERE fecha_fin IS NOT NULL;")) {
+
             while (resultado.next()) {
 
                 Timestamp fecha = resultado.getTimestamp("fecha_fin");
@@ -126,13 +193,11 @@ public class Conexion {
 
                 Alquiler a = new Alquiler(fecha, hora, dni, matricula, fechaRecogida);
 
-                // System.out.println(matricula);
-
                 lista.add(a);
             }
 
         } catch (SQLException error) {
-            System.out.println("Error en la consulta de Alquiler " + error.getMessage());
+            System.err.println("Error en la consulta de Alquiler: " + error.getMessage());
         }
         return lista;
 
@@ -142,9 +207,14 @@ public class Conexion {
 
         ObservableList<Coche> lista = FXCollections.observableArrayList();
 
-        try {
-            Statement consulta = conexion.createStatement();
-            ResultSet resultado = consulta.executeQuery("SELECT * FROM coche;");
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return lista;
+        }
+
+        try (Statement consulta = conexion.createStatement();
+             ResultSet resultado = consulta.executeQuery("SELECT * FROM coche;")) {
+
             while (resultado.next()) {
 
                 String marca = resultado.getString("marca");
@@ -165,7 +235,7 @@ public class Conexion {
             }
 
         } catch (SQLException error) {
-            System.out.println("Error en la consulta muestra de Coches " + error.getMessage());
+            System.err.println("Error en la consulta muestra de Coches: " + error.getMessage());
         }
         return lista;
 
@@ -181,26 +251,34 @@ public class Conexion {
 
         List<Cliente> lista = new ArrayList<>();
 
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return lista;
+        }
+
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
 
             ps.setString(1, dni);
 
-            ResultSet resultado = ps.executeQuery();
+            try (ResultSet resultado = ps.executeQuery()) {
+                while (resultado.next()) {
 
-            while (resultado.next()) {
+                    String nombre = resultado.getString("nombre");
+                    String apellido = resultado.getString("apellidos");
+                    String telefono = resultado.getString("telefono");
+                    String email = resultado.getString("email");
+                    String direccion = resultado.getString("direccion");
 
-                String nombre = resultado.getString("nombre");
-                String apellido = resultado.getString("apellidos");
-                String telefono = resultado.getString("telefono");
-                String email = resultado.getString("email");
-                String direccion = resultado.getString("direccion");
+                    // Parseo seguro del telefono
+                    long telefonoLong = parseLongSafe(telefono, 0L);
 
-                Cliente c = new Cliente(nombre, apellido, dni, Double.parseDouble(telefono), email, direccion);
-                lista.add(c);
+                    Cliente c = new Cliente(nombre, apellido, dni, telefonoLong, email, direccion);
+                    lista.add(c);
+                }
             }
 
         } catch (SQLException e) {
-            System.out.println("Error al actualizar Lista de clientes " + e.getMessage());
+            System.err.println("Error al buscar clientes: " + e.getMessage());
         }
 
         return lista;
@@ -342,20 +420,24 @@ public class Conexion {
     public static List<String> obtenerMarcas() {
 
         List<String> lista = new ArrayList<>();
-        try {
 
-            Statement consulta = conexion.createStatement();
-            ResultSet resultado = consulta.executeQuery("SELECT DISTINCT marca FROM coche;");
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return lista;
+        }
+
+        try (Statement consulta = conexion.createStatement();
+             ResultSet resultado = consulta.executeQuery("SELECT DISTINCT marca FROM coche;")) {
 
             while (resultado.next()) {
                 String marca = resultado.getString("marca");
-
-                lista.add(marca);
-                // System.out.println(marca);
+                if (marca != null) {
+                    lista.add(marca);
+                }
             }
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.err.println("Error al obtener marcas: " + e.getMessage());
         }
 
         return lista;
@@ -364,19 +446,27 @@ public class Conexion {
     public static List<String> obtenerModelosPorMarca(String marca) {
 
         List<String> lista = new ArrayList<>();
+
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return lista;
+        }
+
         String sql = "SELECT DISTINCT modelo FROM coche WHERE marca = ? ORDER BY modelo;";
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, marca);
-            ResultSet resultado = ps.executeQuery();
-
-            while (resultado.next()) {
-                String modelo = resultado.getString("modelo");
-                lista.add(modelo);
+            try (ResultSet resultado = ps.executeQuery()) {
+                while (resultado.next()) {
+                    String modelo = resultado.getString("modelo");
+                    if (modelo != null) {
+                        lista.add(modelo);
+                    }
+                }
             }
 
         } catch (SQLException e) {
-            System.out.println("Error al obtener modelos: " + e.getMessage());
+            System.err.println("Error al obtener modelos: " + e.getMessage());
         }
 
         return lista;
@@ -524,43 +614,50 @@ public class Conexion {
 
         ObservableList<CocheCompra> lista = FXCollections.observableArrayList();
 
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return lista;
+        }
+
+        if (coche == null) {
+            System.err.println("Error: El coche a buscar es null");
+            return lista;
+        }
+
         String sql = "SELECT * FROM coche WHERE marca = ? AND modelo = ? AND año = ? " +
                 "AND diseño_interior = ? AND material_interior = ? AND color = ?";
 
         try (PreparedStatement pst = conexion.prepareStatement(sql)) {
-            // Establecer parámetros
+            // Establecer parámetros con parsing seguro
             pst.setString(1, coche.getMarca());
             pst.setString(2, coche.getModelo());
-            pst.setInt(3, Integer.parseInt(coche.getAño()));
+            pst.setInt(3, parseIntSafe(coche.getAño(), 0));
             pst.setString(4, coche.getInterior());
             pst.setString(5, coche.getMaterial());
             pst.setString(6, coche.getColor());
 
-            ResultSet resultado = pst.executeQuery();
+            try (ResultSet resultado = pst.executeQuery()) {
+                while (resultado.next()) {
+                    String marca = resultado.getString("marca");
+                    String modelo = resultado.getString("modelo");
+                    String año = resultado.getString("año");
+                    String precio = resultado.getString("precio_base");
+                    String color = resultado.getString("color");
+                    String diseñoRuedas = resultado.getString("diseño_llantas");
+                    String diametroLlantas = resultado.getString("diametro_llantas");
+                    String interior = resultado.getString("diseño_interior");
+                    String material = resultado.getString("material_interior");
 
-            while (resultado.next()) {
-                String marca = resultado.getString("marca");
-                String modelo = resultado.getString("modelo");
-                String año = resultado.getString("año");
-                String precio = resultado.getString("precio_base");
-                String color = resultado.getString("color");
-                String diseñoRuedas = resultado.getString("diseño_llantas");
-                String diametroLlantas = resultado.getString("diametro_llantas");
-                String interior = resultado.getString("diseño_interior");
-                String material = resultado.getString("material_interior");
+                    CocheCompra c = new CocheCompra(marca, modelo, año, precio, color,
+                            diseñoRuedas, material, diametroLlantas,
+                            interior, material);
 
-                // ✅ Orden de parámetros corregido según el constructor
-                CocheCompra c = new CocheCompra(marca, modelo, año, precio, color,
-                        diseñoRuedas, material, diametroLlantas,
-                        interior, material);
-
-                lista.add(c);
+                    lista.add(c);
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error al buscar coche: " + e.getMessage());
-            e.printStackTrace();
         }
-        // System.out.println(lista);
         return lista;
     }
 
@@ -576,6 +673,11 @@ public class Conexion {
             String materialInterior) {
 
         ObservableList<CocheCompra> lista = FXCollections.observableArrayList();
+
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return lista;
+        }
 
         // Construir la consulta SQL dinámicamente (sin columnas de interior)
         StringBuilder sql = new StringBuilder("SELECT num_bastidor, marca, modelo, año, precio_base, color, diseño_llantas, diametro_llantas, matricula FROM coche WHERE disponible_ventas = true");
@@ -597,36 +699,33 @@ public class Conexion {
             parametros.add(color);
         }
 
-        // Los parámetros de interior ya no se usan
-
         try (PreparedStatement pst = conexion.prepareStatement(sql.toString())) {
             // Establecer parámetros dinámicamente
             for (int i = 0; i < parametros.size(); i++) {
                 pst.setString(i + 1, parametros.get(i));
             }
 
-            ResultSet resultado = pst.executeQuery();
+            try (ResultSet resultado = pst.executeQuery()) {
+                while (resultado.next()) {
+                    String marcaResult = resultado.getString("marca");
+                    String modeloResult = resultado.getString("modelo");
+                    String añoResult = resultado.getString("año");
+                    String precioResult = resultado.getString("precio_base");
+                    String colorResult = resultado.getString("color");
+                    String diseñoRuedas = resultado.getString("diseño_llantas");
+                    String diametroLlantas = resultado.getString("diametro_llantas");
+                    String matriculaResult = resultado.getString("matricula");
 
-            while (resultado.next()) {
-                String marcaResult = resultado.getString("marca");
-                String modeloResult = resultado.getString("modelo");
-                String añoResult = resultado.getString("año");
-                String precioResult = resultado.getString("precio_base");
-                String colorResult = resultado.getString("color");
-                String diseñoRuedas = resultado.getString("diseño_llantas");
-                String diametroLlantas = resultado.getString("diametro_llantas");
-                String matriculaResult = resultado.getString("matricula");
+                    CocheCompra c = new CocheCompra(
+                        marcaResult, modeloResult, añoResult, precioResult, colorResult,
+                        diseñoRuedas, matriculaResult, diametroLlantas, "", ""
+                    );
 
-                CocheCompra c = new CocheCompra(
-                    marcaResult, modeloResult, añoResult, precioResult, colorResult,
-                    diseñoRuedas, matriculaResult, diametroLlantas, "", ""
-                );
-
-                lista.add(c);
+                    lista.add(c);
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error al buscar coches flexibles: " + e.getMessage());
-            e.printStackTrace();
         }
 
         return lista;
@@ -658,64 +757,78 @@ public class Conexion {
             String diametroLlantas,
             String matricula) throws SQLException {
 
+        if (!isConexionActiva()) {
+            throw new SQLException("No hay conexion activa a la base de datos");
+        }
+
         String sql = "INSERT INTO coche (num_bastidor, marca, modelo, año, kilometraje, disponible_ventas, disponible_alquiler, precio_base, color, diseño_llantas, diametro_llantas, matricula) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, numBastidor);
             ps.setString(2, marca);
             ps.setString(3, modelo);
-            ps.setInt(4, Integer.parseInt(año));
-            ps.setDouble(5, Double.parseDouble(kilometraje));
+            ps.setInt(4, parseIntSafe(año, 0));
+            ps.setDouble(5, parseDoubleSafe(kilometraje, 0.0));
             ps.setBoolean(6, disponibleVentas);
             ps.setBoolean(7, disponibleAlquiler);
-            ps.setDouble(8, Double.parseDouble(precioBase));
+            ps.setDouble(8, parseDoubleSafe(precioBase, 0.0));
             ps.setString(9, color);
             ps.setString(10, diseñoLlantas);
-            ps.setInt(11, Integer.parseInt(diametroLlantas));
+            ps.setInt(11, parseIntSafe(diametroLlantas, 0));
             ps.setString(12, matricula);
 
             int filas = ps.executeUpdate();
             System.out.println("Filas insertadas: " + filas);
 
         } catch (SQLException error) {
-            System.out.println("Error al insertar Ingreso: " + error.getMessage());
+            System.err.println("Error al insertar Ingreso: " + error.getMessage());
+            throw error;
         }
     }
 
     // Buscar
     public static CocheCompleto buscarIngreso(String num_bastidor) {
 
-        CocheCompleto c = new CocheCompleto(num_bastidor, num_bastidor, num_bastidor, null, null, null, null, null,
-                num_bastidor, num_bastidor, null, num_bastidor, num_bastidor, num_bastidor);
+        // Crear objeto con valores por defecto
+        CocheCompleto c = new CocheCompleto(num_bastidor, "", "", 0, 0.0, false, false, 0.0,
+                "", "", 0, "", "", "");
+
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return c;
+        }
+
+        if (num_bastidor == null || num_bastidor.trim().isEmpty()) {
+            System.err.println("Error: El numero de bastidor es null o vacio");
+            return c;
+        }
 
         String sql = "SELECT * FROM coche WHERE num_bastidor = ?";
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, num_bastidor);
 
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-
-                c.setNumBastidor(num_bastidor);
-                c.setMarca(rs.getString("marca"));
-                c.setModelo(rs.getString("modelo"));
-                c.setAño(rs.getInt("año") + "");
-                c.setKilometraje(rs.getDouble("kilometraje"));
-                c.setDisponibleVentas(true);
-                c.setDisponibleAlquiler(true);
-                c.setPrecioBase(rs.getDouble("precio_base"));
-                c.setColor(rs.getString("color"));
-                c.setDisenoLlantas(rs.getString("diseño_llantas"));
-                c.setDiametroLlantas(rs.getInt("diametro_llantas"));
-                c.setDisenoInterior(rs.getString("diseño_interior"));
-                c.setMaterialInterior(rs.getString("material_interior"));
-                c.setMatricula(rs.getString("matricula"));
-
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    c.setNumBastidor(num_bastidor);
+                    c.setMarca(rs.getString("marca"));
+                    c.setModelo(rs.getString("modelo"));
+                    c.setAño(rs.getInt("año") + "");
+                    c.setKilometraje(rs.getDouble("kilometraje"));
+                    c.setDisponibleVentas(rs.getBoolean("disponible_ventas"));
+                    c.setDisponibleAlquiler(rs.getBoolean("disponible_alquiler"));
+                    c.setPrecioBase(rs.getDouble("precio_base"));
+                    c.setColor(rs.getString("color"));
+                    c.setDisenoLlantas(rs.getString("diseño_llantas"));
+                    c.setDiametroLlantas(rs.getInt("diametro_llantas"));
+                    c.setDisenoInterior(rs.getString("diseño_interior"));
+                    c.setMaterialInterior(rs.getString("material_interior"));
+                    c.setMatricula(rs.getString("matricula"));
+                }
             }
 
         } catch (SQLException error) {
-            System.out.println("Error al leer coches: " + error.getMessage());
+            System.err.println("Error al leer coches: " + error.getMessage());
         }
 
         return c;
@@ -736,42 +849,42 @@ public class Conexion {
             String diametroLlantas,
             String matricula) throws SQLException {
 
+        if (!isConexionActiva()) {
+            throw new SQLException("No hay conexion activa a la base de datos");
+        }
+
         String sql = "UPDATE coche SET marca=?, modelo=?, año=?, kilometraje=?, disponible_ventas=?, " +
                 "disponible_alquiler=?, precio_base=?, color=?, diseño_llantas=?, diametro_llantas=?, " +
                 "matricula=? WHERE num_bastidor=?";
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-            // SET clause - en el orden del SQL
-            ps.setString(1, marca); // marca
-            ps.setString(2, modelo); // modelo
-            ps.setInt(3, Integer.parseInt(año)); // año (INTEGER)
-            ps.setDouble(4, Double.parseDouble(kilometraje)); // kilometraje (DOUBLE)
-            ps.setBoolean(5, disponibleVentas); // disponible_ventas
-            ps.setBoolean(6, disponibleAlquiler); // disponible_alquiler
-            ps.setDouble(7, Double.parseDouble(precioBase)); // precio_base (DOUBLE)
-            ps.setString(8, color); // color
-            ps.setString(9, diseñoLlantas); // diseño_llantas
-            ps.setInt(10, Integer.parseInt(diametroLlantas)); // diametro_llantas (INTEGER)
-            ps.setString(11, matricula); // matricula
+            // SET clause - en el orden del SQL con parsing seguro
+            ps.setString(1, marca);
+            ps.setString(2, modelo);
+            ps.setInt(3, parseIntSafe(año, 0));
+            ps.setDouble(4, parseDoubleSafe(kilometraje, 0.0));
+            ps.setBoolean(5, disponibleVentas);
+            ps.setBoolean(6, disponibleAlquiler);
+            ps.setDouble(7, parseDoubleSafe(precioBase, 0.0));
+            ps.setString(8, color);
+            ps.setString(9, diseñoLlantas);
+            ps.setInt(10, parseIntSafe(diametroLlantas, 0));
+            ps.setString(11, matricula);
 
             // WHERE clause - al final
-            ps.setString(12, numBastidor); // num_bastidor
+            ps.setString(12, numBastidor);
 
             int filas = ps.executeUpdate();
 
             if (filas > 0) {
                 System.out.println("Coche actualizado correctamente. Filas actualizadas: " + filas);
             } else {
-                System.out.println("No se encontró ningún coche con num_bastidor: " + numBastidor);
+                System.out.println("No se encontro ningun coche con num_bastidor: " + numBastidor);
             }
 
-        } catch (NumberFormatException e) {
-            System.err.println("Error de formato numérico: " + e.getMessage());
-            throw new SQLException("Valores numéricos inválidos", e);
         } catch (SQLException error) {
             System.err.println("Error al actualizar coche: " + error.getMessage());
-            error.printStackTrace();
-            throw error; // Re-lanzar para que el llamador lo maneje
+            throw error;
         }
     }
 
@@ -791,17 +904,30 @@ public class Conexion {
     // Obtener matrículas de coches asociados a un cliente
     public static List<String> obtenerMatriculasPorCliente(String dniCliente) {
         List<String> matriculas = new ArrayList<>();
+
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return matriculas;
+        }
+
+        if (dniCliente == null || dniCliente.trim().isEmpty()) {
+            return matriculas;
+        }
+
         String sql = "SELECT DISTINCT id_vehiculo FROM transaccion WHERE cliente_dni = ?";
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, dniCliente);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                matriculas.add(rs.getString("id_vehiculo"));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String matricula = rs.getString("id_vehiculo");
+                    if (matricula != null) {
+                        matriculas.add(matricula);
+                    }
+                }
             }
         } catch (SQLException e) {
-            System.out.println("Error al obtener matrículas del cliente: " + e.getMessage());
+            System.err.println("Error al obtener matriculas del cliente: " + e.getMessage());
         }
 
         return matriculas;
@@ -809,35 +935,44 @@ public class Conexion {
 
     // Obtener información completa de un coche por matrícula
     public static CocheCompleto buscarCochePorMatricula(String matricula) {
-        CocheCompleto c = null;
+
+        if (!isConexionActiva()) {
+            System.err.println("Error: No hay conexion activa a la base de datos");
+            return null;
+        }
+
+        if (matricula == null || matricula.trim().isEmpty()) {
+            return null;
+        }
+
         String sql = "SELECT * FROM coche WHERE matricula = ?";
 
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, matricula);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                c = new CocheCompleto(
-                        rs.getString("num_bastidor"),
-                        rs.getString("marca"),
-                        rs.getString("modelo"),
-                        rs.getInt("año"),
-                        rs.getDouble("kilometraje"),
-                        rs.getBoolean("disponible_ventas"),
-                        rs.getBoolean("disponible_alquiler"),
-                        rs.getDouble("precio_base"),
-                        rs.getString("color"),
-                        rs.getString("diseño_llantas"),
-                        rs.getInt("diametro_llantas"),
-                        rs.getString("diseño_interior"),
-                        rs.getString("material_interior"),
-                        rs.getString("matricula"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new CocheCompleto(
+                            rs.getString("num_bastidor"),
+                            rs.getString("marca"),
+                            rs.getString("modelo"),
+                            rs.getInt("año"),
+                            rs.getDouble("kilometraje"),
+                            rs.getBoolean("disponible_ventas"),
+                            rs.getBoolean("disponible_alquiler"),
+                            rs.getDouble("precio_base"),
+                            rs.getString("color"),
+                            rs.getString("diseño_llantas"),
+                            rs.getInt("diametro_llantas"),
+                            rs.getString("diseño_interior"),
+                            rs.getString("material_interior"),
+                            rs.getString("matricula"));
+                }
             }
         } catch (SQLException e) {
-            System.out.println("Error al buscar coche por matrícula: " + e.getMessage());
+            System.err.println("Error al buscar coche por matricula: " + e.getMessage());
         }
 
-        return c;
+        return null;
     }
 
 }

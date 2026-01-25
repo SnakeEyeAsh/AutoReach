@@ -752,6 +752,19 @@ public class controladorApp implements Initializable {
         if (editarCliente) {
             // Validar formulario antes de guardar cambios
             if (validador.validarYMostrarErrores()) {
+
+                // Confirmacion antes de guardar cambios
+                boolean confirmado = AlertaEstilizada.confirmar(
+                    "Confirmar cambios",
+                    "¿Guardar cambios del cliente?",
+                    "Vas a guardar los cambios de " + txtNombre.getText() + " " + txtApellidos.getText() +
+                    ".\n\n¿Deseas continuar?"
+                );
+
+                if (!confirmado) {
+                    return;
+                }
+
                 try {
                     Cliente c = tablaRegistro.getSelectionModel().getSelectedItem();
 
@@ -759,14 +772,14 @@ public class controladorApp implements Initializable {
                     c.setNombre(txtNombre.getText());
                     c.setApellidos(txtApellidos.getText());
                     c.setDireccion(txtDireccion.getText());
-                    c.setTelefono(Double.parseDouble(txtTelefono.getText().replaceAll("[\\s-+]", "")));
+                    c.setTelefono(Conexion.parseLongSafe(txtTelefono.getText(), 0L));
                     c.setEmail(txtEmail.getText());
 
                     Conexion.editarCliente(c);
 
                     AlertaEstilizada.mostrarInformacion(
                         "Cliente actualizado",
-                        "Éxito",
+                        "Exito",
                         "El cliente ha sido actualizado correctamente"
                     );
 
@@ -778,8 +791,8 @@ public class controladorApp implements Initializable {
                 } catch (NumberFormatException e) {
                     AlertaEstilizada.mostrarError(
                         "Error de formato",
-                        "Teléfono inválido",
-                        "El teléfono debe contener solo números"
+                        "Telefono invalido",
+                        "El telefono debe contener solo numeros"
                     );
                 } catch (Exception e) {
                     AlertaEstilizada.mostrarError(
@@ -798,7 +811,7 @@ public class controladorApp implements Initializable {
 
                 // Rellenar los labels con la información del cliente
                 lblNombre.setText("Nombre: " + cliente.getNombre() + " " + cliente.getApellidos());
-                lblNumero.setText("Teléfono: " + (int)cliente.getTelefono());
+                lblNumero.setText("Teléfono: " + cliente.getTelefono());
                 lblEmail.setText("Email: " + cliente.getEmail());
                 lblSexo.setText("DNI: " + cliente.getDni());
                 lblEdad.setText("Dirección: " + cliente.getDireccion());
@@ -827,14 +840,26 @@ public class controladorApp implements Initializable {
 
         if (c == null) {
             AlertaEstilizada.mostrarAdvertencia(
-                "Ningún cliente seleccionado",
+                "Ningun cliente seleccionado",
                 "Selecciona un cliente",
                 "Por favor, selecciona un cliente de la tabla para editarlo"
             );
             return;
         }
 
-        // Activar modo edición
+        // Confirmacion antes de editar
+        boolean confirmado = AlertaEstilizada.confirmar(
+            "Confirmar edicion",
+            "¿Editar cliente?",
+            "Vas a modificar los datos de " + c.getNombre() + " " + c.getApellidos() +
+            ".\n\n¿Deseas continuar?"
+        );
+
+        if (!confirmado) {
+            return;
+        }
+
+        // Activar modo edicion
         editarCliente = true;
 
         // Cargar datos del cliente en los campos
@@ -847,8 +872,8 @@ public class controladorApp implements Initializable {
         txtDireccion.setText(c.getDireccion());
         txtDireccion.setDisable(false);
 
-        // Convertir teléfono a String sin decimales
-        txtTelefono.setText(String.valueOf((int) c.getTelefono()));
+        // Convertir telefono a String
+        txtTelefono.setText(String.valueOf(c.getTelefono()));
         txtTelefono.setDisable(false);
 
         txtDni.setText(c.getDni());
@@ -857,13 +882,19 @@ public class controladorApp implements Initializable {
         txtEmail.setText(c.getEmail());
         txtEmail.setDisable(false);
 
-        // Deshabilitar otros botones durante la edición
+        // Deshabilitar otros botones durante la edicion
         btnEliminarCliente.setDisable(true);
         btnCancelarSeleccion.setDisable(false);
-        btnSeleccionCLiente.setDisable(false); // Este botón guardará los cambios
+        btnSeleccionCLiente.setDisable(false); // Este boton guardara los cambios
         btnEditarCliente.setDisable(true);
         btnNuevoCliente.setDisable(true);
         btnBuscarCliente.setDisable(true);
+
+        AlertaEstilizada.mostrarInformacion(
+            "Modo edicion",
+            "Editando cliente",
+            "Modifica los campos necesarios y pulsa 'Seleccionar' para guardar los cambios."
+        );
     }
 
     @FXML
@@ -952,16 +983,38 @@ public class controladorApp implements Initializable {
             if (!editandoAlquiler) {
                 Disponible d = TblCoincidencias.getSelectionModel().getSelectedItem();
 
+                // Validar que hay un coche seleccionado
+                if (d == null) {
+                    AlertaEstilizada.mostrarAdvertencia(
+                        "Sin seleccion",
+                        "Selecciona un vehiculo",
+                        "Por favor, selecciona un vehiculo de la tabla antes de confirmar el alquiler"
+                    );
+                    return;
+                }
+
                 LocalDate fecha = cldRecoger.getValue();
                 LocalDate fechaFin = cldEntrega.getValue();
 
-                long dias = ChronoUnit.DAYS.between(fecha, fechaFin);
-                double precioTotal = dias * Double.parseDouble(d.getPrecio());
-                String estado = d.getDisponible().equals("si") ? "en_proceso" : "pendiente";
-                if(d.getDisponible().toLowerCase().equals("si")){
-                    try {
+                // Validar fechas
+                if (fecha == null || fechaFin == null) {
+                    AlertaEstilizada.mostrarAdvertencia(
+                        "Fechas incompletas",
+                        "Selecciona las fechas",
+                        "Por favor, selecciona las fechas de recogida y entrega"
+                    );
+                    return;
+                }
 
-                    Conexion.crearAlquiler(
+                long dias = ChronoUnit.DAYS.between(fecha, fechaFin);
+                // Parsing seguro del precio
+                double precioDia = Conexion.parseDoubleSafe(d.getPrecio(), 0.0);
+                double precioTotal = dias * precioDia;
+                String estado = "si".equalsIgnoreCase(d.getDisponible()) ? "en_proceso" : "pendiente";
+
+                if("si".equalsIgnoreCase(d.getDisponible())){
+                    try {
+                        Conexion.crearAlquiler(
                             fecha.toString(),
                             fechaFin.toString(),
                             precioTotal + "",
@@ -971,13 +1024,23 @@ public class controladorApp implements Initializable {
                             txtHoraEntrega.getText(),
                             d.getMatricula(),
                             cliente.getDni());
-                    } catch (SQLException e) {
-                        System.out.println("Error al incertar cita desde controlador " + e.getMessage());
-                    }finally{
+
                         Conexion.actualizarAlquilado(d.getMatricula());
+
+                        AlertaEstilizada.mostrarInformacion(
+                            "Alquiler confirmado",
+                            "Exito",
+                            "El alquiler se ha registrado correctamente"
+                        );
+                        iniciarTablas();
+                    } catch (SQLException e) {
+                        AlertaEstilizada.mostrarError(
+                            "Error al crear alquiler",
+                            "No se pudo registrar el alquiler",
+                            "Error: " + e.getMessage()
+                        );
                     }
                 }else{
-                    /////////ALERTA UNICA
                     AlertaEstilizada.mostrarError(
                         "Coche no disponible",
                         "Cuidado",
@@ -986,15 +1049,45 @@ public class controladorApp implements Initializable {
                 }
 
             } else {
+                Alquiler a = tblAlquiler.getSelectionModel().getSelectedItem();
+
+                // Validar que hay un alquiler seleccionado
+                if (a == null) {
+                    AlertaEstilizada.mostrarAdvertencia(
+                        "Sin seleccion",
+                        "Selecciona un alquiler",
+                        "Por favor, selecciona un alquiler de la tabla para editarlo"
+                    );
+                    return;
+                }
+
+                // Validar fechas
+                if (cldRecoger.getValue() == null || cldEntrega.getValue() == null) {
+                    AlertaEstilizada.mostrarAdvertencia(
+                        "Fechas incompletas",
+                        "Selecciona las fechas",
+                        "Por favor, selecciona las fechas de recogida y entrega"
+                    );
+                    return;
+                }
+
                 try {
-                    Alquiler a = tblAlquiler.getSelectionModel().getSelectedItem();
                     Timestamp t1 = Timestamp.valueOf(cldRecoger.getValue().atStartOfDay());
                     Timestamp t2 = Timestamp.valueOf(cldEntrega.getValue().atStartOfDay());
 
                     Conexion.editarAlquiler(t1, txtHoraEntrega.getText(), t2, a.getMatricula(), a.getDni());
 
+                    AlertaEstilizada.mostrarInformacion(
+                        "Alquiler actualizado",
+                        "Exito",
+                        "El alquiler se ha actualizado correctamente"
+                    );
                 } catch (Exception e) {
-                    System.out.println("Error al actualizar alquiler" + e.getMessage());
+                    AlertaEstilizada.mostrarError(
+                        "Error al actualizar",
+                        "No se pudo actualizar el alquiler",
+                        "Error: " + e.getMessage()
+                    );
                 }
                 mnElegirMarca.setDisable(false);
                 cmbElegirModelo.setDisable(false);
@@ -1002,7 +1095,7 @@ public class controladorApp implements Initializable {
                 txtHoraEntrega.clear();
                 cldEntrega.getEditor().clear();
                 editandoAlquiler = false;
-
+                iniciarTablas();
             }
         }
 
@@ -1022,28 +1115,45 @@ public class controladorApp implements Initializable {
     void editarAlq(ActionEvent event) {
         Alquiler a = tblAlquiler.getSelectionModel().getSelectedItem();
 
-        if (a != null) {
-            editandoAlquiler = true;
-
-            mnElegirMarca.setDisable(true);
-            cmbElegirModelo.setDisable(true);
-
-            Timestamp fechaR = a.getFechaRecogida();
-            Timestamp fechaE = a.getFechaDevolucion();
-            String hora = a.getHoraDevolucion();
-
-            cldRecoger.setValue(fechaR.toLocalDateTime().toLocalDate());
-            cldEntrega.setValue(fechaE.toLocalDateTime().toLocalDate());
-            txtHoraEntrega.setText(hora);
-
-        } else {
-            AlertaEstilizada.mostrarError(
-                "Error",
-                "Sin selección",
-                "Debes seleccionar un alquiler para editarlo"
+        if (a == null) {
+            AlertaEstilizada.mostrarAdvertencia(
+                "Sin seleccion",
+                "Selecciona un alquiler",
+                "Debes seleccionar un alquiler de la tabla para editarlo"
             );
+            return;
         }
 
+        // Confirmacion antes de editar
+        boolean confirmado = AlertaEstilizada.confirmar(
+            "Confirmar edicion",
+            "¿Editar alquiler?",
+            "Vas a modificar el alquiler del vehiculo " + a.getMatricula() +
+            ".\n\n¿Deseas continuar?"
+        );
+
+        if (!confirmado) {
+            return;
+        }
+
+        editandoAlquiler = true;
+
+        mnElegirMarca.setDisable(true);
+        cmbElegirModelo.setDisable(true);
+
+        Timestamp fechaR = a.getFechaRecogida();
+        Timestamp fechaE = a.getFechaDevolucion();
+        String hora = a.getHoraDevolucion();
+
+        cldRecoger.setValue(fechaR.toLocalDateTime().toLocalDate());
+        cldEntrega.setValue(fechaE.toLocalDateTime().toLocalDate());
+        txtHoraEntrega.setText(hora);
+
+        AlertaEstilizada.mostrarInformacion(
+            "Modo edicion",
+            "Editando alquiler",
+            "Modifica los campos necesarios y pulsa 'Confirmar' para guardar los cambios."
+        );
     }
 
     @FXML
@@ -1594,10 +1704,22 @@ public class controladorApp implements Initializable {
 
         if (c == null) {
             AlertaEstilizada.mostrarAdvertencia(
-                "Ningún coche seleccionado",
+                "Ningun coche seleccionado",
                 "Selecciona un coche",
                 "Por favor, selecciona un coche de la tabla para editarlo"
             );
+            return;
+        }
+
+        // Confirmacion antes de editar
+        boolean confirmado = AlertaEstilizada.confirmar(
+            "Confirmar edicion",
+            "¿Editar vehiculo?",
+            "Vas a modificar los datos del vehiculo " + c.getMarca() + " " + c.getModelo() +
+            " (Matricula: " + c.getMatricula() + ").\n\n¿Deseas continuar?"
+        );
+
+        if (!confirmado) {
             return;
         }
 
@@ -1619,10 +1741,27 @@ public class controladorApp implements Initializable {
         ingresoColor.setText(cc.getColor());
         ingresoMatricula.setText(cc.getMatricula());
 
+        AlertaEstilizada.mostrarInformacion(
+            "Modo edicion",
+            "Editando vehiculo",
+            "Modifica los campos necesarios y pulsa 'Guardar Cambios' para actualizar el vehiculo."
+        );
     }
 
     @FXML
     void editarCoche(ActionEvent event) {
+        // Confirmacion antes de guardar cambios
+        boolean confirmado = AlertaEstilizada.confirmar(
+            "Confirmar cambios",
+            "¿Guardar cambios?",
+            "Vas a guardar los cambios del vehiculo " + ingresoMarca.getText() + " " + ingresoModelo.getText() +
+            " (Matricula: " + ingresoMatricula.getText() + ").\n\n¿Deseas continuar?"
+        );
+
+        if (!confirmado) {
+            return;
+        }
+
         try {
             Conexion.actualizarCoche(ingresoBastidor.getText(),
                     ingresoMarca.getText(),
@@ -1636,13 +1775,24 @@ public class controladorApp implements Initializable {
                     ingresoDiseñoLlantas.getText(),
                     ingresoDllantas.getText(),
                     ingresoMatricula.getText());
+
+            AlertaEstilizada.mostrarInformacion(
+                "Vehiculo actualizado",
+                "Exito",
+                "Los cambios del vehiculo han sido guardados correctamente"
+            );
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            AlertaEstilizada.mostrarError(
+                "Error al actualizar",
+                "No se pudieron guardar los cambios",
+                "Error: " + e.getMessage()
+            );
         }
+
         btnAceptarIngreso.setDisable(false);
         btnCancelarIngresos.setDisable(false);
         btnBorrarIngreso.setDisable(false);
-        btnEditarCoche.setDisable(true); // Deshabilitar btnEditarCoche después de guardar
+        btnEditarCoche.setDisable(true);
 
         limpiarIngreso();
         iniciarTablas();
@@ -1656,18 +1806,38 @@ public class controladorApp implements Initializable {
         // Validar que haya un coche seleccionado
         if (c == null) {
             AlertaEstilizada.mostrarAdvertencia(
-                "Selección requerida",
-                "No hay ningún coche seleccionado",
+                "Seleccion requerida",
+                "No hay ningun coche seleccionado",
                 "Por favor, seleccione un coche de la tabla antes de intentar eliminarlo."
             );
             return;
         }
 
+        // Confirmacion antes de eliminar
+        boolean confirmado = AlertaEstilizada.confirmar(
+            "Confirmar eliminacion",
+            "¿Eliminar vehiculo?",
+            "¿Estas seguro de que deseas eliminar el vehiculo " + c.getMarca() + " " + c.getModelo() +
+            " (Matricula: " + c.getMatricula() + ")?\n\nEsta accion no se puede deshacer."
+        );
+
+        if (!confirmado) {
+            return;
+        }
+
         try {
             Conexion.borrarCoche(c.getBastidor());
-
+            AlertaEstilizada.mostrarInformacion(
+                "Vehiculo eliminado",
+                "Exito",
+                "El vehiculo ha sido eliminado correctamente"
+            );
         } catch (SQLException e) {
-            System.out.println("Error al eliminar coche" + e.getMessage());
+            AlertaEstilizada.mostrarError(
+                "Error al eliminar",
+                "No se pudo eliminar el vehiculo",
+                "Error: " + e.getMessage()
+            );
         }
         limpiarIngreso();
         iniciarTablas();
@@ -2262,7 +2432,7 @@ public class controladorApp implements Initializable {
 
                 // Rellenar los labels con la información del cliente
                 lblNombre.setText("Nombre: " + cliente.getNombre() + " " + cliente.getApellidos());
-                lblNumero.setText("Teléfono: " + (int)cliente.getTelefono());
+                lblNumero.setText("Teléfono: " + cliente.getTelefono());
                 lblEmail.setText("Email: " + cliente.getEmail());
                 lblSexo.setText("DNI: " + cliente.getDni());
                 lblEdad.setText("Dirección: " + cliente.getDireccion());
