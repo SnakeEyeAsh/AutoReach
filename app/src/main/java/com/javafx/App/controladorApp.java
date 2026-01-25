@@ -181,6 +181,9 @@ public class controladorApp implements Initializable {
     private Button btnEliminarCliente;
 
     @FXML
+    private Button btnCerrarSesionCliente;
+
+    @FXML
     private Button btnEditarCoche;
 
     @FXML
@@ -1278,7 +1281,9 @@ public class controladorApp implements Initializable {
             Stage stage = new Stage();
             stage.setTitle("Compra");
             stage.initModality(Modality.WINDOW_MODAL); // hace modal
-            stage.initOwner(btnCompra.getScene().getWindow()); // define dueño
+            if (btnCompra.getScene() != null && btnCompra.getScene().getWindow() != null) {
+                stage.initOwner(btnCompra.getScene().getWindow()); // define dueño
+            }
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
@@ -1881,8 +1886,8 @@ public class controladorApp implements Initializable {
                 cochesPorAño.put(año, cochesPorAño.getOrDefault(año, 0) + 1);
             }
 
-            // Encontrar el máximo para escalar las barras
-            int maxCoches = cochesPorAño.values().stream().mapToInt(Integer::intValue).max().orElse(1);
+            // Encontrar el máximo para escalar las barras (mínimo 1 para evitar división por cero)
+            int maxCoches = Math.max(cochesPorAño.values().stream().mapToInt(Integer::intValue).max().orElse(1), 1);
 
             // Generar HTML del reporte con gráfica
             StringBuilder html = new StringBuilder();
@@ -1959,7 +1964,9 @@ public class controladorApp implements Initializable {
             Stage reporteStage = new Stage();
             reporteStage.setTitle("Reporte de Inventario - AutoReach");
             reporteStage.initModality(Modality.WINDOW_MODAL);
-            reporteStage.initOwner(btnVerReporte.getScene().getWindow());
+            if (btnVerReporte.getScene() != null && btnVerReporte.getScene().getWindow() != null) {
+                reporteStage.initOwner(btnVerReporte.getScene().getWindow());
+            }
 
             WebView webView = new WebView();
             webView.getEngine().loadContent(html.toString());
@@ -2000,7 +2007,8 @@ public class controladorApp implements Initializable {
                 cochesPorAño.put(año, cochesPorAño.getOrDefault(año, 0) + 1);
             }
 
-            int maxCoches = cochesPorAño.values().stream().mapToInt(Integer::intValue).max().orElse(1);
+            // Mínimo 1 para evitar división por cero
+            int maxCoches = Math.max(cochesPorAño.values().stream().mapToInt(Integer::intValue).max().orElse(1), 1);
 
             // Generar HTML del reporte con gráfica (igual que verReporteInventario)
             StringBuilder html = new StringBuilder();
@@ -2117,8 +2125,10 @@ public class controladorApp implements Initializable {
             // Desactivar sesión antes de cerrar
             sesionActiva = false;
             cliente = null;
-            Stage escena = (Stage) btnIrAInicio.getScene().getWindow();
-            escena.close();
+            if (btnIrAInicio.getScene() != null && btnIrAInicio.getScene().getWindow() != null) {
+                Stage escena = (Stage) btnIrAInicio.getScene().getWindow();
+                escena.close();
+            }
         }
     }
 
@@ -2126,8 +2136,55 @@ public class controladorApp implements Initializable {
     /// PANELES /////////////////////////////////////////////
     @FXML
     void irAInicio(ActionEvent event) {
-        mostrarPanel(panelRegistro);
+        // Si hay sesión activa, mostrar el perfil del cliente en lugar de la selección
+        if (sesionActiva && cliente != null) {
+            mostrarPanel(pantallaSesion);
+        } else {
+            mostrarPanel(panelRegistro);
+        }
         cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso);
+    }
+
+    @FXML
+    void cerrarSesionCliente(ActionEvent event) {
+        // Confirmar antes de cerrar sesión
+        boolean confirmado = AlertaEstilizada.confirmar(
+            "Cerrar sesión",
+            "¿Cerrar sesión del cliente?",
+            "Se cerrará la sesión de " + (cliente != null ? cliente.getNombre() + " " + cliente.getApellidos() : "cliente actual") +
+            ".\n\n¿Deseas continuar?"
+        );
+
+        if (!confirmado) {
+            return;
+        }
+
+        // Limpiar datos de sesión
+        sesionActiva = false;
+        cliente = null;
+
+        // Limpiar labels del perfil
+        lblNombre.setText("Nombre");
+        lblNumero.setText("Numero");
+        lblEmail.setText("Email");
+        lblSexo.setText("DNI");
+        lblEdad.setText("Dirección");
+
+        // Limpiar información del vehículo
+        lblMarca.setText("Marca");
+        lblModelo.setText("Modelo");
+        lblAño.setText("Año");
+        lblKms.setText("Kilometraje");
+        lblNBastidor.setText("Numero de Bastidor");
+
+        // Mostrar panel de selección de cliente
+        mostrarPanel(panelRegistro);
+
+        AlertaEstilizada.mostrarInformacion(
+            "Sesión cerrada",
+            "Sesión cerrada correctamente",
+            "Puedes seleccionar otro cliente o crear uno nuevo"
+        );
     }
 
     @FXML

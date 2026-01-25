@@ -371,11 +371,11 @@ public class Conexion {
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(fecha + " " + hora + ":00"));
             ps.setTimestamp(2, Timestamp.valueOf(fecha_fin + " 00:00:00"));
-            ps.setDouble(3, Double.parseDouble(precio_total));
-            ps.setDouble(4, Double.parseDouble(precio_cuota));
+            ps.setDouble(3, parseDoubleSafe(precio_total, 0.0));
+            ps.setDouble(4, parseDoubleSafe(precio_cuota, 0.0));
             ps.setDouble(5, 0);
             ps.setString(6, estado);
-            ps.setInt(7, Integer.parseInt(empleado_id));
+            ps.setInt(7, parseIntSafe(empleado_id, 1));
             ps.setString(8, hora);
             ps.setString(9, id_vehiculo);
             ps.setString(10, cliente_id);
@@ -385,7 +385,7 @@ public class Conexion {
 
         } catch (SQLException error) {
 
-            System.out.println("Error al incertar Alquiler " + error.getMessage());
+            System.out.println("Error al insertar Alquiler " + error.getMessage());
 
         }
 

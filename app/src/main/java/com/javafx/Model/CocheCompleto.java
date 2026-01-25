@@ -48,7 +48,11 @@ public class CocheCompleto {
     }
 
     public void setAño(String año) {
-        this.año = Integer.parseInt(año);
+        try {
+            this.año = Integer.parseInt(año);
+        } catch (NumberFormatException e) {
+            this.año = 0; // Valor por defecto si el parsing falla
+        }
     }
 
     public Double getKilometraje() {

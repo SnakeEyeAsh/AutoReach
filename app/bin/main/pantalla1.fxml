@@ -126,6 +126,7 @@
             </Pane>
             <Pane fx:id="pantallaSesion" prefHeight="200.0" prefWidth="200.0" visible="false">
                <children>
+                  <Button fx:id="btnCerrarSesionCliente" layoutX="600.0" layoutY="20.0" mnemonicParsing="false" onAction="#cerrarSesionCliente" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand;" text="Cerrar Sesión" />
                   <ImageView fitHeight="150.0" fitWidth="170.0" layoutX="35.0" layoutY="43.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@Assets/perfil.png" />

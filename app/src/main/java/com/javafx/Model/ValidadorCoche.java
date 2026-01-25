@@ -369,8 +369,10 @@ public class ValidadorCoche {
 
         // Aplicar efecto shake a los controles con errores
         resultado.getErrors().forEach(error -> {
-            Control control = (Control) error.getTarget();
-            aplicarEfectoShake(control);
+            if (error.getTarget() instanceof Control) {
+                Control control = (Control) error.getTarget();
+                aplicarEfectoShake(control);
+            }
         });
 
         // Recopilar mensajes de error

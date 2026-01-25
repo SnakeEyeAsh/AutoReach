@@ -203,8 +203,14 @@ public class controladorCompra implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
          Platform.runLater(()->{
-            Stage s = (Stage)btnRealizarCompra.getScene().getWindow();
-            s.getIcons().add(new Image("Assets/dar-dinero.png"));
+            try {
+                if (btnRealizarCompra.getScene() != null && btnRealizarCompra.getScene().getWindow() != null) {
+                    Stage s = (Stage)btnRealizarCompra.getScene().getWindow();
+                    s.getIcons().add(new Image("Assets/dar-dinero.png"));
+                }
+            } catch (Exception e) {
+                System.err.println("No se pudo aplicar el icono: " + e.getMessage());
+            }
         });
     }
 

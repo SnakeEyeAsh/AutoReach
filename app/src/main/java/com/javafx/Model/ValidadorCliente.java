@@ -145,8 +145,10 @@ public class ValidadorCliente {
     private void registrarValidadorTelefono(Control control) {
         validador.registerValidator(control, Validator.createPredicateValidator(
             t -> {
-                if (esTextoVacio((String) t)) return false;
-                String telefono = ((String) t).replaceAll("[\\s-]", "");
+                if (!(t instanceof String)) return false;
+                String texto = (String) t;
+                if (esTextoVacio(texto)) return false;
+                String telefono = texto.replaceAll("[\\s-]", "");
                 return telefono.matches("^[+]?[0-9]{9,15}$");
             },
             "Teléfono inválido (9-15 dígitos, puede incluir +)",
@@ -160,8 +162,10 @@ public class ValidadorCliente {
     private void registrarValidadorEmail(Control control) {
         validador.registerValidator(control, Validator.createPredicateValidator(
             t -> {
-                if (esTextoVacio((String) t)) return false;
-                return ((String) t).matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+                if (!(t instanceof String)) return false;
+                String texto = (String) t;
+                if (esTextoVacio(texto)) return false;
+                return texto.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
             },
             "Email inválido (ej: usuario@ejemplo.com)",
             Severity.ERROR
@@ -279,8 +283,10 @@ public class ValidadorCliente {
 
         // Aplicar efecto shake a los controles con errores
         resultado.getErrors().forEach(error -> {
-            Control control = (Control) error.getTarget();
-            aplicarEfectoShake(control);
+            if (error.getTarget() instanceof Control) {
+                Control control = (Control) error.getTarget();
+                aplicarEfectoShake(control);
+            }
         });
 
         // Recopilar mensajes de error
