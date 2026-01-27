@@ -31,12 +31,12 @@ public class controladorEmergente {
 
     @FXML
     void RealizarCompra(ActionEvent event) {
-
+        AlertaEstilizada.crearAdvertencia("Cuidado", "Esta seccion aun esta en desarrollo","Vuelve atras este es un limite de la aplicacion esta parte aun no esta programada" );
     }
 
     @FXML
     void btnCancelarCompra(ActionEvent event) {
-
+        AlertaEstilizada.crearAdvertencia("Cuidado", "Esta seccion aun esta en desarrollo","Vuelve atras este es un limite de la aplicacion esta parte aun no esta programada" );
     }
 
 }

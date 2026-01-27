@@ -95,6 +95,21 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </Button>
+                  <Button fx:id="btnAcercaDe" contentDisplay="TOP" mnemonicParsing="false" onAction="#mostrarAcercaDe" prefHeight="78.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Acerca de">
+                     <tooltip>
+                        <Tooltip text="Informacion sobre la aplicacion" />
+                     </tooltip>
+                     <graphic>
+                        <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@Assets/blog.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                  </Button>
                   <Button fx:id="btnCerrarSesion" contentDisplay="TOP" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="78.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Salir">
                      <tooltip>
                         <Tooltip text="Cerrar la aplicacion" />
