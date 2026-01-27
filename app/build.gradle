@@ -38,7 +38,7 @@ sourceSets {
   main {
     resources {
         srcDirs = ["src/main/resources"]
-        includes = ["**/*.fxml","**/*.png","**/*.properties","**/*.jrxml","**/*.jasper"]  //Importante para poder abrir una extensión no reconocida
+        includes = ["**/*.fxml","**/*.png","**/*.properties","**/*.jrxml","**/*.jasper","**/*.css","**/*.html"]  //Importante para poder abrir una extensión no reconocida
     }
   }
 }

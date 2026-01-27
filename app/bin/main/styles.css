@@ -1,0 +1,41 @@
+/* ==================== BOTONES DEL MENÚ LATERAL ==================== */
+/* Mantiene el color darkorange del FXML y añade efecto de aumento */
+.tool-bar .button {
+    -fx-cursor: hand;
+}
+
+.tool-bar .button:hover {
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 3);
+}
+
+.tool-bar .button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 1);
+}
+
+/* ==================== BOTONES REGULARES ==================== */
+/* Color naranja pálido para botones que NO están en el toolbar */
+/* Usa !important para sobrescribir cualquier estilo inline */
+.button {
+    -fx-background-color: #ffcc99 !important;
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #ffb366 !important;
+}
+
+.button:pressed {
+    -fx-background-color: #ff9933 !important;
+}
+
+/* Sobrescribir para mantener el darkorange en botones del toolbar */
+.tool-bar .button {
+    -fx-background-color: darkorange !important;
+    -fx-text-fill: white !important;
+}

@@ -62,7 +62,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SplitMenuButton;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -208,10 +209,13 @@ public class controladorApp implements Initializable {
     private NumberAxis yAxisAño;
 
     @FXML
-    private MenuItem opFemenino;
+    private RadioButton rbFemenino;
 
     @FXML
-    private MenuItem opMasculino;
+    private RadioButton rbMasculino;
+
+    @FXML
+    private ToggleGroup toggleSexo;
 
     @FXML
     private TableColumn<Coche, String> clnAño;
@@ -424,9 +428,6 @@ public class controladorApp implements Initializable {
     private MenuButton slcMatriculaLogin;
 
     @FXML
-    private SplitMenuButton splitMenuSexo;
-
-    @FXML
     private ListView<String> tablaDeInformacion;
 
     @FXML
@@ -454,7 +455,7 @@ public class controladorApp implements Initializable {
     private TextField txtEmail;
 
     @FXML
-    private TextField txtFechaNac;
+    private DatePicker dpFechaNac;
 
     @FXML
     private TextField txtHoraEntrega;
@@ -553,15 +554,15 @@ public class controladorApp implements Initializable {
         validadorAlquiler.inicializarValidadores(cldRecoger, cldEntrega, txtHoraEntrega);
         validadorC.inicializarValidadores(ingresoMarca, ingresoModelo, ingresoAño, ingresoKms, ingresoBastidor,
                 ingresoPrecio, ingresoDllantas, ingresoDiseñoLlantas, ingresoColor, ingresoMatricula);
-        validador.inicializarValidadores(txtNombre, txtApellidos, txtDireccion, txtTelefono, txtFechaNac, txtDni,
-                txtEmail, splitMenuSexo);
+        validador.inicializarValidadores(txtNombre, txtApellidos, txtDireccion, txtTelefono, dpFechaNac, txtDni,
+                txtEmail, toggleSexo);
 
         // Configurar tooltip para el campo de hora de entrega
         Tooltip tooltipHora = new Tooltip("Formato: HH:mm (ejemplo: 14:30, 09:15)");
         txtHoraEntrega.setTooltip(tooltipHora);
 
         // Configurar tooltips para campos de cliente
-        txtFechaNac.setTooltip(new Tooltip("Formato: AAAA-MM-DD (ejemplo: 1990-05-15)"));
+        dpFechaNac.setTooltip(new Tooltip("Selecciona tu fecha de nacimiento"));
         txtEmail.setTooltip(new Tooltip("Formato: usuario@dominio.com (ejemplo: juan.perez@gmail.com)"));
         txtDireccion.setTooltip(new Tooltip("Dirección completa (ejemplo: Calle Mayor 123, Madrid)"));
 
@@ -607,6 +608,24 @@ public class controladorApp implements Initializable {
 
         // Configurar menús contextuales para las tablas
         configurarMenusContextuales();
+
+        // Listener para habilitar controles cuando se selecciona un coche en alquiler
+        TblCoincidencias.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            boolean haySeleccion = newSelection != null;
+            // Habilitar/deshabilitar controles de la parte inferior
+            cldRecoger.setDisable(!haySeleccion);
+            cldEntrega.setDisable(!haySeleccion);
+            txtHoraEntrega.setDisable(!haySeleccion);
+            btnConirmarAlquiler.setDisable(!haySeleccion);
+            btnCancelarAlquiler.setDisable(!haySeleccion);
+        });
+
+        // Listener para habilitar botones de editar/borrar cuando se selecciona un alquiler
+        tblAlquiler.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            boolean haySeleccion = newSelection != null;
+            btnEditarAlquiler.setDisable(!haySeleccion);
+            btnBorrarAlq.setDisable(!haySeleccion);
+        });
     }
 
     //////////////////////////////////////////////////////////////// -----LOGIN-----
@@ -664,12 +683,13 @@ public class controladorApp implements Initializable {
         txtApellidos.setDisable(false);
         txtDireccion.setDisable(false);
         txtTelefono.setDisable(false);
-        txtFechaNac.setDisable(false);
+        dpFechaNac.setDisable(false);
         txtDni.setDisable(false);
         txtEmail.setDisable(false);
         btnAñadirNuevoCliente.setDisable(false);
         btnCancelarNuevoCliente.setDisable(false);
-        splitMenuSexo.setDisable(false);
+        rbMasculino.setDisable(false);
+        rbFemenino.setDisable(false);
     }
 
     @FXML
@@ -682,10 +702,10 @@ public class controladorApp implements Initializable {
             String apellidos = txtApellidos.getText();
             String direccion = txtDireccion.getText();
             String telefono = txtTelefono.getText();
-            String fechaNac = txtFechaNac.getText();
+            String fechaNac = dpFechaNac.getValue() != null ? dpFechaNac.getValue().toString() : "";
             String dni = txtDni.getText();
             String email = txtEmail.getText();
-            String sexo = splitMenuSexo.getText();
+            String sexo = rbMasculino.isSelected() ? "Masculino" : (rbFemenino.isSelected() ? "Femenino" : "");
 
             // Verificar si ya existe un cliente con ese DNI
             List<Cliente> clientesExistentes = Conexion.buscarClientes(dni);
@@ -741,12 +761,13 @@ public class controladorApp implements Initializable {
         txtApellidos.setDisable(true);
         txtDireccion.setDisable(true);
         txtTelefono.setDisable(true);
-        txtFechaNac.setDisable(true);
+        dpFechaNac.setDisable(true);
         txtDni.setDisable(true);
         txtEmail.setDisable(true);
         btnAñadirNuevoCliente.setDisable(true);
         btnCancelarNuevoCliente.setDisable(true);
-        splitMenuSexo.setDisable(true);
+        rbMasculino.setDisable(true);
+        rbFemenino.setDisable(true);
 
     }
 
@@ -892,11 +913,12 @@ public class controladorApp implements Initializable {
         btnEditarCliente.setDisable(true);
         btnNuevoCliente.setDisable(true);
         btnBuscarCliente.setDisable(true);
+        btnAñadirNuevoCliente.setDisable(true); // Deshabilitar para evitar confusión
 
         AlertaEstilizada.mostrarInformacion(
             "Modo edicion",
             "Editando cliente",
-            "Modifica los campos necesarios y pulsa 'Seleccionar' para guardar los cambios."
+            "Modifica los campos necesarios y pulsa 'Aceptar' para guardar los cambios."
         );
     }
 
@@ -951,19 +973,6 @@ public class controladorApp implements Initializable {
         btnSeleccionCLiente.setDisable(false);
         btnEditarCliente.setDisable(false);
         btnEliminarCliente.setDisable(false);
-    }
-
-    ////////////////////////// -----ELEGIR
-    /// SEXO------- /////////////////////////////////
-
-    @FXML
-    void elegirFemenino(ActionEvent event) {
-        splitMenuSexo.setText(opFemenino.getText());
-    }
-
-    @FXML
-    void elegirMasculino(ActionEvent event) {
-        splitMenuSexo.setText(opMasculino.getText());
     }
 
     //////////////////////////////////////////////////////////////////////////////// -
@@ -2594,12 +2603,13 @@ public class controladorApp implements Initializable {
         txtApellidos.setDisable(true);
         txtDireccion.setDisable(true);
         txtTelefono.setDisable(true);
-        txtFechaNac.setDisable(true);
+        dpFechaNac.setDisable(true);
         txtDni.setDisable(true);
         txtEmail.setDisable(true);
         btnAñadirNuevoCliente.setDisable(true);
         btnCancelarNuevoCliente.setDisable(true);
-        splitMenuSexo.setDisable(true);
+        rbMasculino.setDisable(true);
+        rbFemenino.setDisable(true);
 
     }
 
@@ -2698,10 +2708,12 @@ public class controladorApp implements Initializable {
         txtApellidos.clear();
         txtDireccion.clear();
         txtTelefono.clear();
-        txtFechaNac.clear();
+        dpFechaNac.setValue(null);
         txtDni.clear();
         txtEmail.clear();
-        splitMenuSexo.setText("Sexo");
+        if (toggleSexo != null) {
+            toggleSexo.selectToggle(null);
+        }
     }
 
     private void limpiarIngreso() {

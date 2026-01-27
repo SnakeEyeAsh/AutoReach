@@ -12,7 +12,10 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -33,6 +36,9 @@
             <VBox prefHeight="548.0" prefWidth="120.0">
                <children>
                   <Button fx:id="btnIrAInicio" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAInicio" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Inicio">
+                     <tooltip>
+                        <Tooltip text="Ir a la pantalla principal del cliente" />
+                     </tooltip>
                      <graphic>
                         <ImageView fx:id="btnInicio" fitHeight="48.0" fitWidth="48.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -45,6 +51,9 @@
                      </VBox.margin>
                   </Button>
                   <Button fx:id="btnAlquiler" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAalquiler" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Alquiler">
+                     <tooltip>
+                        <Tooltip text="Gestionar alquileres de vehiculos" />
+                     </tooltip>
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -57,6 +66,9 @@
                      </VBox.margin>
                   </Button>
                   <Button fx:id="btnCompras" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcompras" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Compras">
+                     <tooltip>
+                        <Tooltip text="Comprar vehiculos disponibles" />
+                     </tooltip>
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -69,6 +81,9 @@
                      </VBox.margin>
                   </Button>
                   <Button fx:id="btnIrAIngreso" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAIngresos" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Ingresos">
+                     <tooltip>
+                        <Tooltip text="Registrar nuevos vehiculos en inventario" />
+                     </tooltip>
                      <graphic>
                         <ImageView fx:id="btnInicio1" fitHeight="48.0" fitWidth="48.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -81,6 +96,9 @@
                      </VBox.margin>
                   </Button>
                   <Button fx:id="btnCerrarSesion" contentDisplay="TOP" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="78.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Salir">
+                     <tooltip>
+                        <Tooltip text="Cerrar la aplicacion" />
+                     </tooltip>
                      <graphic>
                         <ImageView fitHeight="48.0" fitWidth="51.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -109,24 +127,38 @@
                         </ImageView>
                         <Label text="Nombre de Usurio:" />
                         <TextField fx:id="txtUser" prefHeight="27.0" prefWidth="375.0">
+                           <tooltip>
+                              <Tooltip text="Introduce tu nombre de usuario" />
+                           </tooltip>
                            <VBox.margin>
                               <Insets bottom="30.0" />
                            </VBox.margin>
                         </TextField>
                         <Label text="Contraseña:" />
                         <TextField fx:id="txtContraseña">
+                           <tooltip>
+                              <Tooltip text="Introduce tu contrasenya" />
+                           </tooltip>
                            <VBox.margin>
                               <Insets bottom="30.0" />
                            </VBox.margin>
                         </TextField>
-                        <Button fx:id="btnInicioSesion" defaultButton="true" onAction="#IniciarSesion" text="_Aceptar" />
+                        <Button fx:id="btnInicioSesion" defaultButton="true" onAction="#IniciarSesion" text="_Aceptar">
+                           <tooltip>
+                              <Tooltip text="Iniciar sesion en el sistema" />
+                           </tooltip>
+                        </Button>
                      </children>
                   </VBox>
                </children>
             </Pane>
             <Pane fx:id="pantallaSesion" prefHeight="200.0" prefWidth="200.0" visible="false">
                <children>
-                  <Button fx:id="btnCerrarSesionCliente" layoutX="600.0" layoutY="20.0" mnemonicParsing="false" onAction="#cerrarSesionCliente" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand;" text="Cerrar Sesión" />
+                  <Button fx:id="btnCerrarSesionCliente" layoutX="600.0" layoutY="20.0" mnemonicParsing="false" onAction="#cerrarSesionCliente" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand;" text="Cerrar Sesión">
+                     <tooltip>
+                        <Tooltip text="Cerrar sesion del cliente actual" />
+                     </tooltip>
+                  </Button>
                   <ImageView fitHeight="150.0" fitWidth="170.0" layoutX="35.0" layoutY="43.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@Assets/perfil.png" />
@@ -192,7 +224,11 @@
                               <Insets bottom="15.0" />
                            </VBox.margin>
                         </Label>
-                        <MenuButton fx:id="slcMatriculaLogin" mnemonicParsing="false" text="Matricula" />
+                        <MenuButton fx:id="slcMatriculaLogin" mnemonicParsing="false" text="Matricula">
+                           <tooltip>
+                              <Tooltip text="Seleccionar vehiculo del cliente" />
+                           </tooltip>
+                        </MenuButton>
                      </children>
                   </VBox>
                   <ListView fx:id="tablaDeInformacion" layoutX="368.0" layoutY="280.0" prefHeight="266.0" prefWidth="333.0" />
@@ -224,6 +260,9 @@
                                        </HBox.margin>
                                     </Label>
                                     <MenuButton fx:id="mnMarcaCompra" mnemonicParsing="false" prefHeight="26.0" prefWidth="150.0" text="Marca">
+                                       <tooltip>
+                                          <Tooltip text="Seleccionar marca para filtrar" />
+                                       </tooltip>
                                        <HBox.margin>
                                           <Insets left="28.0" />
                                        </HBox.margin>
@@ -241,6 +280,9 @@
                                        </HBox.margin>
                                     </Label>
                                     <ComboBox fx:id="cmbModeloCompra" prefHeight="26.0" prefWidth="150.0">
+                                       <tooltip>
+                                          <Tooltip text="Seleccionar modelo para filtrar" />
+                                       </tooltip>
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
@@ -310,9 +352,21 @@
                               <Insets top="10.0" />
                            </VBox.margin>
                            <children>
-                              <Button fx:id="btnInformeVehiculo" disable="true" mnemonicParsing="false" onAction="#descargarInformeVehiculo" prefHeight="26.0" prefWidth="130.0" text="Informe Vehiculo" />
-                              <Button fx:id="btnCompra" mnemonicParsing="false" onAction="#efectuarCompra" prefHeight="26.0" prefWidth="106.0" text="Comprar" />
-                              <Button fx:id="btnCancelarCompra" mnemonicParsing="false" onAction="#cancelarCompra" prefHeight="26.0" prefWidth="95.0" text="Cancelar" />
+                              <Button fx:id="btnInformeVehiculo" disable="true" mnemonicParsing="false" onAction="#descargarInformeVehiculo" prefHeight="26.0" prefWidth="130.0" text="Informe Vehiculo">
+                                 <tooltip>
+                                    <Tooltip text="Descargar informe PDF del vehiculo" />
+                                 </tooltip>
+                              </Button>
+                              <Button fx:id="btnCompra" mnemonicParsing="false" onAction="#efectuarCompra" prefHeight="26.0" prefWidth="106.0" text="Comprar">
+                                 <tooltip>
+                                    <Tooltip text="Efectuar compra del vehiculo seleccionado" />
+                                 </tooltip>
+                              </Button>
+                              <Button fx:id="btnCancelarCompra" mnemonicParsing="false" onAction="#cancelarCompra" prefHeight="26.0" prefWidth="95.0" text="Cancelar">
+                                 <tooltip>
+                                    <Tooltip text="Cancelar operacion de compra" />
+                                 </tooltip>
+                              </Button>
                            </children>
                         </HBox>
                      </children>
@@ -397,58 +451,95 @@
                         <VBox prefHeight="518.0" prefWidth="172.0">
                            <children>
                               <TextField fx:id="ingresoMarca" prefHeight="26.0" prefWidth="150.0">
+                                 <tooltip>
+                                    <Tooltip text="Marca del vehiculo (ej: Toyota, BMW)" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="10.0" top="35.0" />
                                  </VBox.margin>
                               </TextField>
                               <TextField fx:id="ingresoModelo">
+                                 <tooltip>
+                                    <Tooltip text="Modelo del vehiculo (ej: Corolla, Serie 3)" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />
                                  </VBox.margin>
                               </TextField>
                               <TextField fx:id="ingresoAño">
+                                 <tooltip>
+                                    <Tooltip text="Anyo de fabricacion (ej: 2023)" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />
                                  </VBox.margin>
                               </TextField>
                               <TextField fx:id="ingresoKms">
+                                 <tooltip>
+                                    <Tooltip text="Kilometraje actual del vehiculo" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />
                                  </VBox.margin>
                               </TextField>
                               <TextField fx:id="ingresoBastidor">
+                                 <tooltip>
+                                    <Tooltip text="Numero de bastidor VIN (17 caracteres)" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />
                                  </VBox.margin>
                               </TextField>
                               <TextField fx:id="ingresoPrecio">
+                                 <tooltip>
+                                    <Tooltip text="Precio base del vehiculo en euros" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />
                                  </VBox.margin>
                               </TextField>
                               <TextField fx:id="ingresoDllantas">
+                                 <tooltip>
+                                    <Tooltip text="Diametro de las llantas en pulgadas" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />
                                  </VBox.margin>
                               </TextField>
                               <TextField fx:id="ingresoDiseñoLlantas">
+                                 <tooltip>
+                                    <Tooltip text="Tipo de llantas (ej: Aleacion, Radial)" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />
                                  </VBox.margin>
                               </TextField>
                               <TextField fx:id="ingresoColor">
+                                 <tooltip>
+                                    <Tooltip text="Color del vehiculo" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />
                                  </VBox.margin></TextField>
-                              <TextField fx:id="ingresoMatricula" />
+                              <TextField fx:id="ingresoMatricula">
+                                 <tooltip>
+                                    <Tooltip text="Matricula del vehiculo (4 numeros + 3 letras)" />
+                                 </tooltip>
+                              </TextField>
                               <HBox prefHeight="45.0" prefWidth="159.0">
                                  <children>
                                     <Button fx:id="btnAceptarIngreso" onAction="#aceptarIngreso" prefHeight="26.0" prefWidth="58.0" text="_Aceptar">
+                                       <tooltip>
+                                          <Tooltip text="Guardar vehiculo en inventario" />
+                                       </tooltip>
                                        <HBox.margin>
                                           <Insets left="10.0" right="10.0" />
                                        </HBox.margin>
                                     </Button>
                                     <Button fx:id="btnCancelarIngresos" onAction="#cancelarIngreso" text="_Cancelar">
+                                       <tooltip>
+                                          <Tooltip text="Limpiar formulario" />
+                                       </tooltip>
                                        <HBox.margin>
                                           <Insets />
                                        </HBox.margin>
@@ -464,8 +555,16 @@
                            <children>
                               <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="363.0" spacing="10.0">
                                  <children>
-                                    <Button fx:id="btnVerReporte" mnemonicParsing="false" onAction="#verReporteInventario" text="Ver Reporte" />
-                                    <Button fx:id="btnDescargarPDF" mnemonicParsing="false" onAction="#descargarReportePDF" text="Descargar PDF" />
+                                    <Button fx:id="btnVerReporte" mnemonicParsing="false" onAction="#verReporteInventario" text="Ver Reporte">
+                                       <tooltip>
+                                          <Tooltip text="Ver reporte del inventario de vehiculos" />
+                                       </tooltip>
+                                    </Button>
+                                    <Button fx:id="btnDescargarPDF" mnemonicParsing="false" onAction="#descargarReportePDF" text="Descargar PDF">
+                                       <tooltip>
+                                          <Tooltip text="Descargar reporte en formato PDF" />
+                                       </tooltip>
+                                    </Button>
                                  </children>
                                  <VBox.margin>
                                     <Insets bottom="5.0" left="30.0" right="10.0" />
@@ -497,21 +596,33 @@
                               <HBox prefHeight="50.0" prefWidth="200.0">
                                  <children>
                                     <Button fx:id="btnEditarCoche" onAction="#editarCoche" text="_Aceptar">
+                                       <tooltip>
+                                          <Tooltip text="Guardar nuevo vehiculo en inventario" />
+                                       </tooltip>
                                        <HBox.margin>
                                           <Insets left="50.0" top="10.0" />
                                        </HBox.margin>
                                     </Button>
                                     <Button fx:id="btnEditarIngreso" onAction="#editarIngreso" text="_Editar">
+                                       <tooltip>
+                                          <Tooltip text="Editar vehiculo seleccionado" />
+                                       </tooltip>
                                        <HBox.margin>
                                           <Insets left="20.0" right="20.0" top="10.0" />
                                        </HBox.margin>
                                     </Button>
                                     <Button fx:id="btnBorrarIngreso" onAction="#borrarIngreso" text="_Borrar">
+                                       <tooltip>
+                                          <Tooltip text="Eliminar vehiculo seleccionado del inventario" />
+                                       </tooltip>
                                        <HBox.margin>
                                           <Insets top="10.0" />
                                        </HBox.margin>
                                     </Button>
                                     <Button fx:id="btnCancelarEdicionIngreso" mnemonicParsing="false" onAction="#cancelarEdicionIngreso" text="Cancelar">
+                                       <tooltip>
+                                          <Tooltip text="Cancelar edicion y limpiar formulario" />
+                                       </tooltip>
                                        <HBox.margin>
                                           <Insets left="20.0" top="10.0" />
                                        </HBox.margin>
@@ -544,6 +655,9 @@
                                  </VBox.margin>
                               </Label>
                               <MenuButton fx:id="mnElegirMarca" maxWidth="100.0" mnemonicParsing="false" text="Marca">
+                                 <tooltip>
+                                    <Tooltip text="Seleccionar marca del vehiculo" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="15.0" left="40.0" />
                                  </VBox.margin>
@@ -554,6 +668,9 @@
                                  </VBox.margin>
                               </Label>
                               <ComboBox fx:id="cmbElegirModelo" prefHeight="26.0" prefWidth="105.0">
+                                 <tooltip>
+                                    <Tooltip text="Seleccionar modelo del vehiculo" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets left="40.0" />
                                  </VBox.margin>
@@ -597,7 +714,10 @@
                                     <Insets />
                                  </VBox.margin>
                               </Label>
-                              <DatePicker fx:id="cldRecoger">
+                              <DatePicker fx:id="cldRecoger" disable="true">
+                                 <tooltip>
+                                    <Tooltip text="Fecha de recogida del vehiculo" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
@@ -607,7 +727,10 @@
                                     <Insets />
                                  </VBox.margin>
                               </Label>
-                              <TextField fx:id="txtHoraEntrega" prefHeight="26.0" prefWidth="192.0">
+                              <TextField fx:id="txtHoraEntrega" prefHeight="26.0" prefWidth="192.0" disable="true">
+                                 <tooltip>
+                                    <Tooltip text="Hora de entrega (formato HH:mm)" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
@@ -617,7 +740,10 @@
                                     <Insets />
                                  </VBox.margin>
                               </Label>
-                              <DatePicker fx:id="cldEntrega">
+                              <DatePicker fx:id="cldEntrega" disable="true">
+                                 <tooltip>
+                                    <Tooltip text="Fecha de devolucion del vehiculo" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
@@ -637,7 +763,10 @@
                         </TableView>
                         <VBox alignment="CENTER" prefHeight="322.0" prefWidth="90.0">
                            <children>
-                              <Button fx:id="btnConirmarAlquiler" onAction="#confirmarAlquiler" text="_Confirmar">
+                              <Button fx:id="btnConirmarAlquiler" onAction="#confirmarAlquiler" text="_Confirmar" disable="true">
+                                 <tooltip>
+                                    <Tooltip text="Confirmar y registrar el alquiler" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="20.0" top="100.0" />
                                  </VBox.margin>
@@ -645,17 +774,27 @@
                                     <Insets />
                                  </opaqueInsets>
                               </Button>
-                              <Button fx:id="btnEditarAlquiler" onAction="#editarAlq" text="_Editar">
+                              <Button fx:id="btnEditarAlquiler" onAction="#editarAlq" text="_Editar" disable="true">
+                                 <tooltip>
+                                    <Tooltip text="Editar alquiler seleccionado" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
                               </Button>
-                              <Button fx:id="btnBorrarAlq" onAction="#borrarAlq" text="_Borrar">
+                              <Button fx:id="btnBorrarAlq" onAction="#borrarAlq" text="_Borrar" disable="true">
+                                 <tooltip>
+                                    <Tooltip text="Eliminar alquiler seleccionado" />
+                                 </tooltip>
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
                               </Button>
-                              <Button fx:id="btnCancelarAlquiler" onAction="#cancelarAlquiler" text="_Cancelar" />
+                              <Button fx:id="btnCancelarAlquiler" onAction="#cancelarAlquiler" text="_Cancelar" disable="true">
+                                 <tooltip>
+                                    <Tooltip text="Cancelar operacion actual" />
+                                 </tooltip>
+                              </Button>
                            </children>
                         </VBox>
                      </children>
@@ -668,7 +807,11 @@
                      <children>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <Button fx:id="btnNuevoCliente" onAction="#crearCliente" prefHeight="18.0" prefWidth="118.0" text="Nuevo Cliente" />
+                              <Button fx:id="btnNuevoCliente" onAction="#crearCliente" prefHeight="18.0" prefWidth="118.0" text="Nuevo Cliente">
+                                 <tooltip>
+                                    <Tooltip text="Crear un nuevo cliente en el sistema" />
+                                 </tooltip>
+                              </Button>
                               <AnchorPane fx:id="panelNuevoCliente" prefHeight="450.0" prefWidth="289.0">
                                  <children>
                                     <Label layoutX="14.0" layoutY="26.0" prefHeight="18.0" prefWidth="62.0" text="NOMBRE">
@@ -686,10 +829,26 @@
                                           <Font name="Arial Bold" size="13.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="txtNombre" layoutX="116.0" layoutY="22.0" prefHeight="18.0" prefWidth="170.0" />
-                                    <TextField fx:id="txtTelefono" layoutX="116.0" layoutY="184.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <TextField fx:id="txtFechaNac" layoutX="116.0" layoutY="238.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <Button fx:id="btnAñadirNuevoCliente" layoutX="158.0" layoutY="460.0" onAction="#añadirCliente" text="_Añadir" />
+                                    <TextField fx:id="txtNombre" layoutX="116.0" layoutY="22.0" prefHeight="18.0" prefWidth="170.0">
+                                       <tooltip>
+                                          <Tooltip text="Nombre del cliente" />
+                                       </tooltip>
+                                    </TextField>
+                                    <TextField fx:id="txtTelefono" layoutX="116.0" layoutY="184.0" prefHeight="26.0" prefWidth="170.0">
+                                       <tooltip>
+                                          <Tooltip text="Telefono de contacto (9-15 digitos)" />
+                                       </tooltip>
+                                    </TextField>
+                                    <DatePicker fx:id="dpFechaNac" layoutX="116.0" layoutY="238.0" prefHeight="26.0" prefWidth="170.0">
+                                       <tooltip>
+                                          <Tooltip text="Fecha de nacimiento (debe ser mayor de 18)" />
+                                       </tooltip>
+                                    </DatePicker>
+                                    <Button fx:id="btnAñadirNuevoCliente" layoutX="158.0" layoutY="460.0" onAction="#añadirCliente" text="_Añadir">
+                                       <tooltip>
+                                          <Tooltip text="Guardar el nuevo cliente" />
+                                       </tooltip>
+                                    </Button>
                                     <Label layoutX="14.0" layoutY="79.0" prefHeight="18.0" prefWidth="82.0" text="APELLIDOS">
                                        <font>
                                           <Font name="Arial Bold" size="13.0" />
@@ -700,32 +859,63 @@
                                           <Font name="Arial Bold" size="13.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="txtApellidos" layoutX="116.0" layoutY="75.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <TextField fx:id="txtDireccion" layoutX="116.0" layoutY="129.0" prefHeight="26.0" prefWidth="170.0" />
-                                    <Button fx:id="btnCancelarNuevoCliente" layoutX="227.0" layoutY="460.0" onAction="#cancelarNuevoCliente" text="_Cancelar" />
+                                    <TextField fx:id="txtApellidos" layoutX="116.0" layoutY="75.0" prefHeight="26.0" prefWidth="170.0">
+                                       <tooltip>
+                                          <Tooltip text="Apellidos del cliente" />
+                                       </tooltip>
+                                    </TextField>
+                                    <TextField fx:id="txtDireccion" layoutX="116.0" layoutY="129.0" prefHeight="26.0" prefWidth="170.0">
+                                       <tooltip>
+                                          <Tooltip text="Direccion completa del cliente" />
+                                       </tooltip>
+                                    </TextField>
+                                    <Button fx:id="btnCancelarNuevoCliente" layoutX="227.0" layoutY="460.0" onAction="#cancelarNuevoCliente" text="_Cancelar">
+                                       <tooltip>
+                                          <Tooltip text="Cancelar y limpiar formulario" />
+                                       </tooltip>
+                                    </Button>
                                     <Label layoutX="14.0" layoutY="293.0" prefHeight="18.0" prefWidth="82.0" text="DNI">
                                        <font>
                                           <Font name="Arial Bold" size="13.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="txtDni" layoutX="116.0" layoutY="289.0" prefHeight="26.0" prefWidth="170.0" />
+                                    <TextField fx:id="txtDni" layoutX="116.0" layoutY="289.0" prefHeight="26.0" prefWidth="170.0">
+                                       <tooltip>
+                                          <Tooltip text="DNI del cliente (8 digitos + letra)" />
+                                       </tooltip>
+                                    </TextField>
                                     <Label layoutX="14.0" layoutY="386.0" prefHeight="18.0" prefWidth="82.0" text="Email">
                                        <font>
                                           <Font name="Arial Bold" size="13.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="txtEmail" layoutX="116.0" layoutY="382.0" prefHeight="26.0" prefWidth="170.0" />
+                                    <TextField fx:id="txtEmail" layoutX="116.0" layoutY="382.0" prefHeight="26.0" prefWidth="170.0">
+                                       <tooltip>
+                                          <Tooltip text="Correo electronico del cliente" />
+                                       </tooltip>
+                                    </TextField>
                                     <Label layoutX="14.0" layoutY="343.0" prefHeight="18.0" prefWidth="82.0" text="SEXO">
                                        <font>
                                           <Font name="Arial Bold" size="13.0" />
                                        </font>
                                     </Label>
-                                    <SplitMenuButton fx:id="splitMenuSexo" layoutX="119.0" layoutY="340.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="170.0" text="Sexo">
-                                      <items>
-                                        <MenuItem fx:id="opMasculino" mnemonicParsing="false" onAction="#elegirMasculino" text="Masculino" />
-                                        <MenuItem fx:id="opFemenino" mnemonicParsing="false" onAction="#elegirFemenino" text="Femenino" />
-                                      </items>
-                                    </SplitMenuButton>
+                                    <HBox layoutX="116.0" layoutY="340.0" spacing="15.0">
+                                       <children>
+                                          <RadioButton fx:id="rbMasculino" text="Masculino">
+                                             <tooltip>
+                                                <Tooltip text="Seleccionar sexo masculino" />
+                                             </tooltip>
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="toggleSexo" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <RadioButton fx:id="rbFemenino" text="Femenino" toggleGroup="$toggleSexo">
+                                             <tooltip>
+                                                <Tooltip text="Seleccionar sexo femenino" />
+                                             </tooltip>
+                                          </RadioButton>
+                                       </children>
+                                    </HBox>
                                  </children>
                                  <VBox.margin>
                                     <Insets right="20.0" top="20.0" />
@@ -738,7 +928,11 @@
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <Button fx:id="btnBuscarCliente" mnemonicParsing="false" onAction="#buscarLogin" prefHeight="18.0" prefWidth="118.0" text="Buscar Cliente" />
+                              <Button fx:id="btnBuscarCliente" mnemonicParsing="false" onAction="#buscarLogin" prefHeight="18.0" prefWidth="118.0" text="Buscar Cliente">
+                                 <tooltip>
+                                    <Tooltip text="Buscar clientes existentes" />
+                                 </tooltip>
+                              </Button>
                               <AnchorPane fx:id="panelLoginCliente" prefHeight="500.0" prefWidth="315.0">
                                  <children>
                                     <Label layoutX="16.0" layoutY="21.0" prefHeight="18.0" prefWidth="62.0" text="DNI">
@@ -746,17 +940,37 @@
                                           <Font name="Arial Bold" size="13.0" />
                                        </font>
                                     </Label>
-                                    <Button fx:id="btnSeleccionCLiente" layoutX="47.0" layoutY="459.0" onAction="#seleccionarCliente" text="_Aceptar" />
-                                    <Button fx:id="btnEditarCliente" layoutX="116.0" layoutY="459.0" onAction="#editarCliente" text="_Editar" />
-                                    <Button fx:id="btnCancelarSeleccion" layoutX="242.0" layoutY="459.0" onAction="#cancelarSeleccion" text="_Cancelar" />
+                                    <Button fx:id="btnSeleccionCLiente" layoutX="47.0" layoutY="459.0" onAction="#seleccionarCliente" text="_Aceptar">
+                                       <tooltip>
+                                          <Tooltip text="Seleccionar cliente e iniciar sesion" />
+                                       </tooltip>
+                                    </Button>
+                                    <Button fx:id="btnEditarCliente" layoutX="116.0" layoutY="459.0" onAction="#editarCliente" text="_Editar">
+                                       <tooltip>
+                                          <Tooltip text="Editar datos del cliente seleccionado" />
+                                       </tooltip>
+                                    </Button>
+                                    <Button fx:id="btnCancelarSeleccion" layoutX="242.0" layoutY="459.0" onAction="#cancelarSeleccion" text="_Cancelar">
+                                       <tooltip>
+                                          <Tooltip text="Cancelar seleccion" />
+                                       </tooltip>
+                                    </Button>
                                     <TableView fx:id="tablaRegistro" layoutX="14.0" layoutY="54.0" prefHeight="394.0" prefWidth="290.0">
                                       <columns>
                                         <TableColumn fx:id="clnNombreRegistro" prefWidth="142.39995765686035" text="Nombre" />
                                         <TableColumn fx:id="clnDniRegistro" prefWidth="147.19998779296873" text="DNI" />
                                       </columns>
                                     </TableView>
-                                    <Button fx:id="btnEliminarCliente" layoutX="174.0" layoutY="459.0" onAction="#eliminarCliente" text="_Eliminar" />
-                                    <ComboBox fx:id="comboDni" layoutX="94.0" layoutY="17.0" prefHeight="26.0" prefWidth="209.0" />
+                                    <Button fx:id="btnEliminarCliente" layoutX="174.0" layoutY="459.0" onAction="#eliminarCliente" text="_Eliminar">
+                                       <tooltip>
+                                          <Tooltip text="Eliminar cliente seleccionado" />
+                                       </tooltip>
+                                    </Button>
+                                    <ComboBox fx:id="comboDni" layoutX="94.0" layoutY="17.0" prefHeight="26.0" prefWidth="209.0">
+                                       <tooltip>
+                                          <Tooltip text="Buscar cliente por DNI" />
+                                       </tooltip>
+                                    </ComboBox>
                                  </children>
                                  <VBox.margin>
                                     <Insets top="20.0" />

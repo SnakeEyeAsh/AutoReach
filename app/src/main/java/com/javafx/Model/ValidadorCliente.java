@@ -10,8 +10,10 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Control;
-import javafx.scene.control.SplitMenuButton;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.util.Duration;
 
 import org.controlsfx.validation.Severity;
@@ -35,6 +37,10 @@ public class ValidadorCliente {
     private static final String ESTILO_VALIDO = "-fx-background-color: #ccffcc;"; // Verde pálido
     private static final String ESTILO_DEFECTO = ""; // Sin estilo (color por defecto)
 
+    // Referencias para validación manual de DatePicker y RadioButtons
+    private DatePicker dpFechaNac;
+    private ToggleGroup toggleSexo;
+
     /**
      * Inicializa el validador con todos los campos del formulario.
      * Este método debe llamarse una sola vez, preferiblemente en el initialize() del controlador.
@@ -43,13 +49,17 @@ public class ValidadorCliente {
      * @param apellidos Campo de apellidos
      * @param direccion Campo de dirección
      * @param telefono Campo de teléfono
-     * @param fechaNac Campo de fecha de nacimiento
+     * @param fechaNac DatePicker de fecha de nacimiento
      * @param dni Campo de DNI
      * @param email Campo de email
-     * @param sexo Menú desplegable de sexo
+     * @param sexo ToggleGroup de sexo (RadioButtons)
      */
     public void inicializarValidadores(Control nombre, Control apellidos, Control direccion,
-            Control telefono, Control fechaNac, Control dni, Control email, Control sexo) {
+            Control telefono, DatePicker fechaNac, Control dni, Control email, ToggleGroup sexo) {
+
+        // Guardar referencias para validación manual
+        this.dpFechaNac = fechaNac;
+        this.toggleSexo = sexo;
 
         // Crear validador único
         validador = new ValidationSupport();
@@ -62,8 +72,7 @@ public class ValidadorCliente {
         registrarValidadorTelefono(telefono);
         registrarValidadorEmail(email);
         registrarValidadorDni(dni);
-        registrarValidadorFecha(fechaNac);
-        registrarValidadorSexo(sexo);
+        registrarValidadorFechaDatePicker(fechaNac);
 
         // Aplicar estilos CSS a los campos
         aplicarEstilosDinamicos(nombre);
@@ -72,8 +81,6 @@ public class ValidadorCliente {
         aplicarEstilosDinamicos(telefono);
         aplicarEstilosDinamicos(email);
         aplicarEstilosDinamicos(dni);
-        aplicarEstilosDinamicos(fechaNac);
-        aplicarEstilosDinamicos(sexo);
 
         // Inicializar decoraciones visuales
         Platform.runLater(() -> validador.initInitialDecoration());
@@ -203,17 +210,12 @@ public class ValidadorCliente {
     }
 
     /**
-     * Valida el campo de fecha de nacimiento.
+     * Valida el campo de fecha de nacimiento con DatePicker.
      */
-    private void registrarValidadorFecha(Control control) {
-        validador.registerValidator(control, (Control c, String texto) -> {
-            if (esTextoVacio(texto)) {
-                return ValidationResult.fromError(c, "La fecha de nacimiento es obligatoria");
-            }
-
-            LocalDate fecha = parsearFecha(texto);
+    private void registrarValidadorFechaDatePicker(DatePicker datePicker) {
+        validador.registerValidator(datePicker, (Control c, LocalDate fecha) -> {
             if (fecha == null) {
-                return ValidationResult.fromError(c, "Fecha inválida (dd/MM/yyyy o yyyy-MM-dd)");
+                return ValidationResult.fromError(c, "La fecha de nacimiento es obligatoria");
             }
 
             // Validar que la fecha no sea futura
@@ -237,19 +239,11 @@ public class ValidadorCliente {
     }
 
     /**
-     * Valida el campo de sexo.
+     * Valida que se haya seleccionado un sexo (RadioButton).
+     * Se valida manualmente ya que ToggleGroup no es un Control.
      */
-    private void registrarValidadorSexo(Control control) {
-        validador.registerValidator(control, (Control c, SplitMenuButton menu) -> {
-            String texto = menu.getText();
-            if (esTextoVacio(texto) ||
-                texto.equalsIgnoreCase("Sexo") ||
-                texto.equalsIgnoreCase("Selecciona") ||
-                texto.equalsIgnoreCase("Seleccione")) {
-                return ValidationResult.fromError(c, "Debe seleccionar un sexo");
-            }
-            return ValidationResult.fromInfo(c, "");
-        });
+    private boolean validarSexoSeleccionado() {
+        return toggleSexo != null && toggleSexo.getSelectedToggle() != null;
     }
 
     /**
@@ -277,7 +271,10 @@ public class ValidadorCliente {
 
         ValidationResult resultado = validador.getValidationResult();
 
-        if (resultado.getErrors().isEmpty()) {
+        // Verificar validación del sexo (RadioButtons)
+        boolean sexoValido = validarSexoSeleccionado();
+
+        if (resultado.getErrors().isEmpty() && sexoValido) {
             return true;
         }
 
@@ -296,6 +293,11 @@ public class ValidadorCliente {
                 errores.add(error.getText());
             }
         });
+
+        // Agregar error de sexo si no está seleccionado
+        if (!sexoValido) {
+            errores.add("Debe seleccionar un sexo");
+        }
 
         // Mostrar alerta con los errores
         Alert alerta = new Alert(AlertType.WARNING);
@@ -409,11 +411,10 @@ public class ValidadorCliente {
                 Platform.runLater(() -> actualizarEstiloCampo(control));
             });
         }
-        // Listener para cambios en SplitMenuButton
-        else if (control instanceof SplitMenuButton) {
-            SplitMenuButton menu = (SplitMenuButton) control;
-            menu.textProperty().addListener((obs, oldVal, newVal) -> {
-                // Usar Platform.runLater para asegurar que el validador se actualice primero
+        // Listener para cambios en DatePicker
+        else if (control instanceof DatePicker) {
+            DatePicker datePicker = (DatePicker) control;
+            datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
                 Platform.runLater(() -> actualizarEstiloCampo(control));
             });
         }
@@ -434,12 +435,8 @@ public class ValidadorCliente {
         boolean estaVacio = false;
         if (control instanceof TextField) {
             estaVacio = esTextoVacio(((TextField) control).getText());
-        } else if (control instanceof SplitMenuButton) {
-            String texto = ((SplitMenuButton) control).getText();
-            estaVacio = esTextoVacio(texto) ||
-                        texto.equalsIgnoreCase("Sexo") ||
-                        texto.equalsIgnoreCase("Selecciona") ||
-                        texto.equalsIgnoreCase("Seleccione");
+        } else if (control instanceof DatePicker) {
+            estaVacio = ((DatePicker) control).getValue() == null;
         }
 
         // Si está vacío, aplicar estilo por defecto

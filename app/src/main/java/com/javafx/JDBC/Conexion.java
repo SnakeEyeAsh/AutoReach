@@ -384,9 +384,9 @@ public class Conexion {
             System.out.println("Filas afectadas " + filas);
 
         } catch (SQLException error) {
-
             System.out.println("Error al insertar Alquiler " + error.getMessage());
-
+            // Re-lanzar la excepción para que el controlador pueda mostrarla en la UI
+            throw error;
         }
 
     }
