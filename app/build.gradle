@@ -1,6 +1,6 @@
 plugins {
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'org.openjfx.javafxplugin' version '0.0.14'
 }
 
 repositories {
@@ -12,13 +12,13 @@ repositories {
 // CONFIGURACIÓN DE JAVAFX
 // ═══════════════════════════════════════════════════════════════════
 javafx {
-    version = "25"
+    version = "21.0.5"
     modules = ['javafx.base', 'javafx.swing', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web']
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -120,7 +120,7 @@ task buildForInstaller(dependsOn: ['clean', 'jar', 'copyDependencies']) {
 // DEPENDENCIAS
 // ═══════════════════════════════════════════════════════════════════
 dependencies {
-    implementation 'org.postgresql:postgresql:42.7.3'
+    implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'org.controlsfx:controlsfx:11.2.1'
     implementation 'io.github.mkpaz:atlantafx-base:2.0.1'
     implementation 'net.sf.jasperreports:jasperreports:7.0.1'

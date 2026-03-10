@@ -128,7 +128,7 @@
       </ToolBar>
       <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="578.0" prefWidth="724.0">
          <children>
-            <Pane fx:id="paneLogin" prefHeight="200.0" prefWidth="200.0" visible="false">
+            <Pane fx:id="paneLogin" prefHeight="578.0" prefWidth="724.0" visible="false">
                <children>
                   <VBox fx:id="ventanaLogin" alignment="TOP_CENTER" layoutX="244.0" layoutY="51.0" prefHeight="431.0" prefWidth="235.0">
                      <children>
@@ -167,7 +167,7 @@
                   </VBox>
                </children>
             </Pane>
-            <Pane fx:id="pantallaSesion" prefHeight="200.0" prefWidth="200.0" visible="false">
+            <Pane fx:id="pantallaSesion" prefHeight="578.0" prefWidth="724.0" visible="false">
                <children>
                   <Button fx:id="btnCerrarSesionCliente" layoutX="600.0" layoutY="20.0" mnemonicParsing="false" onAction="#cerrarSesionCliente" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand;" text="Cerrar Sesión">
                      <tooltip>
@@ -253,7 +253,7 @@
                      </font>
                   </Label>
                </children></Pane>
-            <Pane fx:id="panelVentas" prefHeight="200.0" prefWidth="200.0" visible="false">
+            <Pane fx:id="panelVentas" prefHeight="578.0" prefWidth="724.0" visible="false">
                <children>
                   <HBox prefHeight="251.0" prefWidth="724.0">
                      <children>
@@ -387,7 +387,7 @@
                      </children>
                   </VBox>
                </children></Pane>
-            <Pane fx:id="panelIngreso" prefHeight="200.0" prefWidth="200.0" visible="false">
+            <Pane fx:id="panelIngreso" prefHeight="578.0" prefWidth="724.0" visible="false">
                <children>
                   <HBox layoutX="1.0" prefHeight="38.0" prefWidth="724.0">
                      <children>
@@ -816,11 +816,11 @@
                   </HBox>
                </children>
             </Pane>
-            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="702.0" visible="false" StackPane.alignment="CENTER_RIGHT">
+            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="724.0" visible="false">
                <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox alignment="CENTER" prefHeight="578.0" prefWidth="724.0">
                      <children>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+                        <VBox prefHeight="520.0" prefWidth="309.0">
                            <children>
                               <Button fx:id="btnNuevoCliente" onAction="#crearCliente" prefHeight="18.0" prefWidth="118.0" text="Nuevo Cliente">
                                  <tooltip>
@@ -941,7 +941,7 @@
                               <Insets top="20.0" />
                            </HBox.margin>
                         </VBox>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+                        <VBox prefHeight="540.0" prefWidth="335.0">
                            <children>
                               <Button fx:id="btnBuscarCliente" mnemonicParsing="false" onAction="#buscarLogin" prefHeight="18.0" prefWidth="118.0" text="Buscar Cliente">
                                  <tooltip>
@@ -999,9 +999,6 @@
                      </children>
                   </HBox>
                </children>
-               <StackPane.margin>
-                  <Insets left="50.0" />
-               </StackPane.margin>
             </Pane>
          </children>
       </StackPane>

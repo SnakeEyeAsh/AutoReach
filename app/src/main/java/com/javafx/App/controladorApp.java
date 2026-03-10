@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -727,7 +726,7 @@ public class controladorApp implements Initializable {
                 );
                 limpiarCliente();
                 iniciarTablas();
-            } catch (SQLException error) {
+            } catch (Exception error) {
                 AlertaEstilizada.mostrarError(
                     "Error de base de datos",
                     "No se pudo crear el cliente",
@@ -1045,7 +1044,7 @@ public class controladorApp implements Initializable {
                             "El alquiler se ha registrado correctamente"
                         );
                         iniciarTablas();
-                    } catch (SQLException e) {
+                    } catch (Exception e) {
                         AlertaEstilizada.mostrarError(
                             "Error al crear alquiler",
                             "No se pudo registrar el alquiler",
@@ -1697,7 +1696,7 @@ public class controladorApp implements Initializable {
                 limpiarIngreso();
                 iniciarTablas();
 
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 AlertaEstilizada.mostrarError(
                     "Error de base de datos",
                     "No se pudo crear el coche",
@@ -1795,7 +1794,7 @@ public class controladorApp implements Initializable {
                 "Exito",
                 "Los cambios del vehiculo han sido guardados correctamente"
             );
-        } catch (SQLException e) {
+        } catch (Exception e) {
             AlertaEstilizada.mostrarError(
                 "Error al actualizar",
                 "No se pudieron guardar los cambios",
@@ -1846,7 +1845,7 @@ public class controladorApp implements Initializable {
                 "Exito",
                 "El vehiculo ha sido eliminado correctamente"
             );
-        } catch (SQLException e) {
+        } catch (Exception e) {
             AlertaEstilizada.mostrarError(
                 "Error al eliminar",
                 "No se pudo eliminar el vehiculo",
@@ -2660,7 +2659,7 @@ public class controladorApp implements Initializable {
     private void iniciarTablas() {
 
         // Verificar que la conexión esté disponible antes de cargar datos
-        if (Conexion.getConnection() == null) {
+        if (!Conexion.isConexionActiva()) {
             System.err.println("✗ No se pueden cargar las tablas: conexión a base de datos no disponible");
             return;
         }

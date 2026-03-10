@@ -162,22 +162,4 @@ public class GeneradorInformes {
         return (valor != null && !valor.trim().isEmpty()) ? valor : "-";
     }
 
-    /**
-     * Metodo de compatibilidad para obtener el ano del coche
-     * Maneja tanto getAño() como getAno()
-     */
-    private static String valorSeguro(CocheCompra coche, String campo) {
-        try {
-            switch (campo) {
-                case "ano":
-                    return valorSeguro(coche.getAño());
-                case "disenoRuedas":
-                    return valorSeguro(coche.getDiseñoRuedas());
-                default:
-                    return "-";
-            }
-        } catch (Exception e) {
-            return "-";
-        }
-    }
 }
