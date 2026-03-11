@@ -672,6 +672,62 @@ public class Conexion {
         }
     }
 
+    /** Marca un coche como vendido (estado_id = ESTADO_VENDIDO_ID) por matrícula. */
+    public static void marcarComoVendido(String matricula) {
+        try {
+            String vin = resolverVin(matricula);
+            if (vin == null) { System.err.println("Matrícula no encontrada: " + matricula); return; }
+            JsonObject body = new JsonObject();
+            body.addProperty("estado_id", ESTADO_VENDIDO_ID);
+            HttpResponse<String> resp = patch("coches?vin=eq." + enc(vin), body.toString());
+            if (resp.statusCode() >= 200 && resp.statusCode() < 300)
+                System.out.println("✓ Coche marcado como vendido");
+            else
+                throw new Exception("HTTP " + resp.statusCode() + ": " + resp.body());
+        } catch (Exception e) {
+            System.err.println("Error al marcar como vendido: " + e.getMessage());
+        }
+    }
+
+    /** Devuelve el id de base de datos del cliente con el DNI/NIF indicado, o -1 si no existe. */
+    public static int obtenerClienteIdPorDni(String dni) {
+        try {
+            JsonArray arr = getArray("clientes?dni_nif=eq." + enc(dni) + "&select=id");
+            if (arr.size() > 0) return arr.get(0).getAsJsonObject().get("id").getAsInt();
+        } catch (Exception e) {
+            System.err.println("Error al obtener id de cliente: " + e.getMessage());
+        }
+        return -1;
+    }
+
+    /**
+     * Registra una venta en la tabla transacciones.
+     * Los campos vin_coche y fecha_transaccion se resuelven/generan automáticamente.
+     * @param estadoPago "Pendiente" o "Pagado" (valor del ComboBox del diálogo)
+     * @return el id generado de la transacción, o -1 si falla.
+     */
+    public static int registrarVenta(String matricula, int clienteId, double monto,
+                                     String estadoPago) {
+        try {
+            String vin = resolverVin(matricula);
+            if (vin == null) throw new Exception("Matrícula no encontrada: " + matricula);
+
+            JsonObject body = new JsonObject();
+            body.addProperty("tipo_transaccion", "VENTA");
+            body.addProperty("vin_coche", vin);
+            body.addProperty("cliente_id", clienteId);
+            body.addProperty("monto_total", monto);
+            body.addProperty("estado_pago", estadoPago);
+
+            int id = postReturnId("transacciones", body.toString());
+            System.out.println("✓ Venta registrada con id=" + id);
+            return id;
+        } catch (Exception e) {
+            System.err.println("Error al registrar venta: " + e.getMessage());
+            return -1;
+        }
+    }
+
     // ═══════════════════════════════════════════════════════════════
     // COCHES - CRUD INGRESOS
     // ═══════════════════════════════════════════════════════════════

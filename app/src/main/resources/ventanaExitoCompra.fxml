@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefWidth="420.0" spacing="0"
+      style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 12, 0, 0, 4);"
+      xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.javafx.App.controladorExitoCompra">
+
+   <children>
+
+      <!-- ── Cabecera verde ─────────────────────────────────────── -->
+      <VBox alignment="CENTER" prefHeight="110.0" prefWidth="420.0"
+            style="-fx-background-color: #059669;">
+         <children>
+            <Label text="✓" style="-fx-text-fill: white; -fx-font-size: 42; -fx-font-weight: bold;" />
+            <Label text="¡Compra Realizada!" style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;">
+               <VBox.margin><Insets top="4.0" /></VBox.margin>
+            </Label>
+         </children>
+      </VBox>
+
+      <!-- ── Detalle de la transacción ─────────────────────────── -->
+      <VBox spacing="10.0" style="-fx-padding: 22 28 16 28;">
+
+         <!-- ID Transacción destacado -->
+         <HBox alignment="CENTER">
+            <Label text="Transacción N.º " style="-fx-font-size: 13; -fx-text-fill: #6B7280;" />
+            <Label fx:id="lblIdTransaccion" text="—"
+                   style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+         </HBox>
+
+         <Separator><VBox.margin><Insets top="2.0" bottom="2.0" /></VBox.margin></Separator>
+
+         <!-- Vehículo -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Vehículo:" prefWidth="140.0">
+               <font><Font name="System Bold" size="12.0" /></font>
+            </Label>
+            <Label fx:id="lblVehiculo" text="—" style="-fx-font-size: 12; -fx-text-fill: #1F2937;" />
+         </HBox>
+
+         <!-- Matrícula -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Matrícula:" prefWidth="140.0">
+               <font><Font name="System Bold" size="12.0" /></font>
+            </Label>
+            <Label fx:id="lblMatricula" text="—" style="-fx-font-size: 12; -fx-text-fill: #1F2937;" />
+         </HBox>
+
+         <!-- Importe -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Importe:" prefWidth="140.0">
+               <font><Font name="System Bold" size="12.0" /></font>
+            </Label>
+            <Label fx:id="lblImporte" text="—"
+                   style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #059669;" />
+         </HBox>
+
+         <!-- Cliente -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Cliente:" prefWidth="140.0">
+               <font><Font name="System Bold" size="12.0" /></font>
+            </Label>
+            <Label fx:id="lblCliente" text="—" style="-fx-font-size: 12; -fx-text-fill: #1F2937;" />
+         </HBox>
+
+         <!-- Fecha -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Fecha:" prefWidth="140.0">
+               <font><Font name="System Bold" size="12.0" /></font>
+            </Label>
+            <Label fx:id="lblFecha" text="—" style="-fx-font-size: 12; -fx-text-fill: #6B7280;" />
+         </HBox>
+
+         <!-- Estado de pago -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Estado de pago:" prefWidth="140.0">
+               <font><Font name="System Bold" size="12.0" /></font>
+            </Label>
+            <Label fx:id="lblEstadoPago" text="—"
+                   style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+         </HBox>
+
+      </VBox>
+
+      <!-- ── Botón cerrar ───────────────────────────────────────── -->
+      <HBox alignment="CENTER" style="-fx-padding: 4 28 20 28;">
+         <Button fx:id="btnCerrar" mnemonicParsing="false" onAction="#cerrar"
+                 text="Aceptar" prefWidth="160.0" prefHeight="36.0"
+                 style="-fx-background-color: #059669; -fx-text-fill: white;
+                        -fx-font-size: 13; -fx-font-weight: bold; -fx-cursor: hand;
+                        -fx-background-radius: 4;" />
+      </HBox>
+
+   </children>
+</VBox>

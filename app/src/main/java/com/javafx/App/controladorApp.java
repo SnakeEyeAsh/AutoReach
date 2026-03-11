@@ -87,6 +87,9 @@ public class controladorApp implements Initializable {
 
     private Cliente cliente;
 
+    /** Coche seleccionado en la tabla de compras; lo lee controladorEmergente. */
+    static CocheCompra cocheParaComprar;
+
     private Boolean editarCliente = false;
 
     private boolean editandoAlquiler = false;
@@ -1282,21 +1285,49 @@ public class controladorApp implements Initializable {
     @FXML
     void efectuarCompra(ActionEvent event) {
 
+        CocheCompra seleccionado = tblCochesCompra.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            AlertaEstilizada.crearAdvertencia("Sin selección", "Selecciona un vehículo",
+                    "Debes seleccionar un coche de la tabla antes de comprar.");
+            return;
+        }
+        if (!sesionActiva || cliente == null) {
+            AlertaEstilizada.crearAdvertencia("Sesión requerida", "Inicia sesión",
+                    "Debes iniciar sesión antes de realizar una compra.");
+            return;
+        }
+
+        cocheParaComprar = seleccionado;
+
+        // Asegurar que el cliente tiene su id de BD
+        if (cliente.getId() <= 0) {
+            int dbId = Conexion.obtenerClienteIdPorDni(cliente.getDni());
+            cliente.setId(dbId);
+        }
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ventanaInfo.fxml"));
             Parent root = loader.load();
 
+            // Pasar datos del cliente al controlador emergente
+            controladorEmergente ctrl = loader.getController();
+            ctrl.setClienteId(cliente.getId());
+            ctrl.setClienteNombre(cliente.getNombre() + " " + cliente.getApellidos());
+
             Stage stage = new Stage();
             stage.setTitle("Compra");
-            stage.initModality(Modality.WINDOW_MODAL); // hace modal
+            stage.initModality(Modality.WINDOW_MODAL);
             if (btnCompra.getScene() != null && btnCompra.getScene().getWindow() != null) {
-                stage.initOwner(btnCompra.getScene().getWindow()); // define dueño
+                stage.initOwner(btnCompra.getScene().getWindow());
             }
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
+            // Después del diálogo: refrescar tabla para ocultar el coche comprado
+            actualizarTablaCochesCompra();
+
         } catch (IOException e) {
-            System.out.println(e.getMessage() + "Error al efectuar Compra");
+            System.out.println(e.getMessage() + " – Error al efectuar Compra");
         }
 
     }
@@ -2335,28 +2366,33 @@ public class controladorApp implements Initializable {
             }
         });
 
+        final boolean[] actualizandoModelo = {false};
+
         // Listener para filtrar mientras se escribe
         txtComboModelo.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (actualizandoModelo[0]) return;
             final String selected = cmbElegirModelo.getSelectionModel().getSelectedItem();
 
-            // Si está vacío, restaurar filtro y ocultar
             if (newValue == null || newValue.trim().isEmpty()) {
-                filteredModelos.setPredicate(p -> true);
+                actualizandoModelo[0] = true;
+                try { filteredModelos.setPredicate(p -> true); } finally { actualizandoModelo[0] = false; }
                 cmbElegirModelo.hide();
                 return;
             }
 
-            // Si no hay nada seleccionado o se está escribiendo algo diferente
             if (selected == null || !selected.equals(newValue)) {
-                // Filtrar modelos que empiecen o contengan el texto
-                filteredModelos.setPredicate(p ->
-                    p.toLowerCase().startsWith(newValue.toLowerCase().trim()) ||
-                    p.toLowerCase().contains(newValue.toLowerCase().trim())
-                );
+                actualizandoModelo[0] = true;
+                try {
+                    filteredModelos.setPredicate(p ->
+                        p.toLowerCase().startsWith(newValue.toLowerCase().trim()) ||
+                        p.toLowerCase().contains(newValue.toLowerCase().trim())
+                    );
+                } finally { actualizandoModelo[0] = false; }
                 cmbElegirModelo.setVisibleRowCount(5);
                 cmbElegirModelo.show();
             } else {
-                filteredModelos.setPredicate(p -> true);
+                actualizandoModelo[0] = true;
+                try { filteredModelos.setPredicate(p -> true); } finally { actualizandoModelo[0] = false; }
             }
         });
 
@@ -2402,28 +2438,36 @@ public class controladorApp implements Initializable {
             }
         });
 
+        // Flag para evitar el bucle infinito: setPredicate → texto cambia → listener → setPredicate
+        final boolean[] actualizando = {false};
+
         // Listener para filtrar mientras se escribe
         txtComboModeloCompra.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (actualizando[0]) return;
             final String selected = cmbModeloCompra.getSelectionModel().getSelectedItem();
 
             // Si está vacío, restaurar filtro y ocultar
             if (newValue == null || newValue.trim().isEmpty()) {
-                filteredModelos.setPredicate(p -> true);
+                actualizando[0] = true;
+                try { filteredModelos.setPredicate(p -> true); } finally { actualizando[0] = false; }
                 cmbModeloCompra.hide();
                 return;
             }
 
             // Si no hay nada seleccionado o se está escribiendo algo diferente
             if (selected == null || !selected.equals(newValue)) {
-                // Filtrar modelos que empiecen o contengan el texto
-                filteredModelos.setPredicate(p ->
-                    p.toLowerCase().startsWith(newValue.toLowerCase().trim()) ||
-                    p.toLowerCase().contains(newValue.toLowerCase().trim())
-                );
+                actualizando[0] = true;
+                try {
+                    filteredModelos.setPredicate(p ->
+                        p.toLowerCase().startsWith(newValue.toLowerCase().trim()) ||
+                        p.toLowerCase().contains(newValue.toLowerCase().trim())
+                    );
+                } finally { actualizando[0] = false; }
                 cmbModeloCompra.setVisibleRowCount(5);
                 cmbModeloCompra.show();
             } else {
-                filteredModelos.setPredicate(p -> true);
+                actualizando[0] = true;
+                try { filteredModelos.setPredicate(p -> true); } finally { actualizando[0] = false; }
             }
         });
 
@@ -2465,26 +2509,30 @@ public class controladorApp implements Initializable {
             }
         });
 
+        final boolean[] actualizandoDni = {false};
+
         // Listener para el texto: filtrar DNIs mientras se escribe
         txtComboDni.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (actualizandoDni[0]) return;
             final String selected = comboDni.getSelectionModel().getSelectedItem();
 
-            // Si el campo está vacío, restaurar filtro y ocultar dropdown
             if (newValue == null || newValue.trim().isEmpty()) {
-                filteredDnis.setPredicate(p -> true);
+                actualizandoDni[0] = true;
+                try { filteredDnis.setPredicate(p -> true); } finally { actualizandoDni[0] = false; }
                 comboDni.hide();
                 return;
             }
 
-            // Si no hay nada seleccionado o se está escribiendo algo diferente
             if (selected == null || !selected.equals(newValue)) {
-                // Filtrar DNIs que empiecen con el texto escrito
-                filteredDnis.setPredicate(p -> p.toLowerCase().startsWith(newValue.toLowerCase().trim()));
+                actualizandoDni[0] = true;
+                try {
+                    filteredDnis.setPredicate(p -> p.toLowerCase().startsWith(newValue.toLowerCase().trim()));
+                } finally { actualizandoDni[0] = false; }
                 comboDni.setVisibleRowCount(5);
                 comboDni.show();
             } else {
-                // Si se seleccionó algo, quitar el filtro
-                filteredDnis.setPredicate(p -> true);
+                actualizandoDni[0] = true;
+                try { filteredDnis.setPredicate(p -> true); } finally { actualizandoDni[0] = false; }
             }
         });
 
