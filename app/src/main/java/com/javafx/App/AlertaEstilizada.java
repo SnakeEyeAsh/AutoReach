@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 public class AlertaEstilizada {
 
     private static final String TEMA_PROFESIONAL = new NordDark().getUserAgentStylesheet();
-    private static final String ICONO_APP = "Assets/autoIcon.png";
+    private static final String ICONO_APP = "Assets/auto-limpio.png";
 
     /**
      * Crea una alerta de información estilizada

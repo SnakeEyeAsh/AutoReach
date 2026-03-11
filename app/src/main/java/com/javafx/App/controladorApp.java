@@ -505,7 +505,7 @@ public class controladorApp implements Initializable {
             if (btnIrAInicio.getScene() != null) {
                 Stage s = (Stage) btnIrAInicio.getScene().getWindow();
                 if (s != null) {
-                    s.getIcons().add(new Image("Assets/autoIcon.png"));
+                    s.getIcons().add(new Image("Assets/auto-limpio.png"));
 
                     // Cargar hoja de estilos CSS
                     try {
@@ -528,7 +528,7 @@ public class controladorApp implements Initializable {
                     if (btnIrAInicio.getScene() != null) {
                         Stage s = (Stage) btnIrAInicio.getScene().getWindow();
                         if (s != null) {
-                            s.getIcons().add(new Image("Assets/autoIcon.png"));
+                            s.getIcons().add(new Image("Assets/auto-limpio.png"));
 
                             // Cargar hoja de estilos CSS
                             try {
@@ -2260,6 +2260,14 @@ public class controladorApp implements Initializable {
 
     @FXML
     void irAcompras(ActionEvent event) {
+        if (!sesionActiva) {
+            AlertaEstilizada.mostrarAdvertencia(
+                "Acceso denegado",
+                "Sesión no iniciada",
+                "Debes seleccionar un cliente antes de acceder al módulo de compras"
+            );
+            return;
+        }
         mostrarPanel(panelVentas);
         cambiarColores.cambiar(btnCompras, btnIrAInicio, btnAlquiler, btnIrAIngreso);
     }
