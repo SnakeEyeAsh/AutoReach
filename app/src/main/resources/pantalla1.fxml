@@ -33,89 +33,74 @@
    <children>
       <ToolBar depthTest="DISABLE" orientation="VERTICAL" prefHeight="534.0" prefWidth="110.0" style="-fx-background-color: orange; -fx-padding: 2;">
          <items>
-            <VBox prefHeight="548.0" prefWidth="120.0">
+            <VBox alignment="CENTER" prefHeight="520.0" prefWidth="106.0" spacing="6.0">
                <children>
-                  <Button fx:id="btnIrAInicio" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAInicio" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Inicio">
+                  <Button fx:id="btnIrAInicio" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#irAInicio" prefWidth="106.0" style="-fx-background-color: darkorange;" text="Inicio" VBox.vgrow="ALWAYS">
                      <tooltip>
                         <Tooltip text="Ir a la pantalla principal del cliente" />
                      </tooltip>
                      <graphic>
-                        <ImageView fx:id="btnInicio" fitHeight="48.0" fitWidth="48.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="btnInicio" fitHeight="40.0" fitWidth="40.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@Assets/hogar.png" />
                            </image>
                         </ImageView>
                      </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" top="30.0" />
-                     </VBox.margin>
                   </Button>
-                  <Button fx:id="btnAlquiler" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAalquiler" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Alquiler">
+                  <Button fx:id="btnAlquiler" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#irAalquiler" prefWidth="106.0" style="-fx-background-color: darkorange;" text="Alquiler" VBox.vgrow="ALWAYS">
                      <tooltip>
                         <Tooltip text="Gestionar alquileres de vehiculos" />
                      </tooltip>
                      <graphic>
-                        <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@Assets/entregar.png" />
                            </image>
                         </ImageView>
                      </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
                   </Button>
-                  <Button fx:id="btnCompras" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcompras" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Compras">
+                  <Button fx:id="btnCompras" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#irAcompras" prefWidth="106.0" style="-fx-background-color: darkorange;" text="Compras" VBox.vgrow="ALWAYS">
                      <tooltip>
                         <Tooltip text="Comprar vehiculos disponibles" />
                      </tooltip>
                      <graphic>
-                        <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@Assets/carrito-de-compras.png" />
                            </image>
                         </ImageView>
                      </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
                   </Button>
-                  <Button fx:id="btnIrAIngreso" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAIngresos" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Ingresos">
+                  <Button fx:id="btnIrAIngreso" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#irAIngresos" prefWidth="106.0" style="-fx-background-color: darkorange;" text="Ingresos" VBox.vgrow="ALWAYS">
                      <tooltip>
                         <Tooltip text="Registrar nuevos vehiculos en inventario" />
                      </tooltip>
                      <graphic>
-                        <ImageView fx:id="btnInicio1" fitHeight="48.0" fitWidth="48.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="btnInicio1" fitHeight="40.0" fitWidth="40.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@Assets/carga.png" />
                            </image>
                         </ImageView>
                      </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
                   </Button>
-                  <Button fx:id="btnAcercaDe" contentDisplay="TOP" mnemonicParsing="false" onAction="#mostrarAcercaDe" prefHeight="78.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Acerca de">
+                  <Button fx:id="btnAcercaDe" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#mostrarAcercaDe" prefWidth="106.0" style="-fx-background-color: darkorange;" text="Acerca de" VBox.vgrow="ALWAYS">
                      <tooltip>
                         <Tooltip text="Informacion sobre la aplicacion" />
                      </tooltip>
                      <graphic>
-                        <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@Assets/blog.png" />
                            </image>
                         </ImageView>
                      </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
                   </Button>
-                  <Button fx:id="btnCerrarSesion" contentDisplay="TOP" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="78.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Salir">
+                  <Button fx:id="btnCerrarSesion" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#cerrarSesion" prefWidth="106.0" style="-fx-background-color: darkorange;" text="Salir" VBox.vgrow="ALWAYS">
                      <tooltip>
                         <Tooltip text="Cerrar la aplicacion" />
                      </tooltip>
                      <graphic>
-                        <ImageView fitHeight="48.0" fitWidth="51.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@Assets/boton-de-encendido-apagado.png" />
                            </image>
