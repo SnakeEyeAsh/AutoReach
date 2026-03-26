@@ -12,7 +12,7 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
       prefWidth="460.0" spacing="0"
-      style="-fx-background-color: white;"
+      style="-fx-background-color: white; -fx-font-family: 'Segoe UI';"
       xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.javafx.App.controladorEmergente">

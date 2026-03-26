@@ -1,12 +1,28 @@
 /* ==================== BOTONES DEL MENÚ LATERAL ==================== */
-/* Mantiene el color darkorange del FXML y añade efecto de aumento */
+/* Oculta el botón de overflow del ToolBar */
+.tool-bar .tool-bar-overflow-button {
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+    -fx-min-width: 0;
+    -fx-min-height: 0;
+    -fx-max-width: 0;
+    -fx-max-height: 0;
+    visibility: hidden;
+}
+
 .tool-bar .button {
     -fx-cursor: hand;
+    -fx-background-color: darkorange !important;
+    -fx-text-fill: white !important;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 4 6 4;
+    -fx-background-radius: 6;
 }
 
 .tool-bar .button:hover {
-    -fx-scale-x: 1.1;
-    -fx-scale-y: 1.1;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 3);
 }
 
@@ -17,8 +33,6 @@
 }
 
 /* ==================== BOTONES REGULARES ==================== */
-/* Color naranja pálido para botones que NO están en el toolbar */
-/* Usa !important para sobrescribir cualquier estilo inline */
 .button {
     -fx-background-color: #ffcc99 !important;
     -fx-text-fill: white !important;
@@ -32,10 +46,4 @@
 
 .button:pressed {
     -fx-background-color: #ff9933 !important;
-}
-
-/* Sobrescribir para mantener el darkorange en botones del toolbar */
-.tool-bar .button {
-    -fx-background-color: darkorange !important;
-    -fx-text-fill: white !important;
 }

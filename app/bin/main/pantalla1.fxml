@@ -23,624 +23,515 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 
-<HBox xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javafx.App.controladorApp">
+<HBox xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.javafx.App.controladorApp">
    <children>
-      <ToolBar depthTest="DISABLE" orientation="VERTICAL" prefHeight="534.0" prefWidth="110.0" style="-fx-background-color: orange; -fx-padding: 2;">
+
+      <!-- ═══════════════════════════════════════════════════════════
+           SIDEBAR — Azul marino profesional
+           ═══════════════════════════════════════════════════════════ -->
+      <ToolBar depthTest="DISABLE" orientation="VERTICAL" prefHeight="534.0" prefWidth="110.0"
+               style="-fx-background-color: #1E3A8A; -fx-padding: 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 10, 0, 4, 0);">
          <items>
-            <VBox prefHeight="548.0" prefWidth="120.0">
+            <VBox alignment="CENTER" prefHeight="520.0" prefWidth="110.0" spacing="2.0">
                <children>
-                  <Button fx:id="btnIrAInicio" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAInicio" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Inicio">
-                     <tooltip>
-                        <Tooltip text="Ir a la pantalla principal del cliente" />
-                     </tooltip>
+
+                  <Button fx:id="btnIrAInicio" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
+                          mnemonicParsing="false" onAction="#irAInicio" prefWidth="110.0"
+                          style="-fx-background-color: transparent; -fx-text-fill: #CBD5E1;
+                                 -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
+                          text="Inicio" VBox.vgrow="ALWAYS">
+                     <tooltip><Tooltip text="Ir a la pantalla principal del cliente" /></tooltip>
                      <graphic>
-                        <ImageView fx:id="btnInicio" fitHeight="48.0" fitWidth="48.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@Assets/hogar.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" top="30.0" />
-                     </VBox.margin>
-                  </Button>
-                  <Button fx:id="btnAlquiler" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAalquiler" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Alquiler">
-                     <tooltip>
-                        <Tooltip text="Gestionar alquileres de vehiculos" />
-                     </tooltip>
-                     <graphic>
-                        <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@Assets/entregar.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
-                  </Button>
-                  <Button fx:id="btnCompras" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAcompras" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Compras">
-                     <tooltip>
-                        <Tooltip text="Comprar vehiculos disponibles" />
-                     </tooltip>
-                     <graphic>
-                        <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@Assets/carrito-de-compras.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
-                  </Button>
-                  <Button fx:id="btnIrAIngreso" contentDisplay="TOP" mnemonicParsing="false" onAction="#irAIngresos" prefHeight="26.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Ingresos">
-                     <tooltip>
-                        <Tooltip text="Registrar nuevos vehiculos en inventario" />
-                     </tooltip>
-                     <graphic>
-                        <ImageView fx:id="btnInicio1" fitHeight="48.0" fitWidth="48.0" onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@Assets/carga.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
-                  </Button>
-                  <Button fx:id="btnAcercaDe" contentDisplay="TOP" mnemonicParsing="false" onAction="#mostrarAcercaDe" prefHeight="78.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Acerca de">
-                     <tooltip>
-                        <Tooltip text="Informacion sobre la aplicacion" />
-                     </tooltip>
-                     <graphic>
-                        <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@Assets/blog.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
-                  </Button>
-                  <Button fx:id="btnCerrarSesion" contentDisplay="TOP" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="78.0" prefWidth="120.0" style="-fx-background-color: darkorange;" text="Salir">
-                     <tooltip>
-                        <Tooltip text="Cerrar la aplicacion" />
-                     </tooltip>
-                     <graphic>
-                        <ImageView fitHeight="48.0" fitWidth="51.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@Assets/boton-de-encendido-apagado.png" />
-                           </image>
+                        <ImageView fx:id="btnInicio" fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                           <image><Image url="@Assets/hogar.png" /></image>
                         </ImageView>
                      </graphic>
                   </Button>
+
+                  <Button fx:id="btnAlquiler" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
+                          mnemonicParsing="false" onAction="#irAalquiler" prefWidth="110.0"
+                          style="-fx-background-color: transparent; -fx-text-fill: #CBD5E1;
+                                 -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
+                          text="Alquiler" VBox.vgrow="ALWAYS">
+                     <tooltip><Tooltip text="Gestionar alquileres de vehiculos" /></tooltip>
+                     <graphic>
+                        <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                           <image><Image url="@Assets/entregar.png" /></image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+
+                  <Button fx:id="btnCompras" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
+                          mnemonicParsing="false" onAction="#irAcompras" prefWidth="110.0"
+                          style="-fx-background-color: transparent; -fx-text-fill: #CBD5E1;
+                                 -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
+                          text="Compras" VBox.vgrow="ALWAYS">
+                     <tooltip><Tooltip text="Comprar vehiculos disponibles" /></tooltip>
+                     <graphic>
+                        <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                           <image><Image url="@Assets/carrito-de-compras.png" /></image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+
+                  <Button fx:id="btnIrAIngreso" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
+                          mnemonicParsing="false" onAction="#irAIngresos" prefWidth="110.0"
+                          style="-fx-background-color: transparent; -fx-text-fill: #CBD5E1;
+                                 -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
+                          text="Ingresos" VBox.vgrow="ALWAYS">
+                     <tooltip><Tooltip text="Registrar nuevos vehiculos en inventario" /></tooltip>
+                     <graphic>
+                        <ImageView fx:id="btnInicio1" fitHeight="36.0" fitWidth="36.0"
+                                   onDragDetected="#irAInicio" pickOnBounds="true" preserveRatio="true">
+                           <image><Image url="@Assets/carga.png" /></image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+
+                  <Button fx:id="btnAcercaDe" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
+                          mnemonicParsing="false" onAction="#mostrarAcercaDe" prefWidth="110.0"
+                          style="-fx-background-color: transparent; -fx-text-fill: #CBD5E1;
+                                 -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
+                          text="Acerca de" VBox.vgrow="ALWAYS">
+                     <tooltip><Tooltip text="Informacion sobre la aplicacion" /></tooltip>
+                     <graphic>
+                        <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                           <image><Image url="@Assets/blog.png" /></image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+
+                  <Button fx:id="btnCerrarSesion" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
+                          mnemonicParsing="false" onAction="#cerrarSesion" prefWidth="110.0"
+                          style="-fx-background-color: #7F1D1D; -fx-text-fill: white;
+                                 -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
+                          text="Salir" VBox.vgrow="ALWAYS">
+                     <tooltip><Tooltip text="Cerrar la aplicacion" /></tooltip>
+                     <graphic>
+                        <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                           <image><Image url="@Assets/boton-de-encendido-apagado.png" /></image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+
                </children>
             </VBox>
          </items>
       </ToolBar>
-      <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="578.0" prefWidth="724.0">
+
+      <!-- ═══════════════════════════════════════════════════════════
+           ÁREA DE CONTENIDO
+           ═══════════════════════════════════════════════════════════ -->
+      <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                 prefHeight="578.0" prefWidth="724.0"
+                 style="-fx-font-family: 'Segoe UI';">
          <children>
-            <Pane fx:id="paneLogin" prefHeight="200.0" prefWidth="200.0" visible="false">
+
+            <!-- ── LOGIN ─────────────────────────────────────────── -->
+            <Pane fx:id="paneLogin" prefHeight="578.0" prefWidth="724.0" visible="false"
+                  style="-fx-background-color: #EFF6FF;">
                <children>
-                  <VBox fx:id="ventanaLogin" alignment="TOP_CENTER" layoutX="244.0" layoutY="51.0" prefHeight="431.0" prefWidth="235.0">
+                  <VBox fx:id="ventanaLogin" alignment="CENTER" layoutX="212.0" layoutY="50.0"
+                        prefHeight="460.0" prefWidth="300.0"
+                        style="-fx-background-color: white;
+                               -fx-border-color: #DBEAFE; -fx-border-radius: 10;
+                               -fx-background-radius: 10;
+                               -fx-effect: dropshadow(gaussian, rgba(30,58,138,0.12), 14, 0, 0, 4);
+                               -fx-padding: 28 32;">
                      <children>
-                        <ImageView fitHeight="184.0" fitWidth="175.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@Assets/perfil.png" />
-                           </image>
-                           <VBox.margin>
-                              <Insets bottom="30.0" top="30.0" />
-                           </VBox.margin>
+
+                        <ImageView fitHeight="110.0" fitWidth="110.0" pickOnBounds="true" preserveRatio="true">
+                           <image><Image url="@Assets/perfil.png" /></image>
+                           <VBox.margin><Insets bottom="16.0" /></VBox.margin>
                         </ImageView>
-                        <Label text="Nombre de Usurio:" />
-                        <TextField fx:id="txtUser" prefHeight="27.0" prefWidth="375.0">
-                           <tooltip>
-                              <Tooltip text="Introduce tu nombre de usuario" />
-                           </tooltip>
-                           <VBox.margin>
-                              <Insets bottom="30.0" />
-                           </VBox.margin>
+
+                        <Label text="Bienvenido"
+                               style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #1E3A8A; -fx-font-family: 'Segoe UI';">
+                           <VBox.margin><Insets bottom="4.0" /></VBox.margin>
+                        </Label>
+                        <Label text="Inicia sesión para continuar"
+                               style="-fx-font-size: 12; -fx-text-fill: #6B7280; -fx-font-family: 'Segoe UI';">
+                           <VBox.margin><Insets bottom="22.0" /></VBox.margin>
+                        </Label>
+
+                        <Label text="Nombre de Usuario"
+                               style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;">
+                           <VBox.margin><Insets bottom="4.0" /></VBox.margin>
+                        </Label>
+                        <TextField fx:id="txtUser" prefHeight="36.0" prefWidth="236.0"
+                                   promptText="Introduce tu usuario"
+                                   style="-fx-border-color: #D1D5DB; -fx-border-radius: 5;
+                                          -fx-background-radius: 5; -fx-padding: 5 10; -fx-font-size: 13;">
+                           <tooltip><Tooltip text="Introduce tu nombre de usuario" /></tooltip>
+                           <VBox.margin><Insets bottom="14.0" /></VBox.margin>
                         </TextField>
-                        <Label text="Contraseña:" />
-                        <TextField fx:id="txtContraseña">
-                           <tooltip>
-                              <Tooltip text="Introduce tu contrasenya" />
-                           </tooltip>
-                           <VBox.margin>
-                              <Insets bottom="30.0" />
-                           </VBox.margin>
+
+                        <Label text="Contraseña"
+                               style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;">
+                           <VBox.margin><Insets bottom="4.0" /></VBox.margin>
+                        </Label>
+                        <TextField fx:id="txtContraseña" prefHeight="36.0" prefWidth="236.0"
+                                   promptText="Introduce tu contraseña"
+                                   style="-fx-border-color: #D1D5DB; -fx-border-radius: 5;
+                                          -fx-background-radius: 5; -fx-padding: 5 10; -fx-font-size: 13;">
+                           <tooltip><Tooltip text="Introduce tu contraseña" /></tooltip>
+                           <VBox.margin><Insets bottom="22.0" /></VBox.margin>
                         </TextField>
-                        <Button fx:id="btnInicioSesion" defaultButton="true" onAction="#IniciarSesion" text="_Aceptar">
-                           <tooltip>
-                              <Tooltip text="Iniciar sesion en el sistema" />
-                           </tooltip>
+
+                        <Button fx:id="btnInicioSesion" defaultButton="true" mnemonicParsing="false"
+                                onAction="#IniciarSesion" prefHeight="38.0" prefWidth="236.0"
+                                text="Iniciar Sesión"
+                                style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                       -fx-font-size: 14; -fx-font-weight: bold;
+                                       -fx-background-radius: 5; -fx-cursor: hand;">
+                           <tooltip><Tooltip text="Iniciar sesion en el sistema" /></tooltip>
                         </Button>
+
                      </children>
                   </VBox>
                </children>
             </Pane>
-            <Pane fx:id="pantallaSesion" prefHeight="200.0" prefWidth="200.0" visible="false">
+
+            <!-- ── SESIÓN ─────────────────────────────────────────── -->
+            <Pane fx:id="pantallaSesion" prefHeight="578.0" prefWidth="724.0" visible="false"
+                  style="-fx-background-color: #EFF6FF;">
                <children>
-                  <Button fx:id="btnCerrarSesionCliente" layoutX="600.0" layoutY="20.0" mnemonicParsing="false" onAction="#cerrarSesionCliente" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand;" text="Cerrar Sesión">
-                     <tooltip>
-                        <Tooltip text="Cerrar sesion del cliente actual" />
-                     </tooltip>
-                  </Button>
-                  <ImageView fitHeight="150.0" fitWidth="170.0" layoutX="35.0" layoutY="43.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@Assets/perfil.png" />
-                     </image>
-                  </ImageView>
-                  <VBox layoutX="196.0" layoutY="43.0" prefHeight="150.0" prefWidth="214.0">
+                  <!-- Barra superior -->
+                  <HBox alignment="CENTER_RIGHT" prefHeight="48.0" prefWidth="724.0"
+                        style="-fx-background-color: white; -fx-border-color: #DBEAFE;
+                               -fx-border-width: 0 0 1 0; -fx-padding: 0 20;">
+                     <Button fx:id="btnCerrarSesionCliente" mnemonicParsing="false"
+                             onAction="#cerrarSesionCliente" prefHeight="30.0" prefWidth="130.0"
+                             style="-fx-background-color: #DC2626; -fx-text-fill: white;
+                                    -fx-font-weight: bold; -fx-font-size: 12;
+                                    -fx-background-radius: 4; -fx-cursor: hand;"
+                             text="Cerrar Sesión">
+                        <tooltip><Tooltip text="Cerrar sesion del cliente actual" /></tooltip>
+                     </Button>
+                  </HBox>
+
+                  <!-- Card perfil -->
+                  <HBox layoutX="16.0" layoutY="60.0" prefHeight="140.0" prefWidth="692.0" spacing="20.0"
+                        style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                               -fx-background-radius: 8; -fx-padding: 16;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                      <children>
-                        <Label fx:id="lblNombre" text="Nombre">
-                           <VBox.margin>
-                              <Insets bottom="10.0" />
-                           </VBox.margin>
-                        </Label>
-                        <Label fx:id="lblNumero" text="Numero">
-                           <VBox.margin>
-                              <Insets bottom="10.0" />
-                           </VBox.margin>
-                        </Label>
-                        <Label fx:id="lblSexo" text="Sexo">
-                           <VBox.margin>
-                              <Insets bottom="10.0" />
-                           </VBox.margin>
-                        </Label>
-                        <Label fx:id="lblEdad" text="Edad">
-                           <VBox.margin>
-                              <Insets bottom="10.0" />
-                           </VBox.margin>
-                        </Label>
-                        <Label fx:id="lblEmail" text="Email" />
-                     </children>
-                  </VBox>
-                  <VBox layoutX="35.0" layoutY="224.0" prefHeight="322.0" prefWidth="310.0">
-                     <children>
-                        <Label alignment="CENTER" contentDisplay="CENTER" text="Informacion del Vehiculo">
-                           <VBox.margin>
-                              <Insets top="20.0" />
-                           </VBox.margin>
-                           <font>
-                              <Font name="System Bold Italic" size="20.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="lblMarca" text="Marca">
-                           <VBox.margin>
-                              <Insets bottom="15.0" top="15.0" />
-                           </VBox.margin>
-                        </Label>
-                        <Label fx:id="lblModelo" text="Modelo">
-                           <VBox.margin>
-                              <Insets bottom="15.0" />
-                           </VBox.margin>
-                        </Label>
-                        <Label fx:id="lblAño" text="Año">
-                           <VBox.margin>
-                              <Insets bottom="15.0" />
-                           </VBox.margin>
-                        </Label>
-                        <Label fx:id="lblKms" text="Kilometraje">
-                           <VBox.margin>
-                              <Insets bottom="15.0" />
-                           </VBox.margin>
-                        </Label>
-                        <Label fx:id="lblNBastidor" text="Numero de Bastidor">
-                           <VBox.margin>
-                              <Insets bottom="15.0" />
-                           </VBox.margin>
-                        </Label>
-                        <MenuButton fx:id="slcMatriculaLogin" mnemonicParsing="false" text="Matricula">
-                           <tooltip>
-                              <Tooltip text="Seleccionar vehiculo del cliente" />
-                           </tooltip>
-                        </MenuButton>
-                     </children>
-                  </VBox>
-                  <ListView fx:id="tablaDeInformacion" layoutX="368.0" layoutY="280.0" prefHeight="266.0" prefWidth="333.0" />
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="368.0" layoutY="244.0" text="Informacion Adicional">
-                     <font>
-                        <Font name="System Bold Italic" size="20.0" />
-                     </font>
-                  </Label>
-               </children></Pane>
-            <Pane fx:id="panelVentas" prefHeight="200.0" prefWidth="200.0" visible="false">
-               <children>
-                  <HBox prefHeight="251.0" prefWidth="724.0">
-                     <children>
-                        <VBox prefHeight="310.0" prefWidth="298.0">
+                        <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
+                           <image><Image url="@Assets/perfil.png" /></image>
+                        </ImageView>
+                        <VBox spacing="6.0" alignment="CENTER_LEFT">
                            <children>
-                              <Label text="CONFIGURACION DEL VEHICULO">
-                                 <VBox.margin>
-                                    <Insets left="55.0" top="30.0" />
-                                 </VBox.margin>
-                                 <font>
-                                    <Font name="System Bold Italic" size="14.0" />
-                                 </font>
-                              </Label>
-                              <HBox prefHeight="1.0" prefWidth="306.0">
+                              <Label fx:id="lblNombre" text="Nombre"
+                                     style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #111827;" />
+                              <Label fx:id="lblNumero" text="Teléfono"
+                                     style="-fx-font-size: 13; -fx-text-fill: #6B7280;" />
+                              <Label fx:id="lblEmail" text="Email"
+                                     style="-fx-font-size: 13; -fx-text-fill: #6B7280;" />
+                              <HBox spacing="20.0">
                                  <children>
-                                    <Label text="Marca">
-                                       <HBox.margin>
-                                          <Insets right="50.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <MenuButton fx:id="mnMarcaCompra" mnemonicParsing="false" prefHeight="26.0" prefWidth="150.0" text="Marca">
-                                       <tooltip>
-                                          <Tooltip text="Seleccionar marca para filtrar" />
-                                       </tooltip>
-                                       <HBox.margin>
-                                          <Insets left="28.0" />
-                                       </HBox.margin>
-                                    </MenuButton>
+                                    <Label fx:id="lblSexo" text="Sexo" style="-fx-font-size: 12; -fx-text-fill: #9CA3AF;" />
+                                    <Label fx:id="lblEdad" text="Edad" style="-fx-font-size: 12; -fx-text-fill: #9CA3AF;" />
                                  </children>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" top="30.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox prefHeight="26.0" prefWidth="241.0">
-                                 <children>
-                                    <Label text="Modelo">
-                                       <HBox.margin>
-                                          <Insets right="50.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <ComboBox fx:id="cmbModeloCompra" prefHeight="26.0" prefWidth="150.0">
-                                       <tooltip>
-                                          <Tooltip text="Seleccionar modelo para filtrar" />
-                                       </tooltip>
-                                       <HBox.margin>
-                                          <Insets left="20.0" />
-                                       </HBox.margin>
-                                    </ComboBox>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox prefHeight="26.0" prefWidth="257.0">
-                                 <VBox.margin>
-                                    <Insets top="10.0" />
-                                 </VBox.margin>
                               </HBox>
                            </children>
-                           <HBox.margin>
-                              <Insets left="30.0" />
-                           </HBox.margin>
-                        </VBox>
-                        <VBox prefHeight="235.0" prefWidth="380.0" style="-fx-border-color: #DBEAFE; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-color: #FAFAFA; -fx-background-radius: 5;">
-                           <children>
-                              <HBox alignment="CENTER_LEFT" prefHeight="35.0" spacing="10.0">
-                                 <children>
-                                    <Label text="Detalles del Vehiculo">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets left="10.0" top="5.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <WebView fx:id="webViewInformeCompra" prefHeight="192.0" prefWidth="370.0">
-                                 <VBox.margin>
-                                    <Insets left="5.0" right="5.0" />
-                                 </VBox.margin>
-                              </WebView>
-                           </children>
-                           <HBox.margin>
-                              <Insets left="20.0" right="20.0" top="10.0" />
-                           </HBox.margin>
                         </VBox>
                      </children>
                   </HBox>
-                  <VBox layoutX="15.0" layoutY="260.0" prefWidth="694.0">
+
+                  <!-- Cards vehículo + info adicional -->
+                  <HBox layoutX="16.0" layoutY="212.0" prefHeight="350.0" prefWidth="692.0" spacing="14.0">
                      <children>
-                        <Label text="Coches Disponibles">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                           <VBox.margin>
-                              <Insets bottom="5.0" />
-                           </VBox.margin>
-                        </Label>
-                        <TableView fx:id="tblCochesCompra" prefHeight="200.0" prefWidth="694.0">
+                        <VBox prefHeight="350.0" prefWidth="330.0" spacing="8.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 16;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                           <children>
+                              <Label text="Información del Vehículo"
+                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;">
+                                 <VBox.margin><Insets bottom="8.0" /></VBox.margin>
+                              </Label>
+                              <Label fx:id="lblMarca" text="Marca" style="-fx-font-size: 13; -fx-text-fill: #374151;" />
+                              <Label fx:id="lblModelo" text="Modelo" style="-fx-font-size: 13; -fx-text-fill: #374151;" />
+                              <Label fx:id="lblAño" text="Año" style="-fx-font-size: 13; -fx-text-fill: #374151;" />
+                              <Label fx:id="lblKms" text="Kilometraje" style="-fx-font-size: 13; -fx-text-fill: #374151;" />
+                              <Label fx:id="lblNBastidor" text="Número de Bastidor" style="-fx-font-size: 13; -fx-text-fill: #374151;" />
+                              <MenuButton fx:id="slcMatriculaLogin" mnemonicParsing="false" text="Matrícula"
+                                          prefHeight="30.0" prefWidth="180.0"
+                                          style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                 -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                 <tooltip><Tooltip text="Seleccionar vehiculo del cliente" /></tooltip>
+                              </MenuButton>
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="350.0" prefWidth="348.0" spacing="8.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 16;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                           <children>
+                              <Label text="Información Adicional"
+                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;">
+                                 <VBox.margin><Insets bottom="8.0" /></VBox.margin>
+                              </Label>
+                              <ListView fx:id="tablaDeInformacion" prefHeight="298.0" prefWidth="316.0" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </Pane>
+
+            <!-- ── COMPRAS ─────────────────────────────────────────── -->
+            <Pane fx:id="panelVentas" prefHeight="578.0" prefWidth="724.0" visible="false"
+                  style="-fx-background-color: #EFF6FF;">
+               <children>
+                  <!-- Filtros + WebView -->
+                  <HBox layoutX="12.0" layoutY="12.0" prefHeight="236.0" prefWidth="700.0" spacing="14.0">
+                     <children>
+                        <VBox prefHeight="236.0" prefWidth="256.0" spacing="12.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 14;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                           <children>
+                              <Label text="FILTROS DE BÚSQUEDA"
+                                     style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #6B7280;" />
+                              <Label text="Marca" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <MenuButton fx:id="mnMarcaCompra" mnemonicParsing="false" text="Seleccionar marca"
+                                          prefHeight="30.0" prefWidth="228.0"
+                                          style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                 -fx-border-radius: 4; -fx-font-size: 12;">
+                                 <tooltip><Tooltip text="Seleccionar marca para filtrar" /></tooltip>
+                              </MenuButton>
+                              <Label text="Modelo" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <ComboBox fx:id="cmbModeloCompra" prefHeight="30.0" prefWidth="228.0"
+                                        style="-fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Seleccionar modelo para filtrar" /></tooltip>
+                              </ComboBox>
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="236.0" prefWidth="430.0" spacing="6.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 12;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                           <children>
+                              <Label text="Detalles del Vehículo"
+                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+                              <WebView fx:id="webViewInformeCompra" prefHeight="204.0" prefWidth="406.0" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+
+                  <!-- Tabla + botones -->
+                  <VBox layoutX="12.0" layoutY="260.0" prefWidth="700.0" spacing="8.0"
+                        style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                               -fx-background-radius: 8; -fx-padding: 14;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                     <children>
+                        <Label text="Coches Disponibles"
+                               style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+                        <TableView fx:id="tblCochesCompra" prefHeight="196.0" prefWidth="672.0">
                            <columns>
                               <TableColumn fx:id="colMatriculaCompra" prefWidth="120.0" text="Matrícula" />
                               <TableColumn fx:id="colMarcaCompra" prefWidth="150.0" text="Marca" />
                               <TableColumn fx:id="colModeloCompra" prefWidth="180.0" text="Modelo" />
                               <TableColumn fx:id="colAñoCompra" prefWidth="80.0" text="Año" />
-                              <TableColumn fx:id="colPrecioCompra" prefWidth="160.0" text="Precio" />
+                              <TableColumn fx:id="colPrecioCompra" prefWidth="142.0" text="Precio (€)" />
                            </columns>
                         </TableView>
                         <HBox alignment="CENTER_RIGHT" spacing="10.0">
-                           <VBox.margin>
-                              <Insets top="10.0" />
-                           </VBox.margin>
                            <children>
-                              <Button fx:id="btnInformeVehiculo" disable="true" mnemonicParsing="false" onAction="#descargarInformeVehiculo" prefHeight="26.0" prefWidth="130.0" text="Informe Vehiculo">
-                                 <tooltip>
-                                    <Tooltip text="Descargar informe PDF del vehiculo" />
-                                 </tooltip>
+                              <Button fx:id="btnInformeVehiculo" disable="true" mnemonicParsing="false"
+                                      onAction="#descargarInformeVehiculo" prefHeight="30.0" prefWidth="140.0"
+                                      text="Informe Vehículo"
+                                      style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                             -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                 <tooltip><Tooltip text="Descargar informe PDF del vehiculo" /></tooltip>
                               </Button>
-                              <Button fx:id="btnCompra" mnemonicParsing="false" onAction="#efectuarCompra" prefHeight="26.0" prefWidth="106.0" text="Comprar">
-                                 <tooltip>
-                                    <Tooltip text="Efectuar compra del vehiculo seleccionado" />
-                                 </tooltip>
+                              <Button fx:id="btnCompra" mnemonicParsing="false" onAction="#efectuarCompra"
+                                      prefHeight="30.0" prefWidth="100.0" text="Comprar"
+                                      style="-fx-background-color: #059669; -fx-text-fill: white;
+                                             -fx-font-weight: bold; -fx-background-radius: 4;
+                                             -fx-cursor: hand; -fx-font-size: 12;">
+                                 <tooltip><Tooltip text="Efectuar compra del vehiculo seleccionado" /></tooltip>
                               </Button>
-                              <Button fx:id="btnCancelarCompra" mnemonicParsing="false" onAction="#cancelarCompra" prefHeight="26.0" prefWidth="95.0" text="Cancelar">
-                                 <tooltip>
-                                    <Tooltip text="Cancelar operacion de compra" />
-                                 </tooltip>
+                              <Button fx:id="btnCancelarCompra" mnemonicParsing="false" onAction="#cancelarCompra"
+                                      prefHeight="30.0" prefWidth="90.0" text="Cancelar"
+                                      style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                             -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                 <tooltip><Tooltip text="Cancelar operacion de compra" /></tooltip>
                               </Button>
                            </children>
                         </HBox>
                      </children>
                   </VBox>
-               </children></Pane>
-            <Pane fx:id="panelIngreso" prefHeight="200.0" prefWidth="200.0" visible="false">
+               </children>
+            </Pane>
+
+            <!-- ── INGRESOS ───────────────────────────────────────── -->
+            <Pane fx:id="panelIngreso" prefHeight="578.0" prefWidth="724.0" visible="false"
+                  style="-fx-background-color: #EFF6FF;">
                <children>
-                  <HBox layoutX="1.0" prefHeight="38.0" prefWidth="724.0">
-                     <children>
-                        <Label text="NUEVOS INGRESOS">
-                           <font>
-                              <Font name="System Bold Italic" size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" top="20.0" />
-                           </HBox.margin>
-                        </Label>
-                     </children>
+                  <!-- Header -->
+                  <HBox prefHeight="44.0" prefWidth="724.0"
+                        style="-fx-background-color: white; -fx-border-color: #DBEAFE;
+                               -fx-border-width: 0 0 1 0; -fx-padding: 0 16;">
+                     <Label text="INVENTARIO — Nuevos Ingresos"
+                            style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;
+                                   -fx-padding: 12 0 0 0;" />
                   </HBox>
-                  <HBox layoutX="7.0" layoutY="52.0" prefHeight="517.0" prefWidth="708.0">
+
+                  <HBox layoutX="8.0" layoutY="52.0" prefHeight="518.0" prefWidth="708.0" spacing="12.0">
                      <children>
-                        <VBox prefHeight="518.0" prefWidth="113.0">
+
+                        <!-- Formulario -->
+                        <VBox prefHeight="510.0" prefWidth="300.0" spacing="5.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 14;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
-                              <Label text="AÑADIR">
-                                 <font>
-                                    <Font name="System Bold" size="14.0" />
-                                 </font>
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
+                              <Label text="DATOS DEL VEHÍCULO"
+                                     style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #6B7280;">
+                                 <VBox.margin><Insets bottom="4.0" /></VBox.margin>
                               </Label>
-                              <Label text="Marca">
-                                 <VBox.margin>
-                                    <Insets bottom="15.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Label text="Modelo">
-                                 <VBox.margin>
-                                    <Insets bottom="18.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Label text="Año">
-                                 <VBox.margin>
-                                    <Insets bottom="18.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Label text="KMs">
-                                 <VBox.margin>
-                                    <Insets bottom="18.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Label text="Nº Bastidor">
-                                 <VBox.margin>
-                                    <Insets bottom="18.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Label text="Precio">
-                                 <VBox.margin>
-                                    <Insets bottom="18.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Label text="Llantas º/">
-                                 <VBox.margin>
-                                    <Insets bottom="18.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Label text="Diseño LLantas">
-                                 <VBox.margin>
-                                    <Insets bottom="18.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Label text="Color">
-                                 <VBox.margin>
-                                    <Insets bottom="18.0" />
-                                 </VBox.margin></Label>
-                              <Label text="Matricula" />
-                           </children>
-                           <HBox.margin>
-                              <Insets left="10.0" />
-                           </HBox.margin>
-                        </VBox>
-                        <VBox prefHeight="518.0" prefWidth="172.0">
-                           <children>
-                              <TextField fx:id="ingresoMarca" prefHeight="26.0" prefWidth="150.0">
-                                 <tooltip>
-                                    <Tooltip text="Marca del vehiculo (ej: Toyota, BMW)" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" top="35.0" />
-                                 </VBox.margin>
+                              <Label text="Marca" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="ingresoMarca" prefHeight="28.0" prefWidth="272.0" promptText="ej: Toyota"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Marca del vehiculo (ej: Toyota, BMW)" /></tooltip>
                               </TextField>
-                              <TextField fx:id="ingresoModelo">
-                                 <tooltip>
-                                    <Tooltip text="Modelo del vehiculo (ej: Corolla, Serie 3)" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
+                              <Label text="Modelo" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="ingresoModelo" prefHeight="28.0" prefWidth="272.0" promptText="ej: Corolla"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Modelo del vehiculo (ej: Corolla, Serie 3)" /></tooltip>
                               </TextField>
-                              <TextField fx:id="ingresoAño">
-                                 <tooltip>
-                                    <Tooltip text="Anyo de fabricacion (ej: 2023)" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
+                              <Label text="Año" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="ingresoAño" prefHeight="28.0" prefWidth="272.0" promptText="ej: 2023"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Anyo de fabricacion (ej: 2023)" /></tooltip>
                               </TextField>
-                              <TextField fx:id="ingresoKms">
-                                 <tooltip>
-                                    <Tooltip text="Kilometraje actual del vehiculo" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
+                              <Label text="Kilometraje" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="ingresoKms" prefHeight="28.0" prefWidth="272.0" promptText="ej: 0"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Kilometraje actual del vehiculo" /></tooltip>
                               </TextField>
-                              <TextField fx:id="ingresoBastidor">
-                                 <tooltip>
-                                    <Tooltip text="Numero de bastidor VIN (17 caracteres)" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
+                              <Label text="Nº Bastidor (VIN)" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="ingresoBastidor" prefHeight="28.0" prefWidth="272.0" promptText="17 caracteres"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Numero de bastidor VIN (17 caracteres)" /></tooltip>
                               </TextField>
-                              <TextField fx:id="ingresoPrecio">
-                                 <tooltip>
-                                    <Tooltip text="Precio base del vehiculo en euros" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
+                              <Label text="Precio (€)" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="ingresoPrecio" prefHeight="28.0" prefWidth="272.0" promptText="ej: 25000"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Precio base del vehiculo en euros" /></tooltip>
                               </TextField>
-                              <TextField fx:id="ingresoDllantas">
-                                 <tooltip>
-                                    <Tooltip text="Diametro de las llantas en pulgadas" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
+                              <Label text="Diámetro Llantas" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="ingresoDllantas" prefHeight="28.0" prefWidth="272.0" promptText="ej: 18"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Diametro de las llantas en pulgadas" /></tooltip>
                               </TextField>
-                              <TextField fx:id="ingresoDiseñoLlantas">
-                                 <tooltip>
-                                    <Tooltip text="Tipo de llantas (ej: Aleacion, Radial)" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
+                              <Label text="Diseño Llantas" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="ingresoDiseñoLlantas" prefHeight="28.0" prefWidth="272.0" promptText="ej: Deportivo"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Tipo de llantas (ej: Aleacion, Radial)" /></tooltip>
                               </TextField>
-                              <TextField fx:id="ingresoColor">
-                                 <tooltip>
-                                    <Tooltip text="Color del vehiculo" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin></TextField>
-                              <TextField fx:id="ingresoMatricula">
-                                 <tooltip>
-                                    <Tooltip text="Matricula del vehiculo (4 numeros + 3 letras)" />
-                                 </tooltip>
+                              <Label text="Color" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="ingresoColor" prefHeight="28.0" prefWidth="272.0" promptText="ej: Blanco"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Color del vehiculo" /></tooltip>
                               </TextField>
-                              <HBox prefHeight="45.0" prefWidth="159.0">
+                              <Label text="Matrícula" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="ingresoMatricula" prefHeight="28.0" prefWidth="272.0" promptText="ej: 1234-ABC"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Matricula del vehiculo (4 numeros + 3 letras)" /></tooltip>
+                              </TextField>
+                              <HBox spacing="8.0">
                                  <children>
-                                    <Button fx:id="btnAceptarIngreso" onAction="#aceptarIngreso" prefHeight="26.0" prefWidth="58.0" text="_Aceptar">
-                                       <tooltip>
-                                          <Tooltip text="Guardar vehiculo en inventario" />
-                                       </tooltip>
-                                       <HBox.margin>
-                                          <Insets left="10.0" right="10.0" />
-                                       </HBox.margin>
+                                    <Button fx:id="btnAceptarIngreso" mnemonicParsing="false" onAction="#aceptarIngreso"
+                                            prefHeight="30.0" prefWidth="80.0" text="Guardar"
+                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                                   -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Guardar vehiculo en inventario" /></tooltip>
                                     </Button>
-                                    <Button fx:id="btnCancelarIngresos" onAction="#cancelarIngreso" text="_Cancelar">
-                                       <tooltip>
-                                          <Tooltip text="Limpiar formulario" />
-                                       </tooltip>
-                                       <HBox.margin>
-                                          <Insets />
-                                       </HBox.margin>
+                                    <Button fx:id="btnCancelarIngresos" mnemonicParsing="false" onAction="#cancelarIngreso"
+                                            prefHeight="30.0" prefWidth="80.0" text="Limpiar"
+                                            style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                   -fx-border-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Limpiar formulario" /></tooltip>
                                     </Button>
                                  </children>
-                                 <VBox.margin>
-                                    <Insets top="20.0" />
-                                 </VBox.margin>
+                                 <VBox.margin><Insets top="6.0" /></VBox.margin>
                               </HBox>
                            </children>
                         </VBox>
-                        <VBox prefHeight="518.0" prefWidth="393.0">
+
+                        <!-- Tabla + gráfico -->
+                        <VBox prefHeight="510.0" prefWidth="388.0" spacing="8.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 14;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
-                              <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="363.0" spacing="10.0">
+                              <HBox alignment="CENTER_RIGHT" spacing="8.0">
                                  <children>
-                                    <Button fx:id="btnVerReporte" mnemonicParsing="false" onAction="#verReporteInventario" text="Ver Reporte">
-                                       <tooltip>
-                                          <Tooltip text="Ver reporte del inventario de vehiculos" />
-                                       </tooltip>
+                                    <Button fx:id="btnVerReporte" mnemonicParsing="false" onAction="#verReporteInventario"
+                                            prefHeight="28.0" text="Ver Reporte"
+                                            style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                   -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                       <tooltip><Tooltip text="Ver reporte del inventario de vehiculos" /></tooltip>
                                     </Button>
-                                    <Button fx:id="btnDescargarPDF" mnemonicParsing="false" onAction="#descargarReportePDF" text="Descargar PDF">
-                                       <tooltip>
-                                          <Tooltip text="Descargar reporte en formato PDF" />
-                                       </tooltip>
+                                    <Button fx:id="btnDescargarPDF" mnemonicParsing="false" onAction="#descargarReportePDF"
+                                            prefHeight="28.0" text="Descargar PDF"
+                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                                   -fx-font-weight: bold; -fx-background-radius: 4;
+                                                   -fx-cursor: hand; -fx-font-size: 12;">
+                                       <tooltip><Tooltip text="Descargar reporte en formato PDF" /></tooltip>
                                     </Button>
                                  </children>
-                                 <VBox.margin>
-                                    <Insets bottom="5.0" left="30.0" right="10.0" />
-                                 </VBox.margin>
                               </HBox>
-                              <TableView fx:id="TablaCoches" prefHeight="280.0" prefWidth="363.0">
-                                <columns>
-                                  <TableColumn fx:id="clnMarca" prefWidth="63.20004880428314" text="Marca" />
-                                  <TableColumn fx:id="clnBastidor" prefWidth="123.20001983642578" text="Bastidor" />
+                              <TableView fx:id="TablaCoches" prefHeight="230.0" prefWidth="360.0">
+                                 <columns>
+                                    <TableColumn fx:id="clnMarca" prefWidth="63.0" text="Marca" />
+                                    <TableColumn fx:id="clnBastidor" prefWidth="123.0" text="Bastidor" />
                                     <TableColumn fx:id="clnModelo" prefWidth="72.0" text="Modelo" />
-                                    <TableColumn fx:id="clnAño" prefWidth="48.00006103515625" text="Año" />
+                                    <TableColumn fx:id="clnAño" prefWidth="48.0" text="Año" />
                                     <TableColumn fx:id="clnColor" prefWidth="56.0" text="Color" />
-                                </columns>
-                                 <VBox.margin>
-                                    <Insets left="30.0" />
-                                 </VBox.margin>
+                                 </columns>
                               </TableView>
-                              <BarChart fx:id="chartCochesPorAño" prefHeight="150.0" prefWidth="363.0" title="Coches por Año">
-                                 <xAxis>
-                                    <CategoryAxis side="BOTTOM" />
-                                 </xAxis>
-                                 <yAxis>
-                                    <NumberAxis side="LEFT" />
-                                 </yAxis>
-                                 <VBox.margin>
-                                    <Insets left="30.0" top="5.0" />
-                                 </VBox.margin>
+                              <BarChart fx:id="chartCochesPorAño" prefHeight="130.0" prefWidth="360.0"
+                                        title="Coches por Año">
+                                 <xAxis><CategoryAxis side="BOTTOM" /></xAxis>
+                                 <yAxis><NumberAxis side="LEFT" /></yAxis>
                               </BarChart>
-                              <HBox prefHeight="50.0" prefWidth="200.0">
+                              <HBox spacing="8.0">
                                  <children>
-                                    <Button fx:id="btnEditarCoche" onAction="#editarCoche" text="_Aceptar">
-                                       <tooltip>
-                                          <Tooltip text="Guardar nuevo vehiculo en inventario" />
-                                       </tooltip>
-                                       <HBox.margin>
-                                          <Insets left="50.0" top="10.0" />
-                                       </HBox.margin>
+                                    <Button fx:id="btnEditarCoche" mnemonicParsing="false" onAction="#editarCoche"
+                                            prefHeight="28.0" prefWidth="72.0" text="Guardar"
+                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                                   -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Guardar nuevo vehiculo en inventario" /></tooltip>
                                     </Button>
-                                    <Button fx:id="btnEditarIngreso" onAction="#editarIngreso" text="_Editar">
-                                       <tooltip>
-                                          <Tooltip text="Editar vehiculo seleccionado" />
-                                       </tooltip>
-                                       <HBox.margin>
-                                          <Insets left="20.0" right="20.0" top="10.0" />
-                                       </HBox.margin>
+                                    <Button fx:id="btnEditarIngreso" mnemonicParsing="false" onAction="#editarIngreso"
+                                            prefHeight="28.0" prefWidth="65.0" text="Editar"
+                                            style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                   -fx-border-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Editar vehiculo seleccionado" /></tooltip>
                                     </Button>
-                                    <Button fx:id="btnBorrarIngreso" onAction="#borrarIngreso" text="_Borrar">
-                                       <tooltip>
-                                          <Tooltip text="Eliminar vehiculo seleccionado del inventario" />
-                                       </tooltip>
-                                       <HBox.margin>
-                                          <Insets top="10.0" />
-                                       </HBox.margin>
+                                    <Button fx:id="btnBorrarIngreso" mnemonicParsing="false" onAction="#borrarIngreso"
+                                            prefHeight="28.0" prefWidth="65.0" text="Borrar"
+                                            style="-fx-background-color: #DC2626; -fx-text-fill: white;
+                                                   -fx-background-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Eliminar vehiculo seleccionado del inventario" /></tooltip>
                                     </Button>
-                                    <Button fx:id="btnCancelarEdicionIngreso" mnemonicParsing="false" onAction="#cancelarEdicionIngreso" text="Cancelar">
-                                       <tooltip>
-                                          <Tooltip text="Cancelar edicion y limpiar formulario" />
-                                       </tooltip>
-                                       <HBox.margin>
-                                          <Insets left="20.0" top="10.0" />
-                                       </HBox.margin>
+                                    <Button fx:id="btnCancelarEdicionIngreso" mnemonicParsing="false"
+                                            onAction="#cancelarEdicionIngreso" prefHeight="28.0" prefWidth="75.0"
+                                            text="Cancelar"
+                                            style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                   -fx-border-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Cancelar edicion y limpiar formulario" /></tooltip>
                                     </Button>
                                  </children>
                               </HBox>
@@ -650,359 +541,292 @@
                   </HBox>
                </children>
             </Pane>
-            <Pane fx:id="pantallaAlquiler" prefHeight="578.0" prefWidth="768.0" visible="false">
+
+            <!-- ── ALQUILER ───────────────────────────────────────── -->
+            <Pane fx:id="pantallaAlquiler" prefHeight="578.0" prefWidth="768.0" visible="false"
+                  style="-fx-background-color: #EFF6FF;">
                <children>
-                  <HBox prefHeight="234.0" prefWidth="724.0">
+                  <!-- Selección vehículo -->
+                  <HBox layoutX="12.0" layoutY="12.0" prefHeight="218.0" prefWidth="700.0" spacing="12.0">
                      <children>
-                        <VBox prefHeight="214.0" prefWidth="188.0">
+                        <VBox prefHeight="218.0" prefWidth="200.0" spacing="10.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 14;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
-                              <Label text="Opciones de Coche">
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" left="20.0" />
-                                 </VBox.margin>
-                                 <font>
-                                    <Font name="System Bold Italic" size="18.0" />
-                                 </font>
-                              </Label>
-                              <Label text="Marca">
-                                 <VBox.margin>
-                                    <Insets left="70.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <MenuButton fx:id="mnElegirMarca" maxWidth="100.0" mnemonicParsing="false" text="Marca">
-                                 <tooltip>
-                                    <Tooltip text="Seleccionar marca del vehiculo" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="15.0" left="40.0" />
-                                 </VBox.margin>
+                              <Label text="OPCIONES DE COCHE"
+                                     style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #6B7280;" />
+                              <Label text="Marca" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <MenuButton fx:id="mnElegirMarca" mnemonicParsing="false" text="Seleccionar"
+                                          prefHeight="28.0" prefWidth="172.0"
+                                          style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB; -fx-border-radius: 4;">
+                                 <tooltip><Tooltip text="Seleccionar marca del vehiculo" /></tooltip>
                               </MenuButton>
-                              <Label text="Modelo">
-                                 <VBox.margin>
-                                    <Insets left="70.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <ComboBox fx:id="cmbElegirModelo" prefHeight="26.0" prefWidth="105.0">
-                                 <tooltip>
-                                    <Tooltip text="Seleccionar modelo del vehiculo" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets left="40.0" />
-                                 </VBox.margin>
+                              <Label text="Modelo" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <ComboBox fx:id="cmbElegirModelo" prefHeight="28.0" prefWidth="172.0" style="-fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Seleccionar modelo del vehiculo" /></tooltip>
                               </ComboBox>
                            </children>
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
                         </VBox>
-                        <TableView fx:id="TblCoincidencias" prefHeight="214.0" prefWidth="413.0">
-                          <columns>
-                            <TableColumn fx:id="clnAñoCoche" prefWidth="75.0" text="Año" />
-                            <TableColumn fx:id="clnDisponibleCoche" prefWidth="83.2000732421875" text="Disponible" />
-                              <TableColumn fx:id="clnColorCoche" prefWidth="84.80001831054688" text="Color" />
-                              <TableColumn fx:id="clnPrecioCoche" minWidth="0.0" prefWidth="55.199951171875" text="Precio" />
-                              <TableColumn fx:id="clnMatriculaCoche" minWidth="0.0" prefWidth="116.79995727539062" text="Matricula" />
-                          </columns>
-                           <HBox.margin>
-                              <Insets left="5.0" />
-                           </HBox.margin>
-                        </TableView>
-                     </children>
-                     <padding>
-                        <Insets left="20.0" top="20.0" />
-                     </padding>
-                  </HBox>
-                  <HBox layoutX="25.0" layoutY="239.0" prefHeight="322.0" prefWidth="689.0">
-                     <children>
-                        <VBox prefHeight="322.0" prefWidth="180.0">
+                        <VBox prefHeight="218.0" prefWidth="488.0" spacing="6.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 14;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
-                              <Label text="Fechas y Horarios">
-                                 <font>
-                                    <Font name="System Bold Italic" size="18.0" />
-                                 </font>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" left="15.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Label text="Fecha de recogida">
-                                 <VBox.margin>
-                                    <Insets />
-                                 </VBox.margin>
-                              </Label>
-                              <DatePicker fx:id="cldRecoger" disable="true">
-                                 <tooltip>
-                                    <Tooltip text="Fecha de recogida del vehiculo" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
+                              <Label text="Vehículos Disponibles"
+                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+                              <TableView fx:id="TblCoincidencias" prefHeight="182.0" prefWidth="460.0">
+                                 <columns>
+                                    <TableColumn fx:id="clnAñoCoche" prefWidth="75.0" text="Año" />
+                                    <TableColumn fx:id="clnDisponibleCoche" prefWidth="83.0" text="Disponible" />
+                                    <TableColumn fx:id="clnColorCoche" prefWidth="85.0" text="Color" />
+                                    <TableColumn fx:id="clnPrecioCoche" prefWidth="100.0" text="Precio (€)" />
+                                    <TableColumn fx:id="clnMatriculaCoche" prefWidth="117.0" text="Matrícula" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+
+                  <!-- Fechas + tabla alquileres + acciones -->
+                  <HBox layoutX="12.0" layoutY="242.0" prefHeight="324.0" prefWidth="700.0" spacing="12.0">
+                     <children>
+                        <VBox prefHeight="324.0" prefWidth="200.0" spacing="10.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 14;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                           <children>
+                              <Label text="FECHAS Y HORARIOS"
+                                     style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #6B7280;" />
+                              <Label text="Fecha de recogida" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <DatePicker fx:id="cldRecoger" disable="true" prefHeight="28.0" prefWidth="172.0">
+                                 <tooltip><Tooltip text="Fecha de recogida del vehiculo" /></tooltip>
                               </DatePicker>
-                              <Label text="Hora de Entrega">
-                                 <VBox.margin>
-                                    <Insets />
-                                 </VBox.margin>
-                              </Label>
-                              <TextField fx:id="txtHoraEntrega" prefHeight="26.0" prefWidth="192.0" disable="true">
-                                 <tooltip>
-                                    <Tooltip text="Hora de entrega (formato HH:mm)" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
+                              <Label text="Hora de entrega" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <TextField fx:id="txtHoraEntrega" prefHeight="28.0" prefWidth="172.0"
+                                         disable="true" promptText="HH:mm"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Hora de entrega (formato HH:mm)" /></tooltip>
                               </TextField>
-                              <Label text="Fecha de Entrega">
-                                 <VBox.margin>
-                                    <Insets />
-                                 </VBox.margin>
-                              </Label>
-                              <DatePicker fx:id="cldEntrega" disable="true">
-                                 <tooltip>
-                                    <Tooltip text="Fecha de devolucion del vehiculo" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
+                              <Label text="Fecha de entrega" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <DatePicker fx:id="cldEntrega" disable="true" prefHeight="28.0" prefWidth="172.0">
+                                 <tooltip><Tooltip text="Fecha de devolucion del vehiculo" /></tooltip>
                               </DatePicker>
                            </children>
-                           <HBox.margin>
-                              <Insets right="10.0" />
-                           </HBox.margin>
                         </VBox>
-                        <TableView fx:id="tblAlquiler" prefHeight="322.0" prefWidth="417.0">
-                          <columns>
-                            <TableColumn fx:id="clnFechaAlq" prefWidth="80.00003355741501" text="Fecha" />
-                            <TableColumn fx:id="clnHoraAlq" prefWidth="92.00006103515625" text="Hora" />
-                              <TableColumn fx:id="clnDNIAlq" prefWidth="95.19996643066406" text="DNI" />
-                              <TableColumn fx:id="clnMatriculaAlq" prefWidth="149.5999755859375" text="Matricula" />
-                          </columns>
-                        </TableView>
-                        <VBox alignment="CENTER" prefHeight="322.0" prefWidth="90.0">
+                        <VBox prefHeight="324.0" prefWidth="488.0" spacing="8.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 14;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
-                              <Button fx:id="btnConirmarAlquiler" onAction="#confirmarAlquiler" text="_Confirmar" disable="true">
-                                 <tooltip>
-                                    <Tooltip text="Confirmar y registrar el alquiler" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" top="100.0" />
-                                 </VBox.margin>
-                                 <opaqueInsets>
-                                    <Insets />
-                                 </opaqueInsets>
-                              </Button>
-                              <Button fx:id="btnEditarAlquiler" onAction="#editarAlq" text="_Editar" disable="true">
-                                 <tooltip>
-                                    <Tooltip text="Editar alquiler seleccionado" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
-                              </Button>
-                              <Button fx:id="btnBorrarAlq" onAction="#borrarAlq" text="_Borrar" disable="true">
-                                 <tooltip>
-                                    <Tooltip text="Eliminar alquiler seleccionado" />
-                                 </tooltip>
-                                 <VBox.margin>
-                                    <Insets bottom="20.0" />
-                                 </VBox.margin>
-                              </Button>
-                              <Button fx:id="btnCancelarAlquiler" onAction="#cancelarAlquiler" text="_Cancelar" disable="true">
-                                 <tooltip>
-                                    <Tooltip text="Cancelar operacion actual" />
-                                 </tooltip>
-                              </Button>
+                              <Label text="Alquileres Registrados"
+                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+                              <TableView fx:id="tblAlquiler" prefHeight="232.0" prefWidth="460.0">
+                                 <columns>
+                                    <TableColumn fx:id="clnFechaAlq" prefWidth="115.0" text="Fecha" />
+                                    <TableColumn fx:id="clnHoraAlq" prefWidth="115.0" text="Hora" />
+                                    <TableColumn fx:id="clnDNIAlq" prefWidth="115.0" text="DNI" />
+                                    <TableColumn fx:id="clnMatriculaAlq" prefWidth="115.0" text="Matrícula" />
+                                 </columns>
+                              </TableView>
+                              <HBox spacing="8.0">
+                                 <children>
+                                    <Button fx:id="btnConirmarAlquiler" mnemonicParsing="false" onAction="#confirmarAlquiler"
+                                            prefHeight="30.0" prefWidth="90.0" text="Confirmar" disable="true"
+                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                                   -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Confirmar y registrar el alquiler" /></tooltip>
+                                    </Button>
+                                    <Button fx:id="btnEditarAlquiler" mnemonicParsing="false" onAction="#editarAlq"
+                                            prefHeight="30.0" prefWidth="70.0" text="Editar" disable="true"
+                                            style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                   -fx-border-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Editar alquiler seleccionado" /></tooltip>
+                                    </Button>
+                                    <Button fx:id="btnBorrarAlq" mnemonicParsing="false" onAction="#borrarAlq"
+                                            prefHeight="30.0" prefWidth="70.0" text="Borrar" disable="true"
+                                            style="-fx-background-color: #DC2626; -fx-text-fill: white;
+                                                   -fx-background-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Eliminar alquiler seleccionado" /></tooltip>
+                                    </Button>
+                                    <Button fx:id="btnCancelarAlquiler" mnemonicParsing="false" onAction="#cancelarAlquiler"
+                                            prefHeight="30.0" prefWidth="75.0" text="Cancelar" disable="true"
+                                            style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                   -fx-border-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Cancelar operacion actual" /></tooltip>
+                                    </Button>
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
                      </children>
                   </HBox>
                </children>
             </Pane>
-            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="702.0" visible="false" StackPane.alignment="CENTER_RIGHT">
+
+            <!-- ── REGISTRO CLIENTES ──────────────────────────────── -->
+            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="724.0" visible="false"
+                  style="-fx-background-color: #EFF6FF;">
                <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox alignment="CENTER" prefHeight="578.0" prefWidth="724.0" spacing="14.0"
+                        style="-fx-padding: 14;">
                      <children>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+
+                        <!-- Card: Nuevo Cliente -->
+                        <VBox prefHeight="546.0" prefWidth="324.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 16;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
-                              <Button fx:id="btnNuevoCliente" onAction="#crearCliente" prefHeight="18.0" prefWidth="118.0" text="Nuevo Cliente">
-                                 <tooltip>
-                                    <Tooltip text="Crear un nuevo cliente en el sistema" />
-                                 </tooltip>
+                              <Button fx:id="btnNuevoCliente" mnemonicParsing="false" onAction="#crearCliente"
+                                      prefHeight="28.0" prefWidth="150.0" text="+ Nuevo Cliente"
+                                      style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                             -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                 <tooltip><Tooltip text="Crear un nuevo cliente en el sistema" /></tooltip>
                               </Button>
-                              <AnchorPane fx:id="panelNuevoCliente" prefHeight="450.0" prefWidth="289.0">
+                              <AnchorPane fx:id="panelNuevoCliente" prefHeight="450.0" prefWidth="292.0">
                                  <children>
-                                    <Label layoutX="14.0" layoutY="26.0" prefHeight="18.0" prefWidth="62.0" text="NOMBRE">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Label layoutX="14.0" layoutY="188.0" prefHeight="18.0" prefWidth="75.0" text="TELEFONO">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Label layoutX="14.0" layoutY="242.0" prefHeight="18.0" prefWidth="82.0" text="FECHA NAC">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <TextField fx:id="txtNombre" layoutX="116.0" layoutY="22.0" prefHeight="18.0" prefWidth="170.0">
-                                       <tooltip>
-                                          <Tooltip text="Nombre del cliente" />
-                                       </tooltip>
+                                    <Label layoutX="8.0" layoutY="24.0" text="Nombre"
+                                           style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                    <TextField fx:id="txtNombre" layoutX="108.0" layoutY="20.0" prefHeight="26.0" prefWidth="176.0"
+                                               style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                       <tooltip><Tooltip text="Nombre del cliente" /></tooltip>
                                     </TextField>
-                                    <TextField fx:id="txtTelefono" layoutX="116.0" layoutY="184.0" prefHeight="26.0" prefWidth="170.0">
-                                       <tooltip>
-                                          <Tooltip text="Telefono de contacto (9-15 digitos)" />
-                                       </tooltip>
+                                    <Label layoutX="8.0" layoutY="68.0" text="Apellidos"
+                                           style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                    <TextField fx:id="txtApellidos" layoutX="108.0" layoutY="64.0" prefHeight="26.0" prefWidth="176.0"
+                                               style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                       <tooltip><Tooltip text="Apellidos del cliente" /></tooltip>
                                     </TextField>
-                                    <DatePicker fx:id="dpFechaNac" layoutX="116.0" layoutY="238.0" prefHeight="26.0" prefWidth="170.0">
-                                       <tooltip>
-                                          <Tooltip text="Fecha de nacimiento (debe ser mayor de 18)" />
-                                       </tooltip>
+                                    <Label layoutX="8.0" layoutY="112.0" text="Dirección"
+                                           style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                    <TextField fx:id="txtDireccion" layoutX="108.0" layoutY="108.0" prefHeight="26.0" prefWidth="176.0"
+                                               style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                       <tooltip><Tooltip text="Direccion completa del cliente" /></tooltip>
+                                    </TextField>
+                                    <Label layoutX="8.0" layoutY="156.0" text="Teléfono"
+                                           style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                    <TextField fx:id="txtTelefono" layoutX="108.0" layoutY="152.0" prefHeight="26.0" prefWidth="176.0"
+                                               style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                       <tooltip><Tooltip text="Telefono de contacto (9-15 digitos)" /></tooltip>
+                                    </TextField>
+                                    <Label layoutX="8.0" layoutY="200.0" text="Fecha Nac."
+                                           style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                    <DatePicker fx:id="dpFechaNac" layoutX="108.0" layoutY="196.0" prefHeight="26.0" prefWidth="176.0">
+                                       <tooltip><Tooltip text="Fecha de nacimiento (debe ser mayor de 18)" /></tooltip>
                                     </DatePicker>
-                                    <Button fx:id="btnAñadirNuevoCliente" layoutX="158.0" layoutY="460.0" onAction="#añadirCliente" text="_Añadir">
-                                       <tooltip>
-                                          <Tooltip text="Guardar el nuevo cliente" />
-                                       </tooltip>
-                                    </Button>
-                                    <Label layoutX="14.0" layoutY="79.0" prefHeight="18.0" prefWidth="82.0" text="APELLIDOS">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Label layoutX="14.0" layoutY="133.0" prefHeight="18.0" prefWidth="82.0" text="DIRECCION">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <TextField fx:id="txtApellidos" layoutX="116.0" layoutY="75.0" prefHeight="26.0" prefWidth="170.0">
-                                       <tooltip>
-                                          <Tooltip text="Apellidos del cliente" />
-                                       </tooltip>
+                                    <Label layoutX="8.0" layoutY="244.0" text="DNI / NIF"
+                                           style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                    <TextField fx:id="txtDni" layoutX="108.0" layoutY="240.0" prefHeight="26.0" prefWidth="176.0"
+                                               style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                       <tooltip><Tooltip text="DNI del cliente (8 digitos + letra)" /></tooltip>
                                     </TextField>
-                                    <TextField fx:id="txtDireccion" layoutX="116.0" layoutY="129.0" prefHeight="26.0" prefWidth="170.0">
-                                       <tooltip>
-                                          <Tooltip text="Direccion completa del cliente" />
-                                       </tooltip>
-                                    </TextField>
-                                    <Button fx:id="btnCancelarNuevoCliente" layoutX="227.0" layoutY="460.0" onAction="#cancelarNuevoCliente" text="_Cancelar">
-                                       <tooltip>
-                                          <Tooltip text="Cancelar y limpiar formulario" />
-                                       </tooltip>
-                                    </Button>
-                                    <Label layoutX="14.0" layoutY="293.0" prefHeight="18.0" prefWidth="82.0" text="DNI">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <TextField fx:id="txtDni" layoutX="116.0" layoutY="289.0" prefHeight="26.0" prefWidth="170.0">
-                                       <tooltip>
-                                          <Tooltip text="DNI del cliente (8 digitos + letra)" />
-                                       </tooltip>
-                                    </TextField>
-                                    <Label layoutX="14.0" layoutY="386.0" prefHeight="18.0" prefWidth="82.0" text="Email">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <TextField fx:id="txtEmail" layoutX="116.0" layoutY="382.0" prefHeight="26.0" prefWidth="170.0">
-                                       <tooltip>
-                                          <Tooltip text="Correo electronico del cliente" />
-                                       </tooltip>
-                                    </TextField>
-                                    <Label layoutX="14.0" layoutY="343.0" prefHeight="18.0" prefWidth="82.0" text="SEXO">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <HBox layoutX="116.0" layoutY="340.0" spacing="15.0">
+                                    <Label layoutX="8.0" layoutY="288.0" text="Sexo"
+                                           style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                    <HBox layoutX="108.0" layoutY="284.0" spacing="12.0">
                                        <children>
-                                          <RadioButton fx:id="rbMasculino" text="Masculino">
-                                             <tooltip>
-                                                <Tooltip text="Seleccionar sexo masculino" />
-                                             </tooltip>
-                                             <toggleGroup>
-                                                <ToggleGroup fx:id="toggleSexo" />
-                                             </toggleGroup>
+                                          <RadioButton fx:id="rbMasculino" text="Masculino" style="-fx-font-size: 12;">
+                                             <tooltip><Tooltip text="Seleccionar sexo masculino" /></tooltip>
+                                             <toggleGroup><ToggleGroup fx:id="toggleSexo" /></toggleGroup>
                                           </RadioButton>
-                                          <RadioButton fx:id="rbFemenino" text="Femenino" toggleGroup="$toggleSexo">
-                                             <tooltip>
-                                                <Tooltip text="Seleccionar sexo femenino" />
-                                             </tooltip>
+                                          <RadioButton fx:id="rbFemenino" text="Femenino" toggleGroup="$toggleSexo" style="-fx-font-size: 12;">
+                                             <tooltip><Tooltip text="Seleccionar sexo femenino" /></tooltip>
                                           </RadioButton>
                                        </children>
                                     </HBox>
+                                    <Label layoutX="8.0" layoutY="332.0" text="Email"
+                                           style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                    <TextField fx:id="txtEmail" layoutX="108.0" layoutY="328.0" prefHeight="26.0" prefWidth="176.0"
+                                               style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                       <tooltip><Tooltip text="Correo electronico del cliente" /></tooltip>
+                                    </TextField>
+                                    <Button fx:id="btnAñadirNuevoCliente" layoutX="56.0" layoutY="400.0"
+                                            mnemonicParsing="false" onAction="#añadirCliente"
+                                            prefHeight="28.0" prefWidth="84.0" text="Añadir"
+                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                                   -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Guardar el nuevo cliente" /></tooltip>
+                                    </Button>
+                                    <Button fx:id="btnCancelarNuevoCliente" layoutX="152.0" layoutY="400.0"
+                                            mnemonicParsing="false" onAction="#cancelarNuevoCliente"
+                                            prefHeight="28.0" prefWidth="84.0" text="Cancelar"
+                                            style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                   -fx-border-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Cancelar y limpiar formulario" /></tooltip>
+                                    </Button>
                                  </children>
-                                 <VBox.margin>
-                                    <Insets right="20.0" top="20.0" />
-                                 </VBox.margin>
+                                 <VBox.margin><Insets top="12.0" /></VBox.margin>
                               </AnchorPane>
                            </children>
-                           <HBox.margin>
-                              <Insets top="20.0" />
-                           </HBox.margin>
                         </VBox>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+
+                        <!-- Card: Buscar Cliente -->
+                        <VBox prefHeight="546.0" prefWidth="352.0"
+                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                                     -fx-background-radius: 8; -fx-padding: 16;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
-                              <Button fx:id="btnBuscarCliente" mnemonicParsing="false" onAction="#buscarLogin" prefHeight="18.0" prefWidth="118.0" text="Buscar Cliente">
-                                 <tooltip>
-                                    <Tooltip text="Buscar clientes existentes" />
-                                 </tooltip>
+                              <Button fx:id="btnBuscarCliente" mnemonicParsing="false" onAction="#buscarLogin"
+                                      prefHeight="28.0" prefWidth="140.0" text="Buscar Cliente"
+                                      style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                             -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                 <tooltip><Tooltip text="Buscar clientes existentes" /></tooltip>
                               </Button>
-                              <AnchorPane fx:id="panelLoginCliente" prefHeight="500.0" prefWidth="315.0">
+                              <AnchorPane fx:id="panelLoginCliente" prefHeight="490.0" prefWidth="320.0">
                                  <children>
-                                    <Label layoutX="16.0" layoutY="21.0" prefHeight="18.0" prefWidth="62.0" text="DNI">
-                                       <font>
-                                          <Font name="Arial Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Button fx:id="btnSeleccionCLiente" layoutX="47.0" layoutY="459.0" onAction="#seleccionarCliente" text="_Aceptar">
-                                       <tooltip>
-                                          <Tooltip text="Seleccionar cliente e iniciar sesion" />
-                                       </tooltip>
-                                    </Button>
-                                    <Button fx:id="btnEditarCliente" layoutX="116.0" layoutY="459.0" onAction="#editarCliente" text="_Editar">
-                                       <tooltip>
-                                          <Tooltip text="Editar datos del cliente seleccionado" />
-                                       </tooltip>
-                                    </Button>
-                                    <Button fx:id="btnCancelarSeleccion" layoutX="242.0" layoutY="459.0" onAction="#cancelarSeleccion" text="_Cancelar">
-                                       <tooltip>
-                                          <Tooltip text="Cancelar seleccion" />
-                                       </tooltip>
-                                    </Button>
-                                    <TableView fx:id="tablaRegistro" layoutX="14.0" layoutY="54.0" prefHeight="394.0" prefWidth="290.0">
-                                      <columns>
-                                        <TableColumn fx:id="clnNombreRegistro" prefWidth="142.39995765686035" text="Nombre" />
-                                        <TableColumn fx:id="clnDniRegistro" prefWidth="147.19998779296873" text="DNI" />
-                                      </columns>
-                                    </TableView>
-                                    <Button fx:id="btnEliminarCliente" layoutX="174.0" layoutY="459.0" onAction="#eliminarCliente" text="_Eliminar">
-                                       <tooltip>
-                                          <Tooltip text="Eliminar cliente seleccionado" />
-                                       </tooltip>
-                                    </Button>
-                                    <ComboBox fx:id="comboDni" layoutX="94.0" layoutY="17.0" prefHeight="26.0" prefWidth="209.0">
-                                       <tooltip>
-                                          <Tooltip text="Buscar cliente por DNI" />
-                                       </tooltip>
+                                    <Label layoutX="10.0" layoutY="16.0" text="DNI / NIF"
+                                           style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                    <ComboBox fx:id="comboDni" layoutX="96.0" layoutY="12.0"
+                                              prefHeight="28.0" prefWidth="214.0" style="-fx-font-size: 13;">
+                                       <tooltip><Tooltip text="Buscar cliente por DNI" /></tooltip>
                                     </ComboBox>
+                                    <TableView fx:id="tablaRegistro" layoutX="10.0" layoutY="52.0"
+                                               prefHeight="356.0" prefWidth="300.0">
+                                       <columns>
+                                          <TableColumn fx:id="clnNombreRegistro" prefWidth="150.0" text="Nombre" />
+                                          <TableColumn fx:id="clnDniRegistro" prefWidth="150.0" text="DNI" />
+                                       </columns>
+                                    </TableView>
+                                    <Button fx:id="btnSeleccionCLiente" layoutX="10.0" layoutY="420.0"
+                                            mnemonicParsing="false" onAction="#seleccionarCliente"
+                                            prefHeight="28.0" prefWidth="68.0" text="Aceptar"
+                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                                   -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Seleccionar cliente e iniciar sesion" /></tooltip>
+                                    </Button>
+                                    <Button fx:id="btnEditarCliente" layoutX="88.0" layoutY="420.0"
+                                            mnemonicParsing="false" onAction="#editarCliente"
+                                            prefHeight="28.0" prefWidth="65.0" text="Editar"
+                                            style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                   -fx-border-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Editar datos del cliente seleccionado" /></tooltip>
+                                    </Button>
+                                    <Button fx:id="btnEliminarCliente" layoutX="163.0" layoutY="420.0"
+                                            mnemonicParsing="false" onAction="#eliminarCliente"
+                                            prefHeight="28.0" prefWidth="68.0" text="Eliminar"
+                                            style="-fx-background-color: #DC2626; -fx-text-fill: white;
+                                                   -fx-background-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Eliminar cliente seleccionado" /></tooltip>
+                                    </Button>
+                                    <Button fx:id="btnCancelarSeleccion" layoutX="241.0" layoutY="420.0"
+                                            mnemonicParsing="false" onAction="#cancelarSeleccion"
+                                            prefHeight="28.0" prefWidth="68.0" text="Cancelar"
+                                            style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                   -fx-border-radius: 4; -fx-cursor: hand;">
+                                       <tooltip><Tooltip text="Cancelar seleccion" /></tooltip>
+                                    </Button>
                                  </children>
-                                 <VBox.margin>
-                                    <Insets top="20.0" />
-                                 </VBox.margin>
+                                 <VBox.margin><Insets top="12.0" /></VBox.margin>
                               </AnchorPane>
                            </children>
-                           <HBox.margin>
-                              <Insets top="20.0" />
-                           </HBox.margin>
                         </VBox>
+
                      </children>
                   </HBox>
                </children>
-               <StackPane.margin>
-                  <Insets left="50.0" />
-               </StackPane.margin>
             </Pane>
+
          </children>
       </StackPane>
    </children>

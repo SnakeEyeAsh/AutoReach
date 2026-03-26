@@ -2,118 +2,120 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SplitMenuButton?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="452.0" prefWidth="446.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javafx.App.controladorEmergente">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefWidth="460.0" spacing="0"
+      style="-fx-background-color: white; -fx-font-family: 'Segoe UI';"
+      xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.javafx.App.controladorEmergente">
+
    <children>
-      <HBox prefHeight="28.0" prefWidth="446.0">
-         <children>
-            <Label text="Banco">
-               <font>
-                  <Font name="System Bold Italic" size="18.0" />
-               </font>
-               <HBox.margin>
-                  <Insets bottom="30.0" left="20.0" />
-               </HBox.margin>
+
+      <!-- ── Cabecera ─────────────────────────────────────────── -->
+      <Label text="Confirmar Compra" prefWidth="460.0" prefHeight="48.0"
+             style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                    -fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 0 0 0 20;" />
+
+      <!-- ── Cuerpo ─────────────────────────────────────────────── -->
+      <VBox spacing="12.0" style="-fx-padding: 20 24 10 24;">
+
+         <!-- Sección: Vehículo -->
+         <Label text="DATOS DEL VEHÍCULO"
+                style="-fx-font-size: 10; -fx-text-fill: #6B7280; -fx-font-weight: bold;" />
+
+         <!-- vin_coche / matrícula -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Vehículo:" prefWidth="150.0">
+               <font><Font name="System Bold Italic" size="13.0" /></font>
             </Label>
-            <TextField fx:id="txtBanco" prefHeight="26.0" prefWidth="198.0">
-               <HBox.margin>
-                  <Insets left="150.0" />
-               </HBox.margin>
-            </TextField>
-         </children>
-         <VBox.margin>
-            <Insets top="50.0" />
-         </VBox.margin>
-      </HBox>
-      <HBox prefHeight="38.0" prefWidth="446.0">
-         <children>
-            <Label text="Tipo Pago">
-               <font>
-                  <Font name="System Bold Italic" size="18.0" />
-               </font>
-               <HBox.margin>
-                  <Insets bottom="30.0" left="20.0" />
-               </HBox.margin>
+            <Label fx:id="lblVehiculo" text="—"
+                   style="-fx-font-size: 13; -fx-text-fill: #1F2937; -fx-font-weight: bold;" />
+         </HBox>
+
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Matrícula (VIN):" prefWidth="150.0">
+               <font><Font name="System Bold Italic" size="13.0" /></font>
             </Label>
-            <SplitMenuButton fx:id="MenuTiposPago" mnemonicParsing="false" prefHeight="26.0" prefWidth="199.0" text="Tipo de Pago">
-              <items>
-                <MenuItem mnemonicParsing="false" text="Tarjeta" />
-                <MenuItem mnemonicParsing="false" text="Metalico" />
-                  <MenuItem mnemonicParsing="false" text="Transferencia Bancaria" />
-              </items>
-               <HBox.margin>
-                  <Insets left="115.0" />
-               </HBox.margin>
-            </SplitMenuButton>
-         </children>
-      </HBox>
-      <HBox prefHeight="36.0" prefWidth="446.0">
-         <children>
-            <Label maxHeight="100.0" prefHeight="27.0" prefWidth="202.0" text="Iban/Numero Tarjeta">
-               <font>
-                  <Font name="System Bold Italic" size="18.0" />
-               </font>
-               <HBox.margin>
-                  <Insets bottom="30.0" left="20.0" />
-               </HBox.margin>
+            <Label fx:id="lblMatricula" text="—"
+                   style="-fx-font-size: 13; -fx-text-fill: #374151;" />
+         </HBox>
+
+         <!-- monto_total -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Monto Total:" prefWidth="150.0">
+               <font><Font name="System Bold Italic" size="13.0" /></font>
             </Label>
-            <TextField fx:id="txtIban" prefHeight="26.0" prefWidth="194.0" />
-         </children>
-      </HBox>
-      <HBox prefHeight="30.0" prefWidth="446.0">
-         <children>
-            <Label text="Codigo De Seguridad">
-               <font>
-                  <Font name="System Bold Italic" size="18.0" />
-               </font>
-               <HBox.margin>
-                  <Insets bottom="30.0" left="20.0" />
-               </HBox.margin>
+            <Label fx:id="lblMonto" text="—"
+                   style="-fx-font-size: 15; -fx-text-fill: #059669; -fx-font-weight: bold;" />
+         </HBox>
+
+         <Separator>
+            <VBox.margin><Insets top="4.0" bottom="4.0" /></VBox.margin>
+         </Separator>
+
+         <!-- Sección: Transacción -->
+         <Label text="DATOS DE LA TRANSACCIÓN"
+                style="-fx-font-size: 10; -fx-text-fill: #6B7280; -fx-font-weight: bold;" />
+
+         <!-- tipo_transaccion (fijo VENTA) -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Tipo:" prefWidth="150.0">
+               <font><Font name="System Bold Italic" size="13.0" /></font>
             </Label>
-            <TextField fx:id="txtCodigo" prefHeight="26.0" prefWidth="194.0">
-               <HBox.margin>
-                  <Insets left="30.0" />
-               </HBox.margin>
-            </TextField>
-         </children>
-      </HBox>
-      <HBox prefHeight="100.0" prefWidth="200.0">
-         <children>
-            <Label text="Fecha de Caducidad">
-               <font>
-                  <Font name="System Bold Italic" size="18.0" />
-               </font>
-               <HBox.margin>
-                  <Insets bottom="30.0" left="20.0" />
-               </HBox.margin>
+            <Label text="VENTA"
+                   style="-fx-font-size: 13; -fx-text-fill: #1E3A8A; -fx-font-weight: bold;" />
+         </HBox>
+
+         <!-- cliente_id / nombre -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Cliente:" prefWidth="150.0">
+               <font><Font name="System Bold Italic" size="13.0" /></font>
             </Label>
-            <TextField fx:id="txtFecha" prefHeight="26.0" prefWidth="194.0">
-               <HBox.margin>
-                  <Insets left="40.0" />
-               </HBox.margin>
-            </TextField>
-         </children>
+            <Label fx:id="lblCliente" text="—"
+                   style="-fx-font-size: 13; -fx-text-fill: #374151;" />
+         </HBox>
+
+         <!-- fecha_transaccion (auto, solo informativa) -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Fecha:" prefWidth="150.0">
+               <font><Font name="System Bold Italic" size="13.0" /></font>
+            </Label>
+            <Label fx:id="lblFecha" text="—"
+                   style="-fx-font-size: 13; -fx-text-fill: #374151;" />
+         </HBox>
+
+         <!-- estado_pago (editable) -->
+         <HBox spacing="0" alignment="CENTER_LEFT">
+            <Label text="Estado de Pago:" prefWidth="150.0">
+               <font><Font name="System Bold Italic" size="13.0" /></font>
+            </Label>
+            <ComboBox fx:id="cmbEstadoPago" prefWidth="200.0" />
+         </HBox>
+
+      </VBox>
+
+      <!-- ── Spacer ──────────────────────────────────────────── -->
+      <Region VBox.vgrow="ALWAYS" />
+
+      <!-- ── Botones ─────────────────────────────────────────── -->
+      <HBox alignment="CENTER_RIGHT" spacing="12.0"
+            style="-fx-padding: 12 24; -fx-border-color: #E5E7EB; -fx-border-width: 1 0 0 0;">
+         <Button fx:id="btnAceptarCompra" mnemonicParsing="false" onAction="#RealizarCompra"
+                 text="Confirmar Compra" prefWidth="150.0" prefHeight="34.0"
+                 style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                        -fx-font-weight: bold; -fx-cursor: hand;" />
+         <Button fx:id="brnCancelarCompra" mnemonicParsing="false" onAction="#btnCancelarCompra"
+                 text="Cancelar" prefWidth="90.0" prefHeight="34.0"
+                 style="-fx-background-color: #E5E7EB; -fx-cursor: hand;" />
       </HBox>
-      <HBox alignment="TOP_RIGHT" prefHeight="38.0" prefWidth="446.0">
-         <children>
-            <Button fx:id="btnAceptarCompra" mnemonicParsing="false" onAction="#RealizarCompra" text="Aceptar">
-               <HBox.margin>
-                  <Insets right="30.0" />
-               </HBox.margin>
-            </Button>
-            <Button fx:id="brnCancelarCompra" mnemonicParsing="false" onAction="#btnCancelarCompra" text="Cancelar">
-               <HBox.margin>
-                  <Insets right="60.0" />
-               </HBox.margin>
-            </Button>
-         </children>
-      </HBox>
+
    </children>
 </VBox>
