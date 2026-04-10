@@ -246,6 +246,8 @@ public class Conexion {
             System.out.println("  Estados → Disponible=" + ESTADO_DISPONIBLE_ID
                     + ", Alquilado=" + ESTADO_ALQUILADO_ID
                     + ", Vendido=" + ESTADO_VENDIDO_ID);
+
+            migrarClientesExistentesAAuth();
             return true;
 
         } catch (Exception e) {
@@ -410,7 +412,7 @@ public class Conexion {
         JsonObject body = new JsonObject();
         body.addProperty("email",         email);
         body.addProperty("password",      password);
-        body.addProperty("email_confirm", false);
+        body.addProperty("email_confirm", true);
 
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(baseUrl + "/auth/v1/admin/users"))
@@ -423,9 +425,40 @@ public class Conexion {
         HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
         if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
             System.out.println("✓ Usuario Auth creado: " + email);
+        } else if (resp.statusCode() == 422) {
+            System.out.println("→ Usuario Auth ya existe, omitido: " + email);
         } else {
             System.err.println("✗ Error al crear usuario Auth: " + resp.body());
             throw new Exception("Error al registrar usuario en Auth: " + resp.body());
+        }
+    }
+
+    /** Registra en Supabase Auth todos los clientes de la BD que aún no tengan cuenta. */
+    public static void migrarClientesExistentesAAuth() {
+        if (serviceKey == null || serviceKey.isBlank() || serviceKey.equals("PEGA_AQUI_TU_SERVICE_ROLE_KEY")) {
+            System.err.println("⚠ supabase.service_key no configurada — migración Auth omitida");
+            return;
+        }
+        System.out.println("→ Iniciando migración de clientes existentes a Auth...");
+        try {
+            JsonArray arr = getArray("clientes?select=email,dni_nif");
+            int ok = 0, omitidos = 0;
+            for (JsonElement el : arr) {
+                JsonObject obj = el.getAsJsonObject();
+                String email = str(obj, "email");
+                String dni   = str(obj, "dni_nif");
+                if (email.isBlank() || dni.isBlank()) continue;
+                try {
+                    crearUsuarioAuth(email, dni);
+                    ok++;
+                } catch (Exception e) {
+                    System.err.println("  ✗ " + email + ": " + e.getMessage());
+                    omitidos++;
+                }
+            }
+            System.out.println("✓ Migración completada: " + ok + " creados, " + omitidos + " con error");
+        } catch (Exception e) {
+            System.err.println("✗ Error en migración Auth: " + e.getMessage());
         }
     }
 

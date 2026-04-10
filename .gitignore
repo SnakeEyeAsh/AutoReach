@@ -6,3 +6,6 @@ build
 
 # Claude Code local settings
 .claude
+
+# Credenciales — no subir al repo
+app/src/main/resources/Application.properties
