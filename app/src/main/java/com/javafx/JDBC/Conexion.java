@@ -33,6 +33,7 @@ public class Conexion {
     private static HttpClient httpClient;
     private static String baseUrl;
     private static String apiKey;
+    private static String serviceKey;
     private static boolean initialized = false;
 
     // IDs de estados_vehiculo (se cargan al conectar)
@@ -203,8 +204,9 @@ public class Conexion {
     }
 
     public static boolean realizarConexion() {
-        baseUrl = Config.get("supabase.url");
-        apiKey  = Config.get("supabase.key");
+        baseUrl    = Config.get("supabase.url");
+        apiKey     = Config.get("supabase.key");
+        serviceKey = Config.get("supabase.service_key");
 
         if (baseUrl == null || apiKey == null) {
             System.err.println("✗ supabase.url o supabase.key no encontrados en Application.properties");
@@ -395,6 +397,36 @@ public class Conexion {
             throw new Exception("Error al crear cliente: " + resp.body());
         }
         System.out.println("✓ Cliente creado");
+
+        crearUsuarioAuth(email, dni);
+    }
+
+    private static void crearUsuarioAuth(String email, String password) throws Exception {
+        if (serviceKey == null || serviceKey.isBlank() || serviceKey.equals("PEGA_AQUI_TU_SERVICE_ROLE_KEY")) {
+            System.err.println("⚠ supabase.service_key no configurada — usuario Auth no creado");
+            return;
+        }
+
+        JsonObject body = new JsonObject();
+        body.addProperty("email",         email);
+        body.addProperty("password",      password);
+        body.addProperty("email_confirm", false);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + "/auth/v1/admin/users"))
+                .header("apikey",        serviceKey)
+                .header("Authorization", "Bearer " + serviceKey)
+                .header("Content-Type",  "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+                .build();
+
+        HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+        if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
+            System.out.println("✓ Usuario Auth creado: " + email);
+        } else {
+            System.err.println("✗ Error al crear usuario Auth: " + resp.body());
+            throw new Exception("Error al registrar usuario en Auth: " + resp.body());
+        }
     }
 
     public static void editarCliente(Cliente c) {
