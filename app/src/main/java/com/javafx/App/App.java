@@ -36,7 +36,7 @@ public class App extends Application {
 
         // Ambos nodos en un Pane libre para poder posicionarlos manualmente
         Pane wrapper = new Pane(sidebar, content);
-        wrapper.setStyle("-fx-background-color: white;");
+        wrapper.setStyle("-fx-background-color: #EFF6FF;");
 
         Scene scene = new Scene(wrapper);
         primeraEscena.setScene(scene);

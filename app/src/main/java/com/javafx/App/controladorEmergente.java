@@ -76,14 +76,14 @@ public class controladorEmergente {
 
         CocheCompra coche = controladorApp.cocheParaComprar;
         if (coche == null || clienteId <= 0) {
-            AlertaEstilizada.crearAdvertencia("Error", "Datos incompletos",
+            AlertaEstilizada.mostrarAdvertencia("Error", "Datos incompletos",
                     "No se pudo obtener la información del vehículo o del cliente.");
             return;
         }
 
         String estadoPago = cmbEstadoPago.getSelectionModel().getSelectedItem();
         if (estadoPago == null) {
-            AlertaEstilizada.crearAdvertencia("Campo requerido", "Estado de pago",
+            AlertaEstilizada.mostrarAdvertencia("Campo requerido", "Estado de pago",
                     "Selecciona el estado de pago.");
             return;
         }
@@ -93,23 +93,21 @@ public class controladorEmergente {
         try {
             monto = Double.parseDouble(coche.getPrecio().replace(",", "."));
         } catch (NumberFormatException e) {
-            AlertaEstilizada.crearAdvertencia("Error", "Precio inválido",
+            AlertaEstilizada.mostrarAdvertencia("Error", "Precio inválido",
                     "El precio del vehículo no es válido: " + coche.getPrecio());
             return;
         }
 
         // ── Registrar en transacciones ───────────────────────────
+        // La API cambia automáticamente el estado del coche a "Vendido"
         int transaccionId = Conexion.registrarVenta(
                 coche.getMatricula(), clienteId, monto, estadoPago);
 
         if (transaccionId <= 0) {
-            AlertaEstilizada.crearAdvertencia("Error de conexión", "No se pudo registrar",
+            AlertaEstilizada.mostrarAdvertencia("Error de conexión", "No se pudo registrar",
                     "Ocurrió un error al guardar la transacción. Inténtalo de nuevo.");
             return;
         }
-
-        // ── Marcar coche como vendido en coches ──────────────────
-        Conexion.marcarComoVendido(coche.getMatricula());
 
         // ── Éxito: cerrar confirmación y abrir ventana de éxito ───
         cerrarDialogo();

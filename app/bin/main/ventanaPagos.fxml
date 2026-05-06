@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.javafx.App.controladorPagos"
+      prefWidth="700.0" prefHeight="440.0" spacing="12.0"
+      style="-fx-background-color: #EFF6FF; -fx-padding: 20;">
+
+   <children>
+
+      <!-- Cabecera -->
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label fx:id="lblTitulo" text="Transacciones Pendientes de Pago"
+                   style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+         </children>
+      </HBox>
+
+      <!-- Tabla -->
+      <VBox VBox.vgrow="ALWAYS" spacing="0"
+            style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                   -fx-background-radius: 8; -fx-padding: 12;
+                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+         <children>
+            <TableView fx:id="tblTransacciones" VBox.vgrow="ALWAYS"
+                       prefHeight="300.0" prefWidth="660.0">
+               <columns>
+                  <TableColumn fx:id="colId"       prefWidth="50.0"  text="ID" />
+                  <TableColumn fx:id="colFecha"    prefWidth="140.0" text="Fecha" />
+                  <TableColumn fx:id="colCliente"  prefWidth="170.0" text="Cliente" />
+                  <TableColumn fx:id="colMatricula" prefWidth="100.0" text="Matrícula" />
+                  <TableColumn fx:id="colMonto"    prefWidth="100.0" text="Monto" />
+                  <TableColumn fx:id="colEstado"   prefWidth="100.0" text="Estado Pago" />
+               </columns>
+               <placeholder>
+                  <Label text="No hay transacciones pendientes de pago"
+                         style="-fx-text-fill: #6B7280; -fx-font-size: 13;" />
+               </placeholder>
+            </TableView>
+         </children>
+      </VBox>
+
+      <!-- Controles de cambio de estado -->
+      <HBox alignment="CENTER_LEFT" spacing="12.0"
+            style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                   -fx-background-radius: 8; -fx-padding: 12;
+                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+         <children>
+            <Label text="Nuevo estado:"
+                   style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+            <ComboBox fx:id="cmbNuevoEstado" prefWidth="160.0" />
+            <Button fx:id="btnActualizar" text="Actualizar estado"
+                    onAction="#actualizarEstado"
+                    prefHeight="32.0" prefWidth="150.0"
+                    style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                           -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+               <tooltip><Tooltip text="Guardar el nuevo estado de pago para la transacción seleccionada" /></tooltip>
+            </Button>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="Cerrar" onAction="#cerrar"
+                    prefHeight="32.0" prefWidth="80.0"
+                    style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                           -fx-border-radius: 4; -fx-cursor: hand;" />
+         </children>
+      </HBox>
+
+   </children>
+</VBox>

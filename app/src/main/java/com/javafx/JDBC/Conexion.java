@@ -31,10 +31,13 @@ import javafx.collections.ObservableList;
 public class Conexion {
 
     private static HttpClient httpClient;
-    private static String baseUrl;
-    private static String apiKey;
-    private static String serviceKey;
+    private static String apiUrl;
     private static boolean initialized = false;
+
+    // Sesión del agente autenticado
+    private static String agenteToken   = null;
+    private static int    agenteId      = -1;
+    private static String agenteNombre  = "";
 
     // IDs de estados_vehiculo (se cargan al conectar)
     private static int ESTADO_DISPONIBLE_ID = 1;
@@ -43,6 +46,8 @@ public class Conexion {
 
     private static final DateTimeFormatter TS_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter DATE_FMT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public Conexion() {}
 
@@ -54,73 +59,60 @@ public class Conexion {
         return URLEncoder.encode(val, StandardCharsets.UTF_8);
     }
 
+    /** Builder base con Content-Type y, si hay sesión activa, Authorization. */
+    private static HttpRequest.Builder baseRequest(String path) {
+        HttpRequest.Builder b = HttpRequest.newBuilder()
+                .uri(URI.create(apiUrl + "/api/" + path))
+                .header("Content-Type", "application/json");
+        if (agenteToken != null && !agenteToken.isBlank())
+            b.header("Authorization", "Bearer " + agenteToken);
+        return b;
+    }
+
     private static HttpResponse<String> get(String path) throws Exception {
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/rest/v1/" + path))
-                .header("apikey", apiKey)
-                .header("Authorization", "Bearer " + apiKey)
-                .GET()
-                .build();
-        return httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+        return httpClient.send(baseRequest(path).GET().build(),
+                HttpResponse.BodyHandlers.ofString());
     }
 
     private static HttpResponse<String> post(String path, String json) throws Exception {
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/rest/v1/" + path))
-                .header("apikey", apiKey)
-                .header("Authorization", "Bearer " + apiKey)
-                .header("Content-Type", "application/json")
-                .header("Prefer", "return=minimal")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-        return httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+        return httpClient.send(
+                baseRequest(path).POST(HttpRequest.BodyPublishers.ofString(json)).build(),
+                HttpResponse.BodyHandlers.ofString());
     }
 
     /** POST que devuelve el id generado del registro insertado */
     private static int postReturnId(String path, String json) throws Exception {
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/rest/v1/" + path))
-                .header("apikey", apiKey)
-                .header("Authorization", "Bearer " + apiKey)
-                .header("Content-Type", "application/json")
-                .header("Prefer", "return=representation")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-        HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> resp = post(path, json);
         if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
-            JsonArray arr = JsonParser.parseString(resp.body()).getAsJsonArray();
-            if (arr.size() > 0) return arr.get(0).getAsJsonObject().get("id").getAsInt();
+            JsonElement el = JsonParser.parseString(resp.body());
+            if (el.isJsonObject()) {
+                JsonObject obj = el.getAsJsonObject();
+                if (obj.has("id")) return obj.get("id").getAsInt();
+            } else if (el.isJsonArray()) {
+                JsonArray arr = el.getAsJsonArray();
+                if (arr.size() > 0) return arr.get(0).getAsJsonObject().get("id").getAsInt();
+            }
         }
         throw new Exception("Error al insertar (" + path + "): HTTP "
                 + resp.statusCode() + " " + resp.body());
     }
 
-    private static HttpResponse<String> patch(String path, String json) throws Exception {
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/rest/v1/" + path))
-                .header("apikey", apiKey)
-                .header("Authorization", "Bearer " + apiKey)
-                .header("Content-Type", "application/json")
-                .header("Prefer", "return=minimal")
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(json))
-                .build();
-        return httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+    private static HttpResponse<String> put(String path, String json) throws Exception {
+        return httpClient.send(
+                baseRequest(path).PUT(HttpRequest.BodyPublishers.ofString(json)).build(),
+                HttpResponse.BodyHandlers.ofString());
     }
 
     private static HttpResponse<String> delete(String path) throws Exception {
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/rest/v1/" + path))
-                .header("apikey", apiKey)
-                .header("Authorization", "Bearer " + apiKey)
-                .DELETE()
-                .build();
-        return httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+        return httpClient.send(baseRequest(path).DELETE().build(),
+                HttpResponse.BodyHandlers.ofString());
     }
 
     private static JsonArray getArray(String path) throws Exception {
         HttpResponse<String> resp = get(path);
         if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
-            return JsonParser.parseString(resp.body()).getAsJsonArray();
+            JsonElement el = JsonParser.parseString(resp.body());
+            if (el.isJsonArray()) return el.getAsJsonArray();
         }
         System.err.println("HTTP " + resp.statusCode() + " en GET " + path + ": " + resp.body());
         return new JsonArray();
@@ -156,6 +148,7 @@ public class Conexion {
         if (iso == null || iso.isBlank()) return null;
         try {
             String cleaned = iso.replaceAll("\\+.*$|Z$", "").replaceAll("\\.\\d+$", "");
+            if (cleaned.length() == 10) cleaned += "T00:00:00"; // solo fecha
             return Timestamp.valueOf(LocalDateTime.parse(cleaned, TS_FMT));
         } catch (DateTimeParseException e) {
             System.err.println("Error parseando timestamp: " + iso);
@@ -163,9 +156,9 @@ public class Conexion {
         }
     }
 
-    private static String fmtTimestamp(Timestamp ts) {
+    private static String fmtDate(Timestamp ts) {
         if (ts == null) return null;
-        return ts.toLocalDateTime().format(TS_FMT);
+        return ts.toLocalDateTime().format(DATE_FMT);
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -198,18 +191,16 @@ public class Conexion {
         return initialized;
     }
 
-    /** Mantenido por compatibilidad: devuelve httpClient si hay conexión, null si no */
+    /** Mantenido por compatibilidad */
     public static Object getConnection() {
         return initialized ? httpClient : null;
     }
 
     public static boolean realizarConexion() {
-        baseUrl    = Config.get("supabase.url");
-        apiKey     = Config.get("supabase.key");
-        serviceKey = Config.get("supabase.service_key");
+        apiUrl = Config.get("api.url");
 
-        if (baseUrl == null || apiKey == null) {
-            System.err.println("✗ supabase.url o supabase.key no encontrados en Application.properties");
+        if (apiUrl == null || apiUrl.isBlank()) {
+            System.err.println("✗ api.url no encontrado en Application.properties");
             return false;
         }
 
@@ -217,41 +208,37 @@ public class Conexion {
             httpClient = HttpClient.newHttpClient();
 
             // Ping + cachear IDs de estados_vehiculo
-            HttpResponse<String> resp = get("estados_vehiculo?select=id,descripcion&order=id");
+            HttpResponse<String> resp = get("estados-vehiculo");
             if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
-                System.err.println("✗ Error al conectar con Supabase: HTTP " + resp.statusCode());
+                System.err.println("✗ Error al conectar con la API: HTTP " + resp.statusCode());
                 return false;
             }
 
             JsonArray arr = JsonParser.parseString(resp.body()).getAsJsonArray();
             if (arr.size() == 0) {
-                System.err.println("✗ La tabla estados_vehiculo está vacía. Inserta los estados base en Supabase:");
-                System.err.println("  INSERT INTO estados_vehiculo (descripcion) VALUES ('Disponible'),('Vendido'),('Alquilado'),('Mantenimiento');");
-                return false;
-            }
-
-            for (JsonElement el : arr) {
-                JsonObject obj = el.getAsJsonObject();
-                String desc = str(obj, "descripcion");
-                int id      = intVal(obj, "id");
-                switch (desc) {
-                    case "Disponible"  -> ESTADO_DISPONIBLE_ID = id;
-                    case "Vendido"     -> ESTADO_VENDIDO_ID    = id;
-                    case "Alquilado"   -> ESTADO_ALQUILADO_ID  = id;
+                System.out.println("⚠ estados_vehiculo vacío — usando IDs por defecto (1=Disponible, 2=Vendido, 3=Alquilado)");
+            } else {
+                for (JsonElement el : arr) {
+                    JsonObject obj = el.getAsJsonObject();
+                    String desc = str(obj, "descripcion");
+                    int id      = intVal(obj, "id");
+                    switch (desc) {
+                        case "Disponible" -> ESTADO_DISPONIBLE_ID = id;
+                        case "Vendido"    -> ESTADO_VENDIDO_ID    = id;
+                        case "Alquilado"  -> ESTADO_ALQUILADO_ID  = id;
+                    }
                 }
             }
 
             initialized = true;
-            System.out.println("✓ Conexión Supabase REST API exitosa");
+            System.out.println("✓ Conexión API exitosa: " + apiUrl);
             System.out.println("  Estados → Disponible=" + ESTADO_DISPONIBLE_ID
                     + ", Alquilado=" + ESTADO_ALQUILADO_ID
                     + ", Vendido=" + ESTADO_VENDIDO_ID);
-
-            migrarClientesExistentesAAuth();
             return true;
 
         } catch (Exception e) {
-            System.err.println("✗ ERROR al conectar con Supabase: " + e.getMessage());
+            System.err.println("✗ ERROR al conectar con la API: " + e.getMessage());
             e.printStackTrace();
             initialized = false;
             return false;
@@ -261,8 +248,60 @@ public class Conexion {
     public static void cerrarConexion() {
         initialized = false;
         httpClient  = null;
-        System.out.println("Conexión Supabase cerrada");
+        agenteToken  = null;
+        agenteId     = -1;
+        agenteNombre = "";
+        System.out.println("Conexión API cerrada");
     }
+
+    // ═══════════════════════════════════════════════════════════════
+    // AUTENTICACIÓN DE AGENTES
+    // ═══════════════════════════════════════════════════════════════
+
+    /**
+     * Autentica un agente contra POST /api/agentes/login.
+     * Almacena el token JWT y los datos del agente para usarlos en el resto de llamadas.
+     * @throws Exception con el mensaje de error devuelto por la API ("Credenciales incorrectas",
+     *                   "Cuenta desactivada", etc.)
+     */
+    public static void login(String username, String password) throws Exception {
+        JsonObject body = new JsonObject();
+        body.addProperty("username", username);
+        body.addProperty("password", password);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(apiUrl + "/api/agentes/login"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+                .build();
+
+        HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("[LOGIN] POST " + apiUrl + "/api/agentes/login");
+        System.out.println("[LOGIN] Status: " + resp.statusCode());
+        System.out.println("[LOGIN] Body: " + resp.body());
+
+        if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
+            String mensaje = "Error de autenticación";
+            try {
+                JsonObject err = JsonParser.parseString(resp.body()).getAsJsonObject();
+                if (err.has("error")) mensaje = err.get("error").getAsString();
+            } catch (Exception ignored) {}
+            throw new Exception(mensaje);
+        }
+
+        JsonObject data   = JsonParser.parseString(resp.body()).getAsJsonObject();
+        agenteToken       = str(data, "token");
+        JsonObject agente = data.getAsJsonObject("agente");
+        agenteId          = intVal(agente, "id");
+        agenteNombre      = str(agente, "nombre") + " " + str(agente, "apellidos");
+        agenteNombre      = agenteNombre.trim();
+
+        System.out.println("✓ Sesión iniciada: " + agenteNombre + " (id=" + agenteId + ")");
+    }
+
+    public static int    getAgenteId()     { return agenteId; }
+    public static String getAgenteNombre() { return agenteNombre; }
 
     // ═══════════════════════════════════════════════════════════════
     // RESOLVERS INTERNOS
@@ -270,22 +309,37 @@ public class Conexion {
 
     /** Devuelve el id (INT) de un cliente dado su dni_nif, o -1 si no existe */
     private static int resolverClienteId(String dniNif) throws Exception {
-        JsonArray arr = getArray("clientes?dni_nif=eq." + enc(dniNif) + "&select=id");
-        if (arr.size() > 0) return arr.get(0).getAsJsonObject().get("id").getAsInt();
+        JsonArray arr = getArray("clientes?search=" + enc(dniNif));
+        for (JsonElement el : arr) {
+            JsonObject obj = el.getAsJsonObject();
+            if (dniNif.equalsIgnoreCase(str(obj, "dni_nif"))) {
+                return intVal(obj, "id");
+            }
+        }
         return -1;
     }
 
     /** Devuelve el VIN de un coche dado su matrícula, o null si no existe */
     private static String resolverVin(String matricula) throws Exception {
-        JsonArray arr = getArray("coches?matricula=eq." + enc(matricula) + "&select=vin");
-        if (arr.size() > 0) return str(arr.get(0).getAsJsonObject(), "vin");
+        JsonArray arr = getArray("coches");
+        for (JsonElement el : arr) {
+            JsonObject obj = el.getAsJsonObject();
+            if (matricula.equalsIgnoreCase(str(obj, "matricula"))) {
+                return str(obj, "vin");
+            }
+        }
         return null;
     }
 
     /** Obtiene (o crea) una marca por nombre; devuelve su id */
     private static int obtenerOCrearMarca(String nombre) throws Exception {
-        JsonArray arr = getArray("marcas?nombre=eq." + enc(nombre) + "&select=id");
-        if (arr.size() > 0) return arr.get(0).getAsJsonObject().get("id").getAsInt();
+        JsonArray arr = getArray("marcas");
+        for (JsonElement el : arr) {
+            JsonObject obj = el.getAsJsonObject();
+            if (nombre.equalsIgnoreCase(str(obj, "nombre"))) {
+                return intVal(obj, "id");
+            }
+        }
         JsonObject body = new JsonObject();
         body.addProperty("nombre", nombre);
         return postReturnId("marcas", body.toString());
@@ -293,55 +347,81 @@ public class Conexion {
 
     /** Obtiene (o crea) un modelo por nombre + marcaId; devuelve su id */
     private static int obtenerOCrearModelo(String nombre, int marcaId) throws Exception {
-        JsonArray arr = getArray("modelos?nombre=eq." + enc(nombre)
-                + "&marca_id=eq." + marcaId + "&select=id");
-        if (arr.size() > 0) return arr.get(0).getAsJsonObject().get("id").getAsInt();
+        JsonArray arr = getArray("modelos?marca_id=" + marcaId);
+        for (JsonElement el : arr) {
+            JsonObject obj = el.getAsJsonObject();
+            if (nombre.equalsIgnoreCase(str(obj, "nombre"))) {
+                return intVal(obj, "id");
+            }
+        }
         JsonObject body = new JsonObject();
         body.addProperty("nombre",   nombre);
         body.addProperty("marca_id", marcaId);
         return postReturnId("modelos", body.toString());
     }
 
-    /** Extrae [marca, modelo] de un JsonObject con modelos(marcas) embebido */
+    /** Extrae [marca, modelo] del objeto coche con el shape de la API propia */
     private static String[] extractMarcaModelo(JsonObject obj) {
         String marca = "", modelo = "";
-        JsonElement modEl = obj.get("modelos");
-        if (modEl != null && !modEl.isJsonNull()) {
+        JsonElement modEl = obj.get("modelo");
+        if (modEl != null && !modEl.isJsonNull() && modEl.isJsonObject()) {
             JsonObject mod = modEl.getAsJsonObject();
             modelo = str(mod, "nombre");
-            JsonElement marcaEl = mod.get("marcas");
-            if (marcaEl != null && !marcaEl.isJsonNull()) {
+            JsonElement marcaEl = mod.get("marca");
+            if (marcaEl != null && !marcaEl.isJsonNull() && marcaEl.isJsonObject()) {
                 marca = str(marcaEl.getAsJsonObject(), "nombre");
             }
         }
         return new String[]{marca, modelo};
     }
 
-    /** Construye un CocheCompleto desde un JsonObject con relaciones embebidas */
-    private static CocheCompleto cocheCompletoFromJson(JsonObject obj) {
-        String[] mm    = extractMarcaModelo(obj);
-        boolean dispon = intVal(obj, "estado_id") == ESTADO_DISPONIBLE_ID;
+    /** Determina si el estado del coche es "Disponible" */
+    private static boolean esDisponible(JsonObject obj) {
+        JsonElement estEl = obj.get("estado");
+        if (estEl != null && !estEl.isJsonNull() && estEl.isJsonObject()) {
+            return intVal(estEl.getAsJsonObject(), "id") == ESTADO_DISPONIBLE_ID;
+        }
+        return intVal(obj, "estado_id") == ESTADO_DISPONIBLE_ID;
+    }
 
+    /**
+     * Parsea detalles_interiores, que la API devuelve como string serializado JSON.
+     * Devuelve [diseñoLlantas, diametroLlantas, diseñoInterior, materialInterior].
+     */
+    private static String[] parseDetalles(JsonObject obj) {
         String disenoL = "", disenoInt = "", material = "";
-        int diametro   = 0;
+        int diametro = 0;
         JsonElement detEl = obj.get("detalles_interiores");
         if (detEl != null && !detEl.isJsonNull()) {
-            JsonObject det = detEl.getAsJsonObject();
-            disenoL   = str(det, "diseño_llantas");
-            diametro  = intVal(det, "diametro_llantas");
-            disenoInt = str(det, "diseño_interior");
-            material  = str(det, "material_interior");
+            String detStr = detEl.isJsonPrimitive() ? detEl.getAsString() : detEl.toString();
+            try {
+                JsonObject det = JsonParser.parseString(detStr).getAsJsonObject();
+                disenoL   = str(det, "diseño_llantas");
+                diametro  = intVal(det, "diametro_llantas");
+                disenoInt = str(det, "diseño_interior");
+                material  = str(det, "material_interior");
+            } catch (Exception e) {
+                disenoL = detStr; // texto plano: guardar tal cual
+            }
         }
+        return new String[]{disenoL, String.valueOf(diametro), disenoInt, material};
+    }
+
+    /** Construye un CocheCompleto desde un JsonObject de la API */
+    private static CocheCompleto cocheCompletoFromJson(JsonObject obj) {
+        String[] mm  = extractMarcaModelo(obj);
+        boolean disp = esDisponible(obj);
+        String[] det = parseDetalles(obj);
 
         return new CocheCompleto(
                 str(obj, "vin"), mm[0], mm[1],
                 intVal(obj, "anio"),
                 dblVal(obj, "kilometraje"),
-                dispon, dispon,
+                disp, disp,
                 dblVal(obj, "precio_venta_base"),
                 str(obj, "color"),
-                disenoL, diametro,
-                disenoInt, material,
+                det[0], parseIntSafe(det[1], 0),
+                det[2], det[3],
                 str(obj, "matricula"));
     }
 
@@ -353,12 +433,14 @@ public class Conexion {
         ObservableList<Cliente> lista = FXCollections.observableArrayList();
         if (!isConexionActiva()) { System.err.println("Sin conexión activa"); return lista; }
         try {
-            JsonArray arr = getArray("clientes?select=nombre,apellidos,dni_nif,telefono,email,direccion&order=apellidos");
+            JsonArray arr = getArray("clientes");
             for (JsonElement el : arr) {
                 JsonObject obj = el.getAsJsonObject();
                 long tel = parseLongSafe(str(obj, "telefono"), 0L);
-                lista.add(new Cliente(str(obj, "nombre"), str(obj, "apellidos"),
-                        str(obj, "dni_nif"), tel, str(obj, "email"), str(obj, "direccion")));
+                Cliente c = new Cliente(str(obj, "nombre"), str(obj, "apellidos"),
+                        str(obj, "dni_nif"), tel, str(obj, "email"), str(obj, "direccion"));
+                c.setId(intVal(obj, "id"));
+                lista.add(c);
             }
         } catch (Exception e) {
             System.err.println("Error al mostrar clientes: " + e.getMessage());
@@ -370,13 +452,15 @@ public class Conexion {
         List<Cliente> lista = new ArrayList<>();
         if (!isConexionActiva()) { System.err.println("Sin conexión activa"); return lista; }
         try {
-            JsonArray arr = getArray("clientes?dni_nif=eq." + enc(dni)
-                    + "&select=nombre,apellidos,dni_nif,telefono,email,direccion");
+            JsonArray arr = getArray("clientes?search=" + enc(dni));
             for (JsonElement el : arr) {
                 JsonObject obj = el.getAsJsonObject();
+                if (!dni.equalsIgnoreCase(str(obj, "dni_nif"))) continue;
                 long tel = parseLongSafe(str(obj, "telefono"), 0L);
-                lista.add(new Cliente(str(obj, "nombre"), str(obj, "apellidos"),
-                        str(obj, "dni_nif"), tel, str(obj, "email"), str(obj, "direccion")));
+                Cliente c = new Cliente(str(obj, "nombre"), str(obj, "apellidos"),
+                        str(obj, "dni_nif"), tel, str(obj, "email"), str(obj, "direccion"));
+                c.setId(intVal(obj, "id"));
+                lista.add(c);
             }
         } catch (Exception e) {
             System.err.println("Error al buscar cliente: " + e.getMessage());
@@ -399,67 +483,6 @@ public class Conexion {
             throw new Exception("Error al crear cliente: " + resp.body());
         }
         System.out.println("✓ Cliente creado");
-
-        crearUsuarioAuth(email, dni);
-    }
-
-    private static void crearUsuarioAuth(String email, String password) throws Exception {
-        if (serviceKey == null || serviceKey.isBlank() || serviceKey.equals("PEGA_AQUI_TU_SERVICE_ROLE_KEY")) {
-            System.err.println("⚠ supabase.service_key no configurada — usuario Auth no creado");
-            return;
-        }
-
-        JsonObject body = new JsonObject();
-        body.addProperty("email",         email);
-        body.addProperty("password",      password);
-        body.addProperty("email_confirm", true);
-
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/auth/v1/admin/users"))
-                .header("apikey",        serviceKey)
-                .header("Authorization", "Bearer " + serviceKey)
-                .header("Content-Type",  "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
-                .build();
-
-        HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
-        if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
-            System.out.println("✓ Usuario Auth creado: " + email);
-        } else if (resp.statusCode() == 422) {
-            System.out.println("→ Usuario Auth ya existe, omitido: " + email);
-        } else {
-            System.err.println("✗ Error al crear usuario Auth: " + resp.body());
-            throw new Exception("Error al registrar usuario en Auth: " + resp.body());
-        }
-    }
-
-    /** Registra en Supabase Auth todos los clientes de la BD que aún no tengan cuenta. */
-    public static void migrarClientesExistentesAAuth() {
-        if (serviceKey == null || serviceKey.isBlank() || serviceKey.equals("PEGA_AQUI_TU_SERVICE_ROLE_KEY")) {
-            System.err.println("⚠ supabase.service_key no configurada — migración Auth omitida");
-            return;
-        }
-        System.out.println("→ Iniciando migración de clientes existentes a Auth...");
-        try {
-            JsonArray arr = getArray("clientes?select=email,dni_nif");
-            int ok = 0, omitidos = 0;
-            for (JsonElement el : arr) {
-                JsonObject obj = el.getAsJsonObject();
-                String email = str(obj, "email");
-                String dni   = str(obj, "dni_nif");
-                if (email.isBlank() || dni.isBlank()) continue;
-                try {
-                    crearUsuarioAuth(email, dni);
-                    ok++;
-                } catch (Exception e) {
-                    System.err.println("  ✗ " + email + ": " + e.getMessage());
-                    omitidos++;
-                }
-            }
-            System.out.println("✓ Migración completada: " + ok + " creados, " + omitidos + " con error");
-        } catch (Exception e) {
-            System.err.println("✗ Error en migración Auth: " + e.getMessage());
-        }
     }
 
     public static void editarCliente(Cliente c) {
@@ -471,7 +494,7 @@ public class Conexion {
         body.addProperty("direccion", c.getDireccion());
 
         try {
-            HttpResponse<String> resp = patch("clientes?dni_nif=eq." + enc(c.getDni()), body.toString());
+            HttpResponse<String> resp = put("clientes/" + c.getId(), body.toString());
             if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
                 System.out.println("✓ Cliente actualizado");
             } else {
@@ -484,7 +507,7 @@ public class Conexion {
 
     public static void eliminarCliente(Cliente c) {
         try {
-            HttpResponse<String> resp = delete("clientes?dni_nif=eq." + enc(c.getDni()));
+            HttpResponse<String> resp = delete("clientes/" + c.getId());
             if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
                 System.out.println("✓ Cliente eliminado");
             } else {
@@ -503,28 +526,19 @@ public class Conexion {
         ObservableList<Coche> lista = FXCollections.observableArrayList();
         if (!isConexionActiva()) { System.err.println("Sin conexión activa"); return lista; }
         try {
-            JsonArray arr = getArray("coches?select=vin,anio,kilometraje,precio_venta_base,"
-                    + "color,matricula,detalles_interiores,modelos(nombre,marcas(nombre))");
+            JsonArray arr = getArray("coches");
             for (JsonElement el : arr) {
                 JsonObject obj = el.getAsJsonObject();
-                String[] mm = extractMarcaModelo(obj);
-
-                String diseño = "", diametro = "";
-                JsonElement detEl = obj.get("detalles_interiores");
-                if (detEl != null && !detEl.isJsonNull()) {
-                    JsonObject det = detEl.getAsJsonObject();
-                    diseño = str(det, "diseño_llantas");
-                    JsonElement dEl = det.get("diametro_llantas");
-                    if (dEl != null && !dEl.isJsonNull()) diametro = dEl.getAsString();
-                }
+                String[] mm  = extractMarcaModelo(obj);
+                String[] det = parseDetalles(obj);
 
                 lista.add(new Coche(
                         mm[0], mm[1], str(obj, "matricula"),
-                        str(obj, "anio"),
+                        String.valueOf(intVal(obj, "anio")),
                         dblVal(obj, "kilometraje") + " Km",
                         str(obj, "vin"),
                         dblVal(obj, "precio_venta_base") + "",
-                        diseño, diametro, str(obj, "color")));
+                        det[0], det[1], str(obj, "color")));
             }
         } catch (Exception e) {
             System.err.println("Error al mostrar coches: " + e.getMessage());
@@ -536,7 +550,7 @@ public class Conexion {
         List<String> lista = new ArrayList<>();
         if (!isConexionActiva()) { System.err.println("Sin conexión activa"); return lista; }
         try {
-            JsonArray arr = getArray("marcas?select=nombre&order=nombre");
+            JsonArray arr = getArray("marcas");
             for (JsonElement el : arr) {
                 String nombre = str(el.getAsJsonObject(), "nombre");
                 if (!nombre.isEmpty()) lista.add(nombre);
@@ -551,11 +565,19 @@ public class Conexion {
         List<String> lista = new ArrayList<>();
         if (!isConexionActiva()) { System.err.println("Sin conexión activa"); return lista; }
         try {
-            JsonArray marcaArr = getArray("marcas?nombre=eq." + enc(marca) + "&select=id");
-            if (marcaArr.size() == 0) return lista;
-            int marcaId = marcaArr.get(0).getAsJsonObject().get("id").getAsInt();
+            // Resolver marca_id filtrando client-side
+            JsonArray marcaArr = getArray("marcas");
+            int marcaId = -1;
+            for (JsonElement el : marcaArr) {
+                JsonObject obj = el.getAsJsonObject();
+                if (marca.equalsIgnoreCase(str(obj, "nombre"))) {
+                    marcaId = intVal(obj, "id");
+                    break;
+                }
+            }
+            if (marcaId == -1) return lista;
 
-            JsonArray arr = getArray("modelos?marca_id=eq." + marcaId + "&select=nombre&order=nombre");
+            JsonArray arr = getArray("modelos?marca_id=" + marcaId);
             for (JsonElement el : arr) {
                 String nombre = str(el.getAsJsonObject(), "nombre");
                 if (!nombre.isEmpty()) lista.add(nombre);
@@ -569,25 +591,14 @@ public class Conexion {
     public static ObservableList<Disponible> mostrarCoincidencias(String marca) {
         ObservableList<Disponible> lista = FXCollections.observableArrayList();
         try {
-            JsonArray marcaArr = getArray("marcas?nombre=eq." + enc(marca) + "&select=id");
-            if (marcaArr.size() == 0) return lista;
-            int marcaId = marcaArr.get(0).getAsJsonObject().get("id").getAsInt();
-
-            JsonArray modArr = getArray("modelos?marca_id=eq." + marcaId + "&select=id");
-            if (modArr.size() == 0) return lista;
-            StringBuilder ids = new StringBuilder();
-            for (JsonElement el : modArr) {
-                if (ids.length() > 0) ids.append(",");
-                ids.append(el.getAsJsonObject().get("id").getAsInt());
-            }
-
-            JsonArray arr = getArray("coches?modelo_id=in.(" + ids
-                    + ")&select=anio,precio_alquiler_dia,color,matricula,estado_id");
+            JsonArray arr = getArray("coches");
             for (JsonElement el : arr) {
                 JsonObject obj = el.getAsJsonObject();
-                boolean disponible = intVal(obj, "estado_id") == ESTADO_DISPONIBLE_ID;
+                String[] mm = extractMarcaModelo(obj);
+                if (!marca.equalsIgnoreCase(mm[0])) continue;
+                boolean disponible = esDisponible(obj);
                 lista.add(new Disponible(
-                        str(obj, "anio"), str(obj, "color"),
+                        String.valueOf(intVal(obj, "anio")), str(obj, "color"),
                         disponible ? "Si" : "No",
                         dblVal(obj, "precio_alquiler_dia") + "",
                         str(obj, "matricula")));
@@ -601,22 +612,15 @@ public class Conexion {
     public static ObservableList<Disponible> mostrarCoincidencias(String marca, String modelo) {
         ObservableList<Disponible> lista = FXCollections.observableArrayList();
         try {
-            JsonArray marcaArr = getArray("marcas?nombre=eq." + enc(marca) + "&select=id");
-            if (marcaArr.size() == 0) return lista;
-            int marcaId = marcaArr.get(0).getAsJsonObject().get("id").getAsInt();
-
-            JsonArray modArr = getArray("modelos?marca_id=eq." + marcaId
-                    + "&nombre=eq." + enc(modelo) + "&select=id");
-            if (modArr.size() == 0) return lista;
-            int modeloId = modArr.get(0).getAsJsonObject().get("id").getAsInt();
-
-            JsonArray arr = getArray("coches?modelo_id=eq." + modeloId
-                    + "&select=anio,precio_alquiler_dia,color,matricula,estado_id");
+            JsonArray arr = getArray("coches");
             for (JsonElement el : arr) {
                 JsonObject obj = el.getAsJsonObject();
-                boolean disponible = intVal(obj, "estado_id") == ESTADO_DISPONIBLE_ID;
+                String[] mm = extractMarcaModelo(obj);
+                if (!marca.equalsIgnoreCase(mm[0])) continue;
+                if (!modelo.equalsIgnoreCase(mm[1])) continue;
+                boolean disponible = esDisponible(obj);
                 lista.add(new Disponible(
-                        str(obj, "anio"), str(obj, "color"),
+                        String.valueOf(intVal(obj, "anio")), str(obj, "color"),
                         disponible ? "Si" : "No",
                         dblVal(obj, "precio_alquiler_dia") + "",
                         str(obj, "matricula")));
@@ -639,60 +643,25 @@ public class Conexion {
         if (!isConexionActiva()) { System.err.println("Sin conexión activa"); return lista; }
 
         try {
-            StringBuilder query = new StringBuilder(
-                    "coches?estado_id=eq." + ESTADO_DISPONIBLE_ID
-                    + "&select=vin,anio,precio_venta_base,color,matricula,"
-                    + "detalles_interiores,modelos(nombre,marcas(nombre))");
-
-            if (marca != null && !marca.isBlank() && !marca.equals("Marca")) {
-                JsonArray marcaArr = getArray("marcas?nombre=eq." + enc(marca) + "&select=id");
-                if (marcaArr.size() == 0) return lista;
-                int marcaId = marcaArr.get(0).getAsJsonObject().get("id").getAsInt();
-
-                if (modelo != null && !modelo.isBlank()) {
-                    JsonArray modArr = getArray("modelos?marca_id=eq." + marcaId
-                            + "&nombre=eq." + enc(modelo) + "&select=id");
-                    if (modArr.size() == 0) return lista;
-                    int modeloId = modArr.get(0).getAsJsonObject().get("id").getAsInt();
-                    query.append("&modelo_id=eq.").append(modeloId);
-                } else {
-                    JsonArray modArr = getArray("modelos?marca_id=eq." + marcaId + "&select=id");
-                    if (modArr.size() == 0) return lista;
-                    StringBuilder ids = new StringBuilder();
-                    for (JsonElement el : modArr) {
-                        if (ids.length() > 0) ids.append(",");
-                        ids.append(el.getAsJsonObject().get("id").getAsInt());
-                    }
-                    query.append("&modelo_id=in.(").append(ids).append(")");
-                }
-            }
-
-            if (color != null && !color.isBlank() && !color.equals("Color")) {
-                query.append("&color=eq.").append(enc(color));
-            }
-
-            JsonArray arr = getArray(query.toString());
+            JsonArray arr = getArray("coches/disponibles");
             for (JsonElement el : arr) {
                 JsonObject obj = el.getAsJsonObject();
-                String[] mm = extractMarcaModelo(obj);
+                String[] mm  = extractMarcaModelo(obj);
+                String[] det = parseDetalles(obj);
 
-                String diseñoR = "", diametroL = "", interior = "", material = "";
-                JsonElement detEl = obj.get("detalles_interiores");
-                if (detEl != null && !detEl.isJsonNull()) {
-                    JsonObject det = detEl.getAsJsonObject();
-                    diseñoR  = str(det, "diseño_llantas");
-                    JsonElement dEl = det.get("diametro_llantas");
-                    if (dEl != null && !dEl.isJsonNull()) diametroL = dEl.getAsString();
-                    interior = str(det, "diseño_interior");
-                    material = str(det, "material_interior");
-                }
+                if (marca != null && !marca.isBlank() && !marca.equals("Marca")
+                        && !marca.equalsIgnoreCase(mm[0])) continue;
+                if (modelo != null && !modelo.isBlank()
+                        && !modelo.equalsIgnoreCase(mm[1])) continue;
+                if (color != null && !color.isBlank() && !color.equals("Color")
+                        && !color.equalsIgnoreCase(str(obj, "color"))) continue;
 
                 lista.add(new CocheCompra(
-                        mm[0], mm[1], str(obj, "anio"),
+                        mm[0], mm[1], String.valueOf(intVal(obj, "anio")),
                         dblVal(obj, "precio_venta_base") + "",
-                        str(obj, "color"), diseñoR,
-                        str(obj, "matricula"), diametroL,
-                        interior, material));
+                        str(obj, "color"), det[0],
+                        str(obj, "matricula"), det[1],
+                        det[2], det[3]));
             }
         } catch (Exception e) {
             System.err.println("Error en buscarCocheFlexible: " + e.getMessage());
@@ -717,7 +686,7 @@ public class Conexion {
             if (vin == null) { System.err.println("Matrícula no encontrada: " + matricula); return; }
             JsonObject body = new JsonObject();
             body.addProperty("estado_id", ESTADO_ALQUILADO_ID);
-            patch("coches?vin=eq." + enc(vin), body.toString());
+            put("coches/" + enc(vin), body.toString());
             System.out.println("✓ Coche marcado como alquilado");
         } catch (Exception e) {
             System.err.println("Error al actualizar estado alquilado: " + e.getMessage());
@@ -730,21 +699,22 @@ public class Conexion {
             if (vin == null) { System.err.println("Matrícula no encontrada: " + matricula); return; }
             JsonObject body = new JsonObject();
             body.addProperty("estado_id", ESTADO_DISPONIBLE_ID);
-            patch("coches?vin=eq." + enc(vin), body.toString());
+            put("coches/" + enc(vin), body.toString());
             System.out.println("✓ Coche liberado");
         } catch (Exception e) {
             System.err.println("Error al liberar coche: " + e.getMessage());
         }
     }
 
-    /** Marca un coche como vendido (estado_id = ESTADO_VENDIDO_ID) por matrícula. */
+    /** Marca un coche como vendido. La API ya lo hace automáticamente en POST /transacciones/venta,
+     *  pero este método lo mantiene disponible para uso directo. */
     public static void marcarComoVendido(String matricula) {
         try {
             String vin = resolverVin(matricula);
             if (vin == null) { System.err.println("Matrícula no encontrada: " + matricula); return; }
             JsonObject body = new JsonObject();
             body.addProperty("estado_id", ESTADO_VENDIDO_ID);
-            HttpResponse<String> resp = patch("coches?vin=eq." + enc(vin), body.toString());
+            HttpResponse<String> resp = put("coches/" + enc(vin), body.toString());
             if (resp.statusCode() >= 200 && resp.statusCode() < 300)
                 System.out.println("✓ Coche marcado como vendido");
             else
@@ -754,11 +724,10 @@ public class Conexion {
         }
     }
 
-    /** Devuelve el id de base de datos del cliente con el DNI/NIF indicado, o -1 si no existe. */
+    /** Devuelve el id numérico del cliente con el DNI/NIF indicado, o -1 si no existe. */
     public static int obtenerClienteIdPorDni(String dni) {
         try {
-            JsonArray arr = getArray("clientes?dni_nif=eq." + enc(dni) + "&select=id");
-            if (arr.size() > 0) return arr.get(0).getAsJsonObject().get("id").getAsInt();
+            return resolverClienteId(dni);
         } catch (Exception e) {
             System.err.println("Error al obtener id de cliente: " + e.getMessage());
         }
@@ -766,9 +735,7 @@ public class Conexion {
     }
 
     /**
-     * Registra una venta en la tabla transacciones.
-     * Los campos vin_coche y fecha_transaccion se resuelven/generan automáticamente.
-     * @param estadoPago "Pendiente" o "Pagado" (valor del ComboBox del diálogo)
+     * Registra una venta. La API cambia automáticamente el estado del coche a "Vendido".
      * @return el id generado de la transacción, o -1 si falla.
      */
     public static int registrarVenta(String matricula, int clienteId, double monto,
@@ -778,13 +745,13 @@ public class Conexion {
             if (vin == null) throw new Exception("Matrícula no encontrada: " + matricula);
 
             JsonObject body = new JsonObject();
-            body.addProperty("tipo_transaccion", "VENTA");
-            body.addProperty("vin_coche", vin);
-            body.addProperty("cliente_id", clienteId);
+            body.addProperty("vin_coche",   vin);
+            body.addProperty("cliente_id",  clienteId);
+            body.addProperty("empleado_id", agenteId > 0 ? agenteId : 1);
             body.addProperty("monto_total", monto);
             body.addProperty("estado_pago", estadoPago);
 
-            int id = postReturnId("transacciones", body.toString());
+            int id = postReturnId("transacciones/venta", body.toString());
             System.out.println("✓ Venta registrada con id=" + id);
             return id;
         } catch (Exception e) {
@@ -814,16 +781,16 @@ public class Conexion {
         detalles.addProperty("diametro_llantas",  parseIntSafe(diametroLlantas, 0));
 
         JsonObject body = new JsonObject();
-        body.addProperty("vin",                numBastidor);
-        body.addProperty("modelo_id",          modeloId);
-        body.addProperty("estado_id",          estadoId);
-        body.addProperty("anio",               parseIntSafe(año, 0));
-        body.addProperty("kilometraje",        parseDoubleSafe(kilometraje, 0.0));
-        body.addProperty("precio_venta_base",  parseDoubleSafe(precioBase, 0.0));
+        body.addProperty("vin",                 numBastidor);
+        body.addProperty("modelo_id",           modeloId);
+        body.addProperty("estado_id",           estadoId);
+        body.addProperty("anio",                parseIntSafe(año, 0));
+        body.addProperty("kilometraje",         parseDoubleSafe(kilometraje, 0.0));
+        body.addProperty("precio_venta_base",   parseDoubleSafe(precioBase, 0.0));
         body.addProperty("precio_alquiler_dia", parseDoubleSafe(precioBase, 0.0) / 100.0);
-        body.addProperty("color",              color);
-        body.add("detalles_interiores",        detalles);
-        body.addProperty("matricula",          matricula);
+        body.addProperty("color",               color);
+        body.addProperty("detalles_interiores", detalles.toString());
+        body.addProperty("matricula",           matricula);
 
         HttpResponse<String> resp = post("coches", body.toString());
         if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
@@ -837,27 +804,31 @@ public class Conexion {
                 false, false, 0.0, "", "", 0, "", "", "");
         if (!isConexionActiva()) return defecto;
         try {
-            JsonArray arr = getArray("coches?vin=eq." + enc(numBastidor)
-                    + "&select=*,modelos(nombre,marcas(nombre)),estados_vehiculo(descripcion)");
-            if (arr.size() == 0) return defecto;
-            return cocheCompletoFromJson(arr.get(0).getAsJsonObject());
+            HttpResponse<String> resp = get("coches/" + enc(numBastidor));
+            if (resp.statusCode() == 404) return defecto;
+            if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
+                return cocheCompletoFromJson(JsonParser.parseString(resp.body()).getAsJsonObject());
+            }
         } catch (Exception e) {
             System.err.println("Error al buscar ingreso: " + e.getMessage());
-            return defecto;
         }
+        return defecto;
     }
 
     public static CocheCompleto buscarCochePorMatricula(String matricula) {
         if (!isConexionActiva()) return null;
         try {
-            JsonArray arr = getArray("coches?matricula=eq." + enc(matricula)
-                    + "&select=*,modelos(nombre,marcas(nombre)),estados_vehiculo(descripcion)");
-            if (arr.size() == 0) return null;
-            return cocheCompletoFromJson(arr.get(0).getAsJsonObject());
+            String vin = resolverVin(matricula);
+            if (vin == null) return null;
+            HttpResponse<String> resp = get("coches/" + enc(vin));
+            if (resp.statusCode() == 404) return null;
+            if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
+                return cocheCompletoFromJson(JsonParser.parseString(resp.body()).getAsJsonObject());
+            }
         } catch (Exception e) {
             System.err.println("Error al buscar coche por matrícula: " + e.getMessage());
-            return null;
         }
+        return null;
     }
 
     public static void actualizarCoche(
@@ -877,16 +848,16 @@ public class Conexion {
         detalles.addProperty("diametro_llantas", parseIntSafe(diametroLlantas, 0));
 
         JsonObject body = new JsonObject();
-        body.addProperty("modelo_id",         modeloId);
-        body.addProperty("estado_id",         estadoId);
-        body.addProperty("anio",              parseIntSafe(año, 0));
-        body.addProperty("kilometraje",       parseDoubleSafe(kilometraje, 0.0));
-        body.addProperty("precio_venta_base", parseDoubleSafe(precioBase, 0.0));
-        body.addProperty("color",             color);
-        body.add("detalles_interiores",       detalles);
-        body.addProperty("matricula",         matricula);
+        body.addProperty("modelo_id",           modeloId);
+        body.addProperty("estado_id",           estadoId);
+        body.addProperty("anio",                parseIntSafe(año, 0));
+        body.addProperty("kilometraje",         parseDoubleSafe(kilometraje, 0.0));
+        body.addProperty("precio_venta_base",   parseDoubleSafe(precioBase, 0.0));
+        body.addProperty("color",               color);
+        body.addProperty("detalles_interiores", detalles.toString());
+        body.addProperty("matricula",           matricula);
 
-        HttpResponse<String> resp = patch("coches?vin=eq." + enc(numBastidor), body.toString());
+        HttpResponse<String> resp = put("coches/" + enc(numBastidor), body.toString());
         if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
             throw new Exception("Error al actualizar coche: " + resp.body());
         }
@@ -894,7 +865,7 @@ public class Conexion {
     }
 
     public static void borrarCoche(String numBastidor) throws Exception {
-        HttpResponse<String> resp = delete("coches?vin=eq." + enc(numBastidor));
+        HttpResponse<String> resp = delete("coches/" + enc(numBastidor));
         if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
             throw new Exception("Error al borrar coche: " + resp.body());
         }
@@ -909,27 +880,42 @@ public class Conexion {
         ObservableList<Alquiler> lista = FXCollections.observableArrayList();
         if (!isConexionActiva()) { System.err.println("Sin conexión activa"); return lista; }
         try {
-            JsonArray arr = getArray("transacciones?tipo_transaccion=eq.ALQUILER"
-                    + "&select=id,clientes(dni_nif),coches(matricula),"
-                    + "detalle_alquiler(fecha_inicio,fecha_fin_prevista)");
+            JsonArray arr = getArray("transacciones?tipo=ALQUILER");
             for (JsonElement el : arr) {
                 JsonObject obj = el.getAsJsonObject();
 
+                // Excluir alquileres cancelados
+                if ("Cancelado".equalsIgnoreCase(str(obj, "estado_pago"))) continue;
+
+                // DNI del cliente
                 String dni = "";
-                JsonElement cliEl = obj.get("clientes");
-                if (cliEl != null && !cliEl.isJsonNull()) dni = str(cliEl.getAsJsonObject(), "dni_nif");
+                JsonElement cliEl = obj.get("cliente");
+                if (cliEl != null && !cliEl.isJsonNull() && cliEl.isJsonObject()) {
+                    dni = str(cliEl.getAsJsonObject(), "dni_nif");
+                } else {
+                    JsonElement cidEl = obj.get("cliente_id");
+                    if (cidEl != null && !cidEl.isJsonNull()) dni = cidEl.getAsString();
+                }
 
+                // Matrícula del coche
                 String matricula = "";
-                JsonElement cocEl = obj.get("coches");
-                if (cocEl != null && !cocEl.isJsonNull()) matricula = str(cocEl.getAsJsonObject(), "matricula");
+                JsonElement cocEl = obj.get("coche");
+                if (cocEl != null && !cocEl.isJsonNull() && cocEl.isJsonObject()) {
+                    matricula = str(cocEl.getAsJsonObject(), "matricula");
+                }
 
+                // Fechas desde detalle_alquiler (objeto o array según respuesta)
                 Timestamp fechaRecogida = null, fechaDevolucion = null;
                 String hora = "";
                 JsonElement detEl = obj.get("detalle_alquiler");
-                if (detEl != null && !detEl.isJsonNull() && detEl.isJsonArray()) {
-                    JsonArray dets = detEl.getAsJsonArray();
-                    if (dets.size() > 0) {
-                        JsonObject det = dets.get(0).getAsJsonObject();
+                if (detEl != null && !detEl.isJsonNull()) {
+                    JsonObject det = null;
+                    if (detEl.isJsonObject()) {
+                        det = detEl.getAsJsonObject();
+                    } else if (detEl.isJsonArray() && detEl.getAsJsonArray().size() > 0) {
+                        det = detEl.getAsJsonArray().get(0).getAsJsonObject();
+                    }
+                    if (det != null) {
                         fechaRecogida   = parseTimestamp(str(det, "fecha_inicio"));
                         fechaDevolucion = parseTimestamp(str(det, "fecha_fin_prevista"));
                         if (fechaRecogida != null) {
@@ -951,37 +937,27 @@ public class Conexion {
             String estado, String empleado_id, String hora,
             String id_vehiculo, String cliente_id) throws Exception {
 
-        // 1. Resolver cliente_id (INT) desde DNI
         int clienteIntId = resolverClienteId(cliente_id);
         if (clienteIntId == -1) throw new Exception("Cliente no encontrado con DNI: " + cliente_id);
 
-        // 2. Resolver VIN desde matrícula
         String vin = resolverVin(id_vehiculo);
         if (vin == null) throw new Exception("Vehículo no encontrado con matrícula: " + id_vehiculo);
 
-        // 3. Insertar transaccion y obtener su id
-        JsonObject bodyTrans = new JsonObject();
-        bodyTrans.addProperty("tipo_transaccion", "ALQUILER");
-        bodyTrans.addProperty("vin_coche",        vin);
-        bodyTrans.addProperty("cliente_id",       clienteIntId);
-        bodyTrans.addProperty("empleado_id",      parseIntSafe(empleado_id, 1));
-        bodyTrans.addProperty("monto_total",      parseDoubleSafe(precio_total, 0.0));
-        bodyTrans.addProperty("estado_pago",      estado);
+        JsonObject body = new JsonObject();
+        body.addProperty("vin_coche",          vin);
+        body.addProperty("cliente_id",         clienteIntId);
+        body.addProperty("empleado_id",        agenteId > 0 ? agenteId : parseIntSafe(empleado_id, 1));
+        body.addProperty("monto_total",        parseDoubleSafe(precio_total, 0.0));
+        body.addProperty("estado_pago",        estado);
+        body.addProperty("fecha_inicio",       fecha);
+        body.addProperty("fecha_fin_prevista", fecha_fin);
+        body.addProperty("kilometraje_salida", 0);
 
-        int transaccionId = postReturnId("transacciones", bodyTrans.toString());
-
-        // 4. Insertar detalle_alquiler
-        JsonObject bodyDetalle = new JsonObject();
-        bodyDetalle.addProperty("transaccion_id",     transaccionId);
-        bodyDetalle.addProperty("fecha_inicio",       fecha + "T" + hora + ":00");
-        bodyDetalle.addProperty("fecha_fin_prevista", fecha_fin + "T00:00:00");
-        bodyDetalle.addProperty("fianza_depositada",  0);
-
-        HttpResponse<String> resp = post("detalle_alquiler", bodyDetalle.toString());
+        HttpResponse<String> resp = post("transacciones/alquiler", body.toString());
         if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
-            throw new Exception("Error al crear detalle_alquiler: " + resp.body());
+            throw new Exception("Error al crear alquiler: " + resp.body());
         }
-        System.out.println("✓ Alquiler creado (transaccion #" + transaccionId + ")");
+        System.out.println("✓ Alquiler creado");
     }
 
     public static void editarAlquiler(Timestamp fechaRecogida, String hora,
@@ -993,32 +969,60 @@ public class Conexion {
             int clienteId = resolverClienteId(dni);
             if (clienteId == -1) { System.err.println("Cliente no encontrado: " + dni); return; }
 
-            JsonArray tranArr = getArray("transacciones?vin_coche=eq." + enc(vin)
-                    + "&cliente_id=eq." + clienteId
-                    + "&tipo_transaccion=eq.ALQUILER&select=id");
-            if (tranArr.size() == 0) { System.err.println("Alquiler no encontrado"); return; }
-            int transId = tranArr.get(0).getAsJsonObject().get("id").getAsInt();
+            // Buscar el id de la transacción de alquiler activa para este coche y cliente
+            JsonArray tranArr = getArray("transacciones?tipo=ALQUILER&cliente_id=" + clienteId);
+            int transId = -1;
+            for (JsonElement el : tranArr) {
+                JsonObject obj = el.getAsJsonObject();
+                JsonElement cocEl = obj.get("coche");
+                if (cocEl != null && !cocEl.isJsonNull() && cocEl.isJsonObject()) {
+                    String vinTrans = str(cocEl.getAsJsonObject(), "vin");
+                    if (vin.equals(vinTrans)) {
+                        transId = intVal(obj, "id");
+                        break;
+                    }
+                }
+            }
+            if (transId == -1) { System.err.println("Alquiler no encontrado"); return; }
 
             JsonObject body = new JsonObject();
-            body.addProperty("fecha_inicio",       fmtTimestamp(fechaRecogida));
-            body.addProperty("fecha_fin_prevista", fmtTimestamp(fechaEntrega));
+            body.addProperty("fecha_inicio",       fmtDate(fechaRecogida));
+            body.addProperty("fecha_fin_prevista",  fmtDate(fechaEntrega));
 
-            patch("detalle_alquiler?transaccion_id=eq." + transId, body.toString());
+            put("transacciones/" + transId + "/fechas", body.toString());
             System.out.println("✓ Alquiler editado");
         } catch (Exception e) {
             System.err.println("Error al editar alquiler: " + e.getMessage());
         }
     }
 
+    /** Cancela un alquiler marcando su estado_pago como "Cancelado".
+     *  Nota: la API no expone DELETE para transacciones. */
     public static void eliminarAlquiler(String matricula) {
         try {
             String vin = resolverVin(matricula);
             if (vin == null) { System.err.println("Matrícula no encontrada: " + matricula); return; }
-            // ON DELETE CASCADE elimina automáticamente detalle_alquiler
-            delete("transacciones?vin_coche=eq." + enc(vin) + "&tipo_transaccion=eq.ALQUILER");
-            System.out.println("✓ Alquiler eliminado");
+
+            JsonArray arr = getArray("transacciones?tipo=ALQUILER");
+            int transId = -1;
+            for (JsonElement el : arr) {
+                JsonObject obj = el.getAsJsonObject();
+                JsonElement cocEl = obj.get("coche");
+                if (cocEl != null && !cocEl.isJsonNull() && cocEl.isJsonObject()) {
+                    if (vin.equals(str(cocEl.getAsJsonObject(), "vin"))) {
+                        transId = intVal(obj, "id");
+                        break;
+                    }
+                }
+            }
+            if (transId == -1) { System.err.println("Alquiler no encontrado para: " + matricula); return; }
+
+            JsonObject body = new JsonObject();
+            body.addProperty("estado_pago", "Cancelado");
+            put("transacciones/" + transId + "/pago", body.toString());
+            System.out.println("✓ Alquiler cancelado");
         } catch (Exception e) {
-            System.err.println("Error al eliminar alquiler: " + e.getMessage());
+            System.err.println("Error al cancelar alquiler: " + e.getMessage());
         }
     }
 
@@ -1029,11 +1033,11 @@ public class Conexion {
             int clienteId = resolverClienteId(dniCliente);
             if (clienteId == -1) return matriculas;
 
-            JsonArray arr = getArray("transacciones?cliente_id=eq." + clienteId + "&select=coches(matricula)");
+            JsonArray arr = getArray("clientes/" + clienteId + "/transacciones");
             for (JsonElement el : arr) {
                 JsonObject obj = el.getAsJsonObject();
-                JsonElement cocEl = obj.get("coches");
-                if (cocEl != null && !cocEl.isJsonNull()) {
+                JsonElement cocEl = obj.get("coche");
+                if (cocEl != null && !cocEl.isJsonNull() && cocEl.isJsonObject()) {
                     String mat = str(cocEl.getAsJsonObject(), "matricula");
                     if (!mat.isEmpty() && !matriculas.contains(mat)) matriculas.add(mat);
                 }
@@ -1042,5 +1046,62 @@ public class Conexion {
             System.err.println("Error al obtener matrículas del cliente: " + e.getMessage());
         }
         return matriculas;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // TRANSACCIONES - ESTADO DE PAGO
+    // ═══════════════════════════════════════════════════════════════
+
+    /**
+     * Devuelve todas las transacciones del tipo indicado ("VENTA" o "ALQUILER")
+     * cuyo estado_pago sea "Pendiente".
+     */
+    public static ObservableList<com.javafx.Model.Transaccion> obtenerTransaccionesPendientes(String tipo) {
+        ObservableList<com.javafx.Model.Transaccion> lista = FXCollections.observableArrayList();
+        if (!isConexionActiva()) return lista;
+        try {
+            JsonArray arr = getArray("transacciones?tipo=" + tipo + "&estado_pago=Pendiente");
+            for (JsonElement el : arr) {
+                JsonObject obj = el.getAsJsonObject();
+
+                int    id    = intVal(obj, "id");
+                String fecha = str(obj, "fecha_transaccion").replace("T", " ").replaceAll("\\..*$", "");
+                String monto = String.format("%.2f €", dblVal(obj, "monto_total"));
+                String estado = str(obj, "estado_pago");
+
+                String cliente = "";
+                if (obj.has("cliente") && !obj.get("cliente").isJsonNull()) {
+                    JsonObject c = obj.getAsJsonObject("cliente");
+                    cliente = str(c, "nombre") + " " + str(c, "apellidos");
+                }
+
+                String matricula = "";
+                if (obj.has("coche") && !obj.get("coche").isJsonNull()) {
+                    matricula = str(obj.getAsJsonObject("coche"), "matricula");
+                }
+
+                lista.add(new com.javafx.Model.Transaccion(id, tipo, fecha, cliente.trim(), matricula, monto, estado));
+            }
+        } catch (Exception e) {
+            System.err.println("Error al obtener transacciones pendientes: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    /**
+     * Actualiza el estado_pago de una transacción.
+     * @return true si la operación fue exitosa
+     */
+    public static boolean actualizarEstadoPago(int transaccionId, String nuevoEstado) {
+        if (!isConexionActiva()) return false;
+        try {
+            JsonObject body = new JsonObject();
+            body.addProperty("estado_pago", nuevoEstado);
+            HttpResponse<String> resp = put("transacciones/" + transaccionId + "/pago", body.toString());
+            return resp.statusCode() >= 200 && resp.statusCode() < 300;
+        } catch (Exception e) {
+            System.err.println("Error al actualizar estado de pago: " + e.getMessage());
+            return false;
+        }
     }
 }

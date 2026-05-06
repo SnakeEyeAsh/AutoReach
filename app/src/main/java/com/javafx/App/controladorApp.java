@@ -635,38 +635,57 @@ public class controladorApp implements Initializable {
 
     @FXML
     void IniciarSesion(ActionEvent event) {
-        if (txtUser.getText().equals(Datos.ADMIN.toString())
-                && txtContraseña.getText().equals(Datos.PASSWORD.toString())) {
-            mostrarPanel(panelRegistro);
-            btnAlquiler.setDisable(false);
-            btnIrAInicio.setDisable(false);
-            btnCerrarSesion.setDisable(false);
-            btnIrAIngreso.setDisable(false);
-            btnCompras.setDisable(false);
+        String user = txtUser.getText().trim();
+        String pass = txtContraseña.getText();
 
-            // Limpiar estilos de error si el login fue exitoso
-            txtUser.setStyle("");
-            txtContraseña.setStyle("");
-        } else {
-            // Aplicar efecto shake y borde rojo a los campos con contenido incorrecto
-            if (!txtUser.getText().equals(Datos.ADMIN.toString())) {
-                aplicarEfectoShake(txtUser);
-                aplicarEstiloError(txtUser);
-            } else {
-                // Limpiar estilo si el usuario es correcto
-                txtUser.setStyle("");
-            }
-
-            if (!txtContraseña.getText().equals(Datos.PASSWORD.toString())) {
-                aplicarEfectoShake(txtContraseña);
-                aplicarEstiloError(txtContraseña);
-            } else {
-                // Limpiar estilo si la contraseña es correcta
-                txtContraseña.setStyle("");
-            }
-
-            AlertaFallo.mostrar();
+        if (user.isEmpty()) {
+            aplicarEfectoShake(txtUser);
+            aplicarEstiloError(txtUser);
+            return;
         }
+        if (pass.isEmpty()) {
+            aplicarEfectoShake(txtContraseña);
+            aplicarEstiloError(txtContraseña);
+            return;
+        }
+
+        btnInicioSesion.setDisable(true);
+
+        new Thread(() -> {
+            try {
+                Conexion.login(user, pass);
+
+                javafx.application.Platform.runLater(() -> {
+                    txtUser.setStyle("");
+                    txtContraseña.setStyle("");
+                    txtContraseña.clear();
+                    btnInicioSesion.setDisable(false);
+
+                    mostrarPanel(panelRegistro);
+                    btnAlquiler.setDisable(false);
+                    btnIrAInicio.setDisable(false);
+                    btnCerrarSesion.setDisable(false);
+                    btnIrAIngreso.setDisable(false);
+                    btnCompras.setDisable(false);
+                });
+
+            } catch (Exception ex) {
+                System.err.println("[LOGIN ERROR] " + ex.getClass().getName() + ": " + ex.getMessage());
+                ex.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    btnInicioSesion.setDisable(false);
+                    aplicarEfectoShake(txtUser);
+                    aplicarEfectoShake(txtContraseña);
+                    aplicarEstiloError(txtUser);
+                    aplicarEstiloError(txtContraseña);
+                    AlertaEstilizada.mostrarAdvertencia(
+                        "Acceso denegado",
+                        "No se pudo iniciar sesión",
+                        ex.getMessage()
+                    );
+                });
+            }
+        }).start();
     }
 
     //////////////////////////// ---LOGIN
@@ -1287,12 +1306,12 @@ public class controladorApp implements Initializable {
 
         CocheCompra seleccionado = tblCochesCompra.getSelectionModel().getSelectedItem();
         if (seleccionado == null) {
-            AlertaEstilizada.crearAdvertencia("Sin selección", "Selecciona un vehículo",
+            AlertaEstilizada.mostrarAdvertencia("Sin selección", "Selecciona un vehículo",
                     "Debes seleccionar un coche de la tabla antes de comprar.");
             return;
         }
         if (!sesionActiva || cliente == null) {
-            AlertaEstilizada.crearAdvertencia("Sesión requerida", "Inicia sesión",
+            AlertaEstilizada.mostrarAdvertencia("Sesión requerida", "Inicia sesión",
                     "Debes iniciar sesión antes de realizar una compra.");
             return;
         }
@@ -1339,6 +1358,36 @@ public class controladorApp implements Initializable {
             "Próximamente",
             "Esta funcionalidad estará disponible en una versión futura"
         );
+    }
+
+    @FXML
+    void verPagosPendientesVenta(ActionEvent event) {
+        abrirVentanaPagos("VENTA");
+    }
+
+    @FXML
+    void verPagosPendientesAlquiler(ActionEvent event) {
+        abrirVentanaPagos("ALQUILER");
+    }
+
+    private void abrirVentanaPagos(String tipo) {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/ventanaPagos.fxml"));
+            javafx.scene.Parent root = loader.load();
+
+            controladorPagos ctrl = loader.getController();
+            ctrl.setTipo(tipo);
+
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle("Pagos pendientes — " + ("VENTA".equals(tipo) ? "Ventas" : "Alquileres"));
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.showAndWait();
+        } catch (java.io.IOException e) {
+            System.err.println("Error al abrir ventana de pagos: " + e.getMessage());
+        }
     }
 
     @FXML
