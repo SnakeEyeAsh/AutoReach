@@ -745,11 +745,11 @@ public class Conexion {
             if (vin == null) throw new Exception("Matrícula no encontrada: " + matricula);
 
             JsonObject body = new JsonObject();
-            body.addProperty("vin_coche",   vin);
-            body.addProperty("cliente_id",  clienteId);
-            body.addProperty("empleado_id", agenteId > 0 ? agenteId : 1);
+            body.addProperty("vin_coche",  vin);
+            body.addProperty("cliente_id", clienteId);
             body.addProperty("monto_total", monto);
             body.addProperty("estado_pago", estadoPago);
+            if (agenteId > 0) body.addProperty("agente_id", agenteId);
 
             int id = postReturnId("transacciones/venta", body.toString());
             System.out.println("✓ Venta registrada con id=" + id);
@@ -932,7 +932,8 @@ public class Conexion {
         return lista;
     }
 
-    public static void crearAlquiler(
+    /** Crea un alquiler y devuelve el id de la transacción generada. */
+    public static int crearAlquiler(
             String fecha, String fecha_fin, String precio_total, String precio_cuota,
             String estado, String empleado_id, String hora,
             String id_vehiculo, String cliente_id) throws Exception {
@@ -944,11 +945,11 @@ public class Conexion {
         if (vin == null) throw new Exception("Vehículo no encontrado con matrícula: " + id_vehiculo);
 
         JsonObject body = new JsonObject();
-        body.addProperty("vin_coche",          vin);
-        body.addProperty("cliente_id",         clienteIntId);
-        body.addProperty("empleado_id",        agenteId > 0 ? agenteId : parseIntSafe(empleado_id, 1));
-        body.addProperty("monto_total",        parseDoubleSafe(precio_total, 0.0));
-        body.addProperty("estado_pago",        estado);
+        body.addProperty("vin_coche",  vin);
+        body.addProperty("cliente_id", clienteIntId);
+        body.addProperty("monto_total", parseDoubleSafe(precio_total, 0.0));
+        body.addProperty("estado_pago", estado);
+        if (agenteId > 0) body.addProperty("agente_id", agenteId);
         body.addProperty("fecha_inicio",       fecha);
         body.addProperty("fecha_fin_prevista", fecha_fin);
         body.addProperty("kilometraje_salida", 0);
@@ -957,7 +958,9 @@ public class Conexion {
         if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
             throw new Exception("Error al crear alquiler: " + resp.body());
         }
-        System.out.println("✓ Alquiler creado");
+        int transId = JsonParser.parseString(resp.body()).getAsJsonObject().get("id").getAsInt();
+        System.out.println("✓ Alquiler creado id=" + transId);
+        return transId;
     }
 
     public static void editarAlquiler(Timestamp fechaRecogida, String hora,
@@ -1046,6 +1049,113 @@ public class Conexion {
             System.err.println("Error al obtener matrículas del cliente: " + e.getMessage());
         }
         return matriculas;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // DOCUMENTOS
+    // ═══════════════════════════════════════════════════════════════
+
+    /**
+     * Crea un documento asociado a una transacción.
+     * @param clienteId     id del cliente
+     * @param transaccionId id de la transacción
+     * @param tipo          CONTRATO_VENTA | CONTRATO_ALQUILER | FACTURA | PRESUPUESTO
+     * @param contenido     texto del documento
+     * @return id del documento creado, o -1 si falla
+     */
+    public static int crearDocumento(int clienteId, int transaccionId,
+                                     String tipo, String contenido) {
+        if (!isConexionActiva()) return -1;
+        try {
+            JsonObject body = new JsonObject();
+            body.addProperty("cliente_id",     clienteId);
+            body.addProperty("transaccion_id", transaccionId);
+            body.addProperty("tipo_documento", tipo);
+            body.addProperty("contenido",      contenido);
+            body.addProperty("estado_documento", "PENDIENTE_FIRMA");
+
+            HttpResponse<String> resp = post("documentos", body.toString());
+            if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
+                int id = JsonParser.parseString(resp.body()).getAsJsonObject().get("id").getAsInt();
+                System.out.println("✓ Documento creado id=" + id);
+                return id;
+            }
+            System.err.println("Error al crear documento: " + resp.statusCode() + " " + resp.body());
+        } catch (Exception e) {
+            System.err.println("Error al crear documento: " + e.getMessage());
+        }
+        return -1;
+    }
+
+    /** Devuelve documentos filtrados por tipo. Pasa null para no filtrar. */
+    public static ObservableList<com.javafx.Model.Documento> obtenerDocumentos(
+            String tipoDocumento, String estadoDocumento) {
+        ObservableList<com.javafx.Model.Documento> lista = FXCollections.observableArrayList();
+        if (!isConexionActiva()) return lista;
+        try {
+            StringBuilder path = new StringBuilder("documentos?");
+            if (tipoDocumento  != null) path.append("tipo_documento=").append(enc(tipoDocumento)).append("&");
+            if (estadoDocumento != null) path.append("estado_documento=").append(enc(estadoDocumento)).append("&");
+            String url = path.toString().replaceAll("[&?]$", "");
+
+            JsonArray arr = getArray(url);
+            for (JsonElement el : arr) {
+                JsonObject obj = el.getAsJsonObject();
+
+                int    id     = intVal(obj, "id");
+                String tipo   = str(obj, "tipo_documento");
+                String estado = str(obj, "estado_documento");
+                String fecha  = str(obj, "fecha_creacion").replace("T", " ").replaceAll("\\..*$", "");
+                String fFirma = str(obj, "fecha_firma");
+                if (!fFirma.isEmpty()) fFirma = fFirma.replace("T", " ").replaceAll("\\..*$", "");
+                String firmadoPor = str(obj, "firmado_por");
+
+                String clienteNom = "";
+                if (obj.has("cliente") && !obj.get("cliente").isJsonNull()) {
+                    JsonObject c = obj.getAsJsonObject("cliente");
+                    clienteNom = str(c, "nombre") + " " + str(c, "apellidos");
+                }
+
+                String transInfo = "";
+                if (obj.has("transaccion") && !obj.get("transaccion").isJsonNull()) {
+                    JsonObject t = obj.getAsJsonObject("transaccion");
+                    transInfo = "#" + intVal(t, "id") + " — " + str(t, "tipo_transaccion")
+                            + " — " + String.format("%.2f €", dblVal(t, "monto_total"));
+                }
+
+                lista.add(new com.javafx.Model.Documento(id, tipo, clienteNom.trim(),
+                        transInfo, fecha, estado, fFirma, firmadoPor));
+            }
+        } catch (Exception e) {
+            System.err.println("Error al obtener documentos: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    /** Firma un documento. */
+    public static boolean firmarDocumento(int documentoId, String firmadoPor) {
+        if (!isConexionActiva()) return false;
+        try {
+            JsonObject body = new JsonObject();
+            body.addProperty("firmado_por", firmadoPor);
+            HttpResponse<String> resp = put("documentos/" + documentoId + "/firmar", body.toString());
+            return resp.statusCode() >= 200 && resp.statusCode() < 300;
+        } catch (Exception e) {
+            System.err.println("Error al firmar documento: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /** Cancelación lógica de un documento. */
+    public static boolean cancelarDocumento(int documentoId) {
+        if (!isConexionActiva()) return false;
+        try {
+            HttpResponse<String> resp = delete("documentos/" + documentoId);
+            return resp.statusCode() >= 200 && resp.statusCode() < 300;
+        } catch (Exception e) {
+            System.err.println("Error al cancelar documento: " + e.getMessage());
+            return false;
+        }
     }
 
     // ═══════════════════════════════════════════════════════════════

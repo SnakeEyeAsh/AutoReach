@@ -24,6 +24,7 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.ArrayList;
 
@@ -65,6 +66,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -95,6 +97,17 @@ public class controladorApp implements Initializable {
     private boolean editandoAlquiler = false;
 
     private boolean sesionActiva = false;
+
+    // Backing lists para los ComboBox de modelo (evita acumular listeners)
+    private final ObservableList<String> modelosAlquilerData =
+            FXCollections.observableArrayList();
+    private final FilteredList<String> filteredModelosAlquiler =
+            new FilteredList<>(modelosAlquilerData, p -> true);
+
+    private final ObservableList<String> modelosCompraData =
+            FXCollections.observableArrayList();
+    private final FilteredList<String> filteredModelosCompra =
+            new FilteredList<>(modelosCompraData, p -> true);
 
     @FXML
     private TextField ingresoAño;
@@ -194,6 +207,9 @@ public class controladorApp implements Initializable {
 
     @FXML
     private ComboBox<String> cmbElegirModelo;
+
+    @FXML
+    private ComboBox<String> cmbEstadoPagoAlquiler;
 
     @FXML
     private ListView<Coche> listaCoincidencias;
@@ -442,7 +458,13 @@ public class controladorApp implements Initializable {
     private TextField txtApellidos;
 
     @FXML
-    private TextField txtContraseña;
+    private PasswordField pfContraseña;
+
+    @FXML
+    private TextField pfContraseñaVisible;
+
+    @FXML
+    private Button btnMostrarPass;
 
     @FXML
     private TextField txtDireccion;
@@ -591,9 +613,21 @@ public class controladorApp implements Initializable {
         configurarComboDni(); // Configurar ComboBox de DNI con filtrado
         btnEditarCoche.setDisable(true); // Deshabilitar btnEditarCoche inicialmente
 
+        // Sincronizar PasswordField y TextField del login
+        pfContraseña.textProperty().addListener((obs, o, n) -> {
+            if (!txtContraseñaVisible.getText().equals(n)) txtContraseñaVisible.setText(n);
+        });
+        txtContraseñaVisible.textProperty().addListener((obs, o, n) -> {
+            if (!pfContraseña.getText().equals(n)) pfContraseña.setText(n);
+        });
+
         // Deshabilitar ComboBox de modelo hasta que se seleccione una marca
         cmbElegirModelo.setDisable(true);
         cmbElegirModelo.setEditable(true);
+
+        // Estado de pago del alquiler
+        cmbEstadoPagoAlquiler.getItems().addAll("Pendiente", "Pagado");
+        cmbEstadoPagoAlquiler.getSelectionModel().selectFirst();
 
         // Deshabilitar ComboBox de modelo de compra hasta que se seleccione una marca
         cmbModeloCompra.setDisable(true);
@@ -634,9 +668,21 @@ public class controladorApp implements Initializable {
     /// - //////////////////////////////////////////////////////////////
 
     @FXML
+    void toggleMostrarPassword(ActionEvent event) {
+        boolean mostrar = !txtContraseñaVisible.isVisible();
+        txtContraseñaVisible.setVisible(mostrar);
+        txtContraseñaVisible.setManaged(mostrar);
+        pfContraseña.setVisible(!mostrar);
+        pfContraseña.setManaged(!mostrar);
+        btnMostrarPass.setText(mostrar ? "🔒" : "👁");
+        if (mostrar) txtContraseñaVisible.requestFocus();
+        else pfContraseña.requestFocus();
+    }
+
+    @FXML
     void IniciarSesion(ActionEvent event) {
         String user = txtUser.getText().trim();
-        String pass = txtContraseña.getText();
+        String pass = pfContraseña.getText();
 
         if (user.isEmpty()) {
             aplicarEfectoShake(txtUser);
@@ -644,8 +690,8 @@ public class controladorApp implements Initializable {
             return;
         }
         if (pass.isEmpty()) {
-            aplicarEfectoShake(txtContraseña);
-            aplicarEstiloError(txtContraseña);
+            aplicarEfectoShake(pfContraseña);
+            aplicarEstiloError(pfContraseña);
             return;
         }
 
@@ -657,8 +703,8 @@ public class controladorApp implements Initializable {
 
                 javafx.application.Platform.runLater(() -> {
                     txtUser.setStyle("");
-                    txtContraseña.setStyle("");
-                    txtContraseña.clear();
+                    pfContraseña.setStyle("");
+                    pfContraseña.clear();
                     btnInicioSesion.setDisable(false);
 
                     mostrarPanel(panelRegistro);
@@ -675,9 +721,9 @@ public class controladorApp implements Initializable {
                 javafx.application.Platform.runLater(() -> {
                     btnInicioSesion.setDisable(false);
                     aplicarEfectoShake(txtUser);
-                    aplicarEfectoShake(txtContraseña);
+                    aplicarEfectoShake(pfContraseña);
                     aplicarEstiloError(txtUser);
-                    aplicarEstiloError(txtContraseña);
+                    aplicarEstiloError(pfContraseña);
                     AlertaEstilizada.mostrarAdvertencia(
                         "Acceso denegado",
                         "No se pudo iniciar sesión",
@@ -1040,25 +1086,69 @@ public class controladorApp implements Initializable {
                 }
 
                 long dias = ChronoUnit.DAYS.between(fecha, fechaFin);
-                // Parsing seguro del precio
                 double precioDia = Conexion.parseDoubleSafe(d.getPrecio(), 0.0);
                 double precioTotal = dias * precioDia;
-                String estado = "si".equalsIgnoreCase(d.getDisponible()) ? "en_proceso" : "pendiente";
+
+                String estadoPago = cmbEstadoPagoAlquiler.getSelectionModel().getSelectedItem();
+                if (estadoPago == null) estadoPago = "Pendiente";
+
+                // Confirmación con toda la info antes de registrar
+                String resumen = String.format(
+                    "Matrícula      : %s%n" +
+                    "Año / Color    : %s  /  %s%n" +
+                    "Cliente        : %s %s  (DNI: %s)%n" +
+                    "Fecha recogida : %s%n" +
+                    "Fecha entrega  : %s%n" +
+                    "Días           : %d%n" +
+                    "Precio/día     : %.2f €%n" +
+                    "Total          : %.2f €%n" +
+                    "Estado de pago : %s",
+                    d.getMatricula(),
+                    d.getAño(), d.getColor(),
+                    cliente.getNombre(), cliente.getApellidos(), cliente.getDni(),
+                    fecha, fechaFin,
+                    dias,
+                    precioDia,
+                    precioTotal,
+                    estadoPago
+                );
+
+                boolean confirmado = AlertaEstilizada.confirmar(
+                    "Confirmar alquiler",
+                    "¿Registrar el siguiente alquiler?",
+                    resumen
+                );
+                if (!confirmado) return;
 
                 if("si".equalsIgnoreCase(d.getDisponible())){
                     try {
-                        Conexion.crearAlquiler(
+                        int transId = Conexion.crearAlquiler(
                             fecha.toString(),
                             fechaFin.toString(),
                             precioTotal + "",
                             d.getPrecio(),
-                            estado,
+                            estadoPago,
                             1 + "",
                             txtHoraEntrega.getText(),
                             d.getMatricula(),
                             cliente.getDni());
 
                         Conexion.actualizarAlquilado(d.getMatricula());
+
+                        // Crear documento CONTRATO_ALQUILER siempre
+                        String contenido = "CONTRATO DE ALQUILER\n"
+                                + "====================\n"
+                                + "Transacción ID : " + transId + "\n"
+                                + "Vehículo       : " + d.getMatricula() + "\n"
+                                + "Cliente        : " + cliente.getNombre() + " " + cliente.getApellidos() + "\n"
+                                + "DNI            : " + cliente.getDni() + "\n"
+                                + "Fecha recogida : " + fecha + "\n"
+                                + "Fecha entrega  : " + fechaFin + "\n"
+                                + "Días           : " + dias + "\n"
+                                + "Monto total    : " + String.format("%.2f €", precioTotal) + "\n"
+                                + "Estado de pago : " + estadoPago + "\n"
+                                + "Pendiente de firma por el cliente y el agente.";
+                        Conexion.crearDocumento(cliente.getId(), transId, "CONTRATO_ALQUILER", contenido);
 
                         AlertaEstilizada.mostrarInformacion(
                             "Alquiler confirmado",
@@ -1125,8 +1215,12 @@ public class controladorApp implements Initializable {
                 mnElegirMarca.setDisable(false);
                 cmbElegirModelo.setDisable(false);
                 cldRecoger.getEditor().clear();
+                cldRecoger.setDisable(true);
                 txtHoraEntrega.clear();
+                txtHoraEntrega.setDisable(true);
                 cldEntrega.getEditor().clear();
+                cldEntrega.setDisable(true);
+                btnConirmarAlquiler.setDisable(true);
                 editandoAlquiler = false;
                 iniciarTablas();
             }
@@ -1137,11 +1231,17 @@ public class controladorApp implements Initializable {
     @FXML
     void cancelarAlquiler(ActionEvent event) {
         mnElegirMarca.setText("Marca");
+        mnElegirMarca.setDisable(false);
         cmbElegirModelo.getSelectionModel().clearSelection();
         TblCoincidencias.getItems().clear();
         cldRecoger.getEditor().clear();
+        cldRecoger.setDisable(true);
         txtHoraEntrega.clear();
+        txtHoraEntrega.setDisable(true);
         cldEntrega.getEditor().clear();
+        cldEntrega.setDisable(true);
+        btnConirmarAlquiler.setDisable(true);
+        editandoAlquiler = false;
     }
 
     @FXML
@@ -1174,13 +1274,19 @@ public class controladorApp implements Initializable {
         mnElegirMarca.setDisable(true);
         cmbElegirModelo.setDisable(true);
 
+        // Habilitar los campos editables aunque no haya coche seleccionado en la tabla
+        cldRecoger.setDisable(false);
+        cldEntrega.setDisable(false);
+        txtHoraEntrega.setDisable(false);
+        btnConirmarAlquiler.setDisable(false);
+
         Timestamp fechaR = a.getFechaRecogida();
         Timestamp fechaE = a.getFechaDevolucion();
         String hora = a.getHoraDevolucion();
 
-        cldRecoger.setValue(fechaR.toLocalDateTime().toLocalDate());
-        cldEntrega.setValue(fechaE.toLocalDateTime().toLocalDate());
-        txtHoraEntrega.setText(hora);
+        if (fechaR != null) cldRecoger.setValue(fechaR.toLocalDateTime().toLocalDate());
+        if (fechaE != null) cldEntrega.setValue(fechaE.toLocalDateTime().toLocalDate());
+        txtHoraEntrega.setText(hora != null ? hora : "");
 
         AlertaEstilizada.mostrarInformacion(
             "Modo edicion",
@@ -1368,6 +1474,36 @@ public class controladorApp implements Initializable {
     @FXML
     void verPagosPendientesAlquiler(ActionEvent event) {
         abrirVentanaPagos("ALQUILER");
+    }
+
+    @FXML
+    void verDocumentosVenta(ActionEvent event) {
+        abrirVentanaDocumentos("CONTRATO_VENTA");
+    }
+
+    @FXML
+    void verDocumentosAlquiler(ActionEvent event) {
+        abrirVentanaDocumentos("CONTRATO_ALQUILER");
+    }
+
+    private void abrirVentanaDocumentos(String tipo) {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/ventanaDocumentos.fxml"));
+            javafx.scene.Parent root = loader.load();
+
+            controladorDocumentos ctrl = loader.getController();
+            ctrl.setTipo(tipo);
+
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle("Documentos — " + ("CONTRATO_VENTA".equals(tipo) ? "Ventas" : "Alquileres"));
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.showAndWait();
+        } catch (java.io.IOException e) {
+            System.err.println("Error al abrir ventana de documentos: " + e.getMessage());
+        }
     }
 
     private void abrirVentanaPagos(String tipo) {
@@ -2394,70 +2530,57 @@ public class controladorApp implements Initializable {
     /**
      * Carga los modelos disponibles para una marca específica en el ComboBox
      */
+    private boolean modelosAlquilerListenersInit = false;
+    private final boolean[] actualizandoModelo = {false};
+
     private void cargarModelosPorMarca(String marca) {
-        // Limpiar selección anterior
         cmbElegirModelo.getSelectionModel().clearSelection();
         cmbElegirModelo.getEditor().clear();
 
-        // Obtener modelos de la marca seleccionada
-        List<String> modelos = Conexion.obtenerModelosPorMarca(marca);
+        // Actualizar datos — los listeners ya capturan esta misma instancia
+        modelosAlquilerData.setAll(Conexion.obtenerModelosPorMarca(marca));
+        filteredModelosAlquiler.setPredicate(p -> true);
 
-        // Crear lista filtrable con los modelos
-        FilteredList<String> filteredModelos = new FilteredList<>(
-            javafx.collections.FXCollections.observableArrayList(modelos),
-            p -> true
-        );
-
-        // Configurar el ComboBox con la lista filtrada
-        cmbElegirModelo.setItems(filteredModelos);
+        cmbElegirModelo.setItems(filteredModelosAlquiler);
         cmbElegirModelo.setEditable(true);
-        cmbElegirModelo.setDisable(false); // Habilitar el ComboBox
+        cmbElegirModelo.setDisable(false);
 
-        // Obtener el editor del ComboBox
+        if (modelosAlquilerListenersInit) return;
+        modelosAlquilerListenersInit = true;
+
         TextField txtComboModelo = cmbElegirModelo.getEditor();
 
-        // EventFilter: bloquear el espacio
         txtComboModelo.addEventFilter(KeyEvent.KEY_TYPED, event -> {
-            if (event.getCharacter().equals(" ")) {
-                event.consume();
-            }
+            if (event.getCharacter().equals(" ")) event.consume();
         });
 
-        final boolean[] actualizandoModelo = {false};
-
-        // Listener para filtrar mientras se escribe
         txtComboModelo.textProperty().addListener((obs, oldValue, newValue) -> {
             if (actualizandoModelo[0]) return;
             final String selected = cmbElegirModelo.getSelectionModel().getSelectedItem();
-
             if (newValue == null || newValue.trim().isEmpty()) {
                 actualizandoModelo[0] = true;
-                try { filteredModelos.setPredicate(p -> true); } finally { actualizandoModelo[0] = false; }
+                try { filteredModelosAlquiler.setPredicate(p -> true); } finally { actualizandoModelo[0] = false; }
                 cmbElegirModelo.hide();
                 return;
             }
-
             if (selected == null || !selected.equals(newValue)) {
                 actualizandoModelo[0] = true;
                 try {
-                    filteredModelos.setPredicate(p ->
+                    filteredModelosAlquiler.setPredicate(p ->
                         p.toLowerCase().startsWith(newValue.toLowerCase().trim()) ||
-                        p.toLowerCase().contains(newValue.toLowerCase().trim())
-                    );
+                        p.toLowerCase().contains(newValue.toLowerCase().trim()));
                 } finally { actualizandoModelo[0] = false; }
                 cmbElegirModelo.setVisibleRowCount(5);
                 cmbElegirModelo.show();
             } else {
                 actualizandoModelo[0] = true;
-                try { filteredModelos.setPredicate(p -> true); } finally { actualizandoModelo[0] = false; }
+                try { filteredModelosAlquiler.setPredicate(p -> true); } finally { actualizandoModelo[0] = false; }
             }
         });
 
-        // Listener para la selección - Ejecuta búsqueda automática
-        cmbElegirModelo.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        cmbElegirModelo.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue != null) {
                 txtComboModelo.positionCaret(txtComboModelo.getText().length());
-                // Ejecutar búsqueda automática
                 buscarCoincidenciasAutomatico();
             }
         });
@@ -2466,74 +2589,58 @@ public class controladorApp implements Initializable {
     /**
      * Carga los modelos disponibles para una marca específica en el ComboBox de compra
      */
+    private boolean modelosCompraListenersInit = false;
+    private final boolean[] actualizandoCompra = {false};
+
     private void cargarModelosPorMarcaCompra(String marca) {
-        // Limpiar selección anterior
         cmbModeloCompra.getSelectionModel().clearSelection();
         cmbModeloCompra.getEditor().clear();
 
-        // Obtener modelos de la marca seleccionada
-        List<String> modelos = Conexion.obtenerModelosPorMarca(marca);
+        modelosCompraData.setAll(Conexion.obtenerModelosPorMarca(marca));
+        filteredModelosCompra.setPredicate(p -> true);
 
-        // Crear lista filtrable con los modelos
-        FilteredList<String> filteredModelos = new FilteredList<>(
-            javafx.collections.FXCollections.observableArrayList(modelos),
-            p -> true
-        );
-
-        // Configurar el ComboBox con la lista filtrada
-        cmbModeloCompra.setItems(filteredModelos);
+        cmbModeloCompra.setItems(filteredModelosCompra);
         cmbModeloCompra.setEditable(true);
-        cmbModeloCompra.setDisable(false); // Habilitar el ComboBox
+        cmbModeloCompra.setDisable(false);
 
-        // Obtener el editor del ComboBox
+        if (modelosCompraListenersInit) return;
+        modelosCompraListenersInit = true;
+
         TextField txtComboModeloCompra = cmbModeloCompra.getEditor();
 
-        // EventFilter: bloquear el espacio
         txtComboModeloCompra.addEventFilter(KeyEvent.KEY_TYPED, event -> {
-            if (event.getCharacter().equals(" ")) {
-                event.consume();
-            }
+            if (event.getCharacter().equals(" ")) event.consume();
         });
 
-        // Flag para evitar el bucle infinito: setPredicate → texto cambia → listener → setPredicate
-        final boolean[] actualizando = {false};
-
-        // Listener para filtrar mientras se escribe
         txtComboModeloCompra.textProperty().addListener((obs, oldValue, newValue) -> {
-            if (actualizando[0]) return;
+            if (actualizandoCompra[0]) return;
             final String selected = cmbModeloCompra.getSelectionModel().getSelectedItem();
-
-            // Si está vacío, restaurar filtro y ocultar
             if (newValue == null || newValue.trim().isEmpty()) {
-                actualizando[0] = true;
-                try { filteredModelos.setPredicate(p -> true); } finally { actualizando[0] = false; }
+                actualizandoCompra[0] = true;
+                try { filteredModelosCompra.setPredicate(p -> true); } finally { actualizandoCompra[0] = false; }
                 cmbModeloCompra.hide();
                 return;
             }
-
-            // Si no hay nada seleccionado o se está escribiendo algo diferente
             if (selected == null || !selected.equals(newValue)) {
-                actualizando[0] = true;
+                actualizandoCompra[0] = true;
                 try {
-                    filteredModelos.setPredicate(p ->
+                    filteredModelosCompra.setPredicate(p ->
                         p.toLowerCase().startsWith(newValue.toLowerCase().trim()) ||
-                        p.toLowerCase().contains(newValue.toLowerCase().trim())
-                    );
-                } finally { actualizando[0] = false; }
+                        p.toLowerCase().contains(newValue.toLowerCase().trim()));
+                } finally { actualizandoCompra[0] = false; }
                 cmbModeloCompra.setVisibleRowCount(5);
                 cmbModeloCompra.show();
             } else {
-                actualizando[0] = true;
-                try { filteredModelos.setPredicate(p -> true); } finally { actualizando[0] = false; }
+                actualizandoCompra[0] = true;
+                try { filteredModelosCompra.setPredicate(p -> true); } finally { actualizandoCompra[0] = false; }
             }
         });
 
-        // Listener para la selección
-        cmbModeloCompra.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        cmbModeloCompra.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue != null) {
                 txtComboModeloCompra.positionCaret(txtComboModeloCompra.getText().length());
-                // Actualizar búsqueda automáticamente al seleccionar modelo
-                    }
+                actualizarTablaCochesCompra();
+            }
         });
     }
 

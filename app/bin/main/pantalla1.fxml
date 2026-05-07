@@ -176,13 +176,30 @@
                                style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;">
                            <VBox.margin><Insets bottom="4.0" /></VBox.margin>
                         </Label>
-                        <TextField fx:id="txtContraseña" prefHeight="36.0" prefWidth="236.0"
-                                   promptText="Introduce tu contraseña"
-                                   style="-fx-border-color: #D1D5DB; -fx-border-radius: 5;
-                                          -fx-background-radius: 5; -fx-padding: 5 10; -fx-font-size: 13;">
-                           <tooltip><Tooltip text="Introduce tu contraseña" /></tooltip>
+                        <HBox prefHeight="36.0" prefWidth="236.0" spacing="0">
                            <VBox.margin><Insets bottom="22.0" /></VBox.margin>
-                        </TextField>
+                           <StackPane HBox.hgrow="ALWAYS">
+                              <PasswordField fx:id="pfContraseña" prefHeight="36.0"
+                                             promptText="Introduce tu contraseña"
+                                             style="-fx-border-color: #D1D5DB; -fx-border-radius: 5 0 0 5;
+                                                    -fx-background-radius: 5 0 0 5; -fx-padding: 5 10; -fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Introduce tu contraseña" /></tooltip>
+                              </PasswordField>
+                              <TextField fx:id="txtContraseñaVisible" prefHeight="36.0"
+                                         promptText="Introduce tu contraseña"
+                                         visible="false" managed="false"
+                                         style="-fx-border-color: #D1D5DB; -fx-border-radius: 5 0 0 5;
+                                                -fx-background-radius: 5 0 0 5; -fx-padding: 5 10; -fx-font-size: 13;">
+                              </TextField>
+                           </StackPane>
+                           <Button fx:id="btnMostrarPass" text="👁" prefHeight="36.0" prefWidth="36.0"
+                                   onAction="#toggleMostrarPassword"
+                                   style="-fx-background-color: #E5E7EB; -fx-border-color: #D1D5DB;
+                                          -fx-border-radius: 0 5 5 0; -fx-background-radius: 0 5 5 0;
+                                          -fx-cursor: hand; -fx-font-size: 14;">
+                              <tooltip><Tooltip text="Mostrar / ocultar contraseña" /></tooltip>
+                           </Button>
+                        </HBox>
 
                         <Button fx:id="btnInicioSesion" defaultButton="true" mnemonicParsing="false"
                                 onAction="#IniciarSesion" prefHeight="38.0" prefWidth="236.0"
@@ -346,6 +363,14 @@
                         </TableView>
                         <HBox alignment="CENTER_RIGHT" spacing="10.0">
                            <children>
+                              <Button fx:id="btnDocumentosVenta" mnemonicParsing="false"
+                                      onAction="#verDocumentosVenta"
+                                      prefHeight="30.0" prefWidth="120.0" text="Documentos"
+                                      style="-fx-background-color: #6D28D9; -fx-text-fill: white;
+                                             -fx-font-weight: bold; -fx-background-radius: 4;
+                                             -fx-cursor: hand; -fx-font-size: 12;">
+                                 <tooltip><Tooltip text="Ver y gestionar documentos de ventas" /></tooltip>
+                              </Button>
                               <Button fx:id="btnPagosPendientesVenta" mnemonicParsing="false"
                                       onAction="#verPagosPendientesVenta"
                                       prefHeight="30.0" prefWidth="160.0" text="Pagos Pendientes"
@@ -621,6 +646,11 @@
                               <DatePicker fx:id="cldEntrega" disable="true" prefHeight="28.0" prefWidth="172.0">
                                  <tooltip><Tooltip text="Fecha de devolucion del vehiculo" /></tooltip>
                               </DatePicker>
+                              <Label text="Estado de pago" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                              <ComboBox fx:id="cmbEstadoPagoAlquiler" prefHeight="28.0" prefWidth="172.0"
+                                        style="-fx-font-size: 13;">
+                                 <tooltip><Tooltip text="Indica si el alquiler se abona ahora o queda pendiente" /></tooltip>
+                              </ComboBox>
                            </children>
                         </VBox>
                         <VBox prefHeight="324.0" prefWidth="488.0" spacing="8.0"
@@ -638,37 +668,50 @@
                                     <TableColumn fx:id="clnMatriculaAlq" prefWidth="115.0" text="Matrícula" />
                                  </columns>
                               </TableView>
+                              <!-- Fila 1: operaciones sobre el alquiler seleccionado -->
                               <HBox spacing="8.0">
                                  <children>
                                     <Button fx:id="btnConirmarAlquiler" mnemonicParsing="false" onAction="#confirmarAlquiler"
-                                            prefHeight="30.0" prefWidth="90.0" text="Confirmar" disable="true"
+                                            prefHeight="30.0" prefWidth="100.0" text="Confirmar" disable="true"
                                             style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
-                                                   -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+                                                   -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
                                        <tooltip><Tooltip text="Confirmar y registrar el alquiler" /></tooltip>
                                     </Button>
                                     <Button fx:id="btnEditarAlquiler" mnemonicParsing="false" onAction="#editarAlq"
-                                            prefHeight="30.0" prefWidth="70.0" text="Editar" disable="true"
+                                            prefHeight="30.0" prefWidth="80.0" text="Editar" disable="true"
                                             style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
-                                                   -fx-border-radius: 4; -fx-cursor: hand;">
+                                                   -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
                                        <tooltip><Tooltip text="Editar alquiler seleccionado" /></tooltip>
                                     </Button>
                                     <Button fx:id="btnBorrarAlq" mnemonicParsing="false" onAction="#borrarAlq"
-                                            prefHeight="30.0" prefWidth="70.0" text="Borrar" disable="true"
+                                            prefHeight="30.0" prefWidth="80.0" text="Borrar" disable="true"
                                             style="-fx-background-color: #DC2626; -fx-text-fill: white;
-                                                   -fx-background-radius: 4; -fx-cursor: hand;">
+                                                   -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
                                        <tooltip><Tooltip text="Eliminar alquiler seleccionado" /></tooltip>
                                     </Button>
                                     <Button fx:id="btnCancelarAlquiler" mnemonicParsing="false" onAction="#cancelarAlquiler"
-                                            prefHeight="30.0" prefWidth="75.0" text="Cancelar" disable="true"
+                                            prefHeight="30.0" prefWidth="85.0" text="Cancelar" disable="true"
                                             style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
-                                                   -fx-border-radius: 4; -fx-cursor: hand;">
+                                                   -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
                                        <tooltip><Tooltip text="Cancelar operacion actual" /></tooltip>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                              <!-- Fila 2: gestión de documentos y pagos -->
+                              <HBox spacing="8.0">
+                                 <children>
+                                    <Button fx:id="btnDocumentosAlquiler" mnemonicParsing="false"
+                                            onAction="#verDocumentosAlquiler"
+                                            prefHeight="30.0" prefWidth="140.0" text="Documentos"
+                                            style="-fx-background-color: #6D28D9; -fx-text-fill: white;
+                                                   -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                       <tooltip><Tooltip text="Ver y gestionar documentos de alquileres" /></tooltip>
                                     </Button>
                                     <Button fx:id="btnPagosPendientesAlquiler" mnemonicParsing="false"
                                             onAction="#verPagosPendientesAlquiler"
-                                            prefHeight="30.0" prefWidth="150.0" text="Pagos Pendientes"
+                                            prefHeight="30.0" prefWidth="160.0" text="Pagos Pendientes"
                                             style="-fx-background-color: #D97706; -fx-text-fill: white;
-                                                   -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+                                                   -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
                                        <tooltip><Tooltip text="Ver y gestionar alquileres pendientes de pago" /></tooltip>
                                     </Button>
                                  </children>

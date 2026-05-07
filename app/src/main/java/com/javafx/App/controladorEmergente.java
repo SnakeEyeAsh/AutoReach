@@ -109,6 +109,19 @@ public class controladorEmergente {
             return;
         }
 
+        // ── Crear documento CONTRATO_VENTA siempre ───────────────────
+        String contenido = "CONTRATO DE VENTA\n"
+                + "==================\n"
+                + "Transacción ID : " + transaccionId + "\n"
+                + "Vehículo       : " + coche.getMarca() + " " + coche.getModelo()
+                                     + " (" + coche.getAño() + ")\n"
+                + "Matrícula      : " + coche.getMatricula() + "\n"
+                + "Cliente        : " + clienteNombre + "\n"
+                + "Monto total    : " + String.format("%.2f €", monto) + "\n"
+                + "Estado de pago : " + estadoPago + "\n"
+                + "Pendiente de firma por el cliente y el agente.";
+        Conexion.crearDocumento(clienteId, transaccionId, "CONTRATO_VENTA", contenido);
+
         // ── Éxito: cerrar confirmación y abrir ventana de éxito ───
         cerrarDialogo();
         mostrarVentanaExito(transaccionId, coche, monto, estadoPago);

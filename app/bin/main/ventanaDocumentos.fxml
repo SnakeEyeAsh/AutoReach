@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.javafx.App.controladorDocumentos"
+      prefWidth="780.0" prefHeight="500.0" spacing="12.0"
+      style="-fx-background-color: #EFF6FF; -fx-padding: 20;">
+
+   <children>
+
+      <!-- Cabecera + filtros -->
+      <HBox alignment="CENTER_LEFT" spacing="12.0">
+         <children>
+            <Label fx:id="lblTitulo" text="Documentos"
+                   style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label text="Estado:" style="-fx-font-size: 12; -fx-text-fill: #374151;" />
+            <ComboBox fx:id="cmbFiltroEstado" prefWidth="170.0" onAction="#aplicarFiltro" />
+            <Button text="Actualizar" onAction="#aplicarFiltro"
+                    prefHeight="28.0" prefWidth="90.0"
+                    style="-fx-background-color: #E5E7EB; -fx-border-color: #D1D5DB;
+                           -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;" />
+         </children>
+      </HBox>
+
+      <!-- Tabla -->
+      <VBox VBox.vgrow="ALWAYS" spacing="0"
+            style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                   -fx-background-radius: 8; -fx-padding: 12;
+                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+         <children>
+            <TableView fx:id="tblDocumentos" VBox.vgrow="ALWAYS"
+                       prefHeight="300.0" prefWidth="740.0">
+               <columns>
+                  <TableColumn fx:id="colId"         prefWidth="45.0"  text="ID" />
+                  <TableColumn fx:id="colTipo"        prefWidth="160.0" text="Tipo" />
+                  <TableColumn fx:id="colCliente"     prefWidth="160.0" text="Cliente" />
+                  <TableColumn fx:id="colTransaccion" prefWidth="175.0" text="Transacción" />
+                  <TableColumn fx:id="colFecha"       prefWidth="130.0" text="Fecha creación" />
+                  <TableColumn fx:id="colEstado"      prefWidth="130.0" text="Estado" />
+               </columns>
+               <placeholder>
+                  <Label text="No hay documentos para los filtros seleccionados"
+                         style="-fx-text-fill: #6B7280; -fx-font-size: 13;" />
+               </placeholder>
+            </TableView>
+         </children>
+      </VBox>
+
+      <!-- Acciones -->
+      <HBox alignment="CENTER_LEFT" spacing="10.0"
+            style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                   -fx-background-radius: 8; -fx-padding: 12;
+                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+         <children>
+            <Label text="Firmado por:" style="-fx-font-size: 12; -fx-text-fill: #374151;" />
+            <TextField fx:id="txtFirmadoPor" prefWidth="180.0" promptText="Nombre del firmante" />
+            <Button text="Firmar documento" onAction="#firmarDocumento"
+                    prefHeight="32.0" prefWidth="150.0"
+                    style="-fx-background-color: #059669; -fx-text-fill: white;
+                           -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+               <tooltip><Tooltip text="Marcar el documento seleccionado como FIRMADO" /></tooltip>
+            </Button>
+            <Button text="Cancelar documento" onAction="#cancelarDocumento"
+                    prefHeight="32.0" prefWidth="155.0"
+                    style="-fx-background-color: #DC2626; -fx-text-fill: white;
+                           -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+               <tooltip><Tooltip text="Cancelar lógicamente el documento seleccionado" /></tooltip>
+            </Button>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="Cerrar" onAction="#cerrar"
+                    prefHeight="32.0" prefWidth="80.0"
+                    style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                           -fx-border-radius: 4; -fx-cursor: hand;" />
+         </children>
+      </HBox>
+
+   </children>
+</VBox>
