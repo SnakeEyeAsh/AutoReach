@@ -1,6 +1,7 @@
 package com.javafx.Model;
 
 import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 
 public class Alquiler{
     private Timestamp fechaDevolucion;
@@ -47,6 +48,16 @@ public class Alquiler{
         this.fechaRecogida = fechaRecogida;
     }
 
-    
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    public String getFechaRecogidaStr() {
+        if (fechaRecogida == null) return "";
+        return fechaRecogida.toLocalDateTime().toLocalDate().format(DATE_FMT);
+    }
+
+    public String getFechaDevolucionStr() {
+        if (fechaDevolucion == null) return "";
+        return fechaDevolucion.toLocalDateTime().toLocalDate().format(DATE_FMT);
+    }
 
 }

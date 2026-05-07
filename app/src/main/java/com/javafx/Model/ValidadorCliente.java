@@ -183,28 +183,19 @@ public class ValidadorCliente {
      * Valida el campo de DNI.
      */
     private void registrarValidadorDni(Control control) {
-        validador.registerValidator(control, (Control c, String texto) -> {
-            if (esTextoVacio(texto)) {
-                return ValidationResult.fromError(c, "El DNI es obligatorio");
-            }
+        validador.registerValidator(control, false, (Control c, String texto) -> {
+            if (esTextoVacio(texto)) return ValidationResult.fromInfo(c, "");
 
             String dniLimpio = texto.trim().toUpperCase();
-
-            // Validar formato: 8 dígitos seguidos de letra
             if (!dniLimpio.matches("^[0-9]{8}[A-Z]$")) {
                 return ValidationResult.fromError(c, "DNI inválido (8 dígitos + letra)");
             }
-
-            // Validar letra correcta del DNI
             String letras = "TRWAGMYFPDXBNJZSQVHLCKE";
             int numeros = Integer.parseInt(dniLimpio.substring(0, 8));
             char letraCalculada = letras.charAt(numeros % 23);
-            char letraIntroducida = dniLimpio.charAt(8);
-
-            if (letraCalculada != letraIntroducida) {
+            if (letraCalculada != texto.trim().toUpperCase().charAt(8)) {
                 return ValidationResult.fromError(c, "La letra del DNI no es correcta");
             }
-
             return ValidationResult.fromInfo(c, "");
         });
     }
@@ -213,27 +204,20 @@ public class ValidadorCliente {
      * Valida el campo de fecha de nacimiento con DatePicker.
      */
     private void registrarValidadorFechaDatePicker(DatePicker datePicker) {
-        validador.registerValidator(datePicker, (Control c, LocalDate fecha) -> {
-            if (fecha == null) {
-                return ValidationResult.fromError(c, "La fecha de nacimiento es obligatoria");
-            }
+        validador.registerValidator(datePicker, false, (Control c, LocalDate fecha) -> {
+            if (fecha == null) return ValidationResult.fromInfo(c, "");
 
-            // Validar que la fecha no sea futura
             if (fecha.isAfter(LocalDate.now())) {
                 return ValidationResult.fromError(c, "La fecha no puede ser futura");
             }
-
-            // Validar edad mínima (18 años) y máxima (120 años)
-            LocalDate hace18 = LocalDate.now().minusYears(18);
+            LocalDate hace18  = LocalDate.now().minusYears(18);
             LocalDate hace120 = LocalDate.now().minusYears(120);
-
             if (fecha.isAfter(hace18)) {
                 return ValidationResult.fromError(c, "Debe ser mayor de 18 años");
             }
             if (fecha.isBefore(hace120)) {
                 return ValidationResult.fromError(c, "Fecha no válida");
             }
-
             return ValidationResult.fromInfo(c, "");
         });
     }
@@ -271,10 +255,7 @@ public class ValidadorCliente {
 
         ValidationResult resultado = validador.getValidationResult();
 
-        // Verificar validación del sexo (RadioButtons)
-        boolean sexoValido = validarSexoSeleccionado();
-
-        if (resultado.getErrors().isEmpty() && sexoValido) {
+        if (resultado.getErrors().isEmpty()) {
             return true;
         }
 
@@ -293,11 +274,6 @@ public class ValidadorCliente {
                 errores.add(error.getText());
             }
         });
-
-        // Agregar error de sexo si no está seleccionado
-        if (!sexoValido) {
-            errores.add("Debe seleccionar un sexo");
-        }
 
         // Mostrar alerta con los errores
         Alert alerta = new Alert(AlertType.WARNING);

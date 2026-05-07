@@ -461,7 +461,7 @@ public class controladorApp implements Initializable {
     private PasswordField pfContraseña;
 
     @FXML
-    private TextField pfContraseñaVisible;
+    private TextField txtPasswordVisible;
 
     @FXML
     private Button btnMostrarPass;
@@ -615,9 +615,9 @@ public class controladorApp implements Initializable {
 
         // Sincronizar PasswordField y TextField del login
         pfContraseña.textProperty().addListener((obs, o, n) -> {
-            if (!txtContraseñaVisible.getText().equals(n)) txtContraseñaVisible.setText(n);
+            if (!txtPasswordVisible.getText().equals(n)) txtPasswordVisible.setText(n);
         });
-        txtContraseñaVisible.textProperty().addListener((obs, o, n) -> {
+        txtPasswordVisible.textProperty().addListener((obs, o, n) -> {
             if (!pfContraseña.getText().equals(n)) pfContraseña.setText(n);
         });
 
@@ -669,13 +669,13 @@ public class controladorApp implements Initializable {
 
     @FXML
     void toggleMostrarPassword(ActionEvent event) {
-        boolean mostrar = !txtContraseñaVisible.isVisible();
-        txtContraseñaVisible.setVisible(mostrar);
-        txtContraseñaVisible.setManaged(mostrar);
+        boolean mostrar = !txtPasswordVisible.isVisible();
+        txtPasswordVisible.setVisible(mostrar);
+        txtPasswordVisible.setManaged(mostrar);
         pfContraseña.setVisible(!mostrar);
         pfContraseña.setManaged(!mostrar);
         btnMostrarPass.setText(mostrar ? "🔒" : "👁");
-        if (mostrar) txtContraseñaVisible.requestFocus();
+        if (mostrar) txtPasswordVisible.requestFocus();
         else pfContraseña.requestFocus();
     }
 
@@ -865,7 +865,6 @@ public class controladorApp implements Initializable {
                     c.setDireccion(txtDireccion.getText());
                     c.setTelefono(Conexion.parseLongSafe(txtTelefono.getText(), 0L));
                     c.setEmail(txtEmail.getText());
-
                     Conexion.editarCliente(c);
 
                     AlertaEstilizada.mostrarInformacion(
@@ -972,6 +971,18 @@ public class controladorApp implements Initializable {
 
         txtEmail.setText(c.getEmail());
         txtEmail.setDisable(false);
+
+        // Fecha de nacimiento
+        if (c.getFechaNacimiento() != null && !c.getFechaNacimiento().isBlank()) {
+            try {
+                dpFechaNac.setValue(java.time.LocalDate.parse(c.getFechaNacimiento()));
+            } catch (Exception ex) {
+                dpFechaNac.setValue(null);
+            }
+        } else {
+            dpFechaNac.setValue(null);
+        }
+        dpFechaNac.setDisable(true);
 
         // Deshabilitar otros botones durante la edicion
         btnEliminarCliente.setDisable(true);
@@ -1156,6 +1167,7 @@ public class controladorApp implements Initializable {
                             "El alquiler se ha registrado correctamente"
                         );
                         iniciarTablas();
+                        limpiarAlquiler();
                     } catch (Exception e) {
                         AlertaEstilizada.mostrarError(
                             "Error al crear alquiler",
@@ -1212,17 +1224,8 @@ public class controladorApp implements Initializable {
                         "Error: " + e.getMessage()
                     );
                 }
-                mnElegirMarca.setDisable(false);
-                cmbElegirModelo.setDisable(false);
-                cldRecoger.getEditor().clear();
-                cldRecoger.setDisable(true);
-                txtHoraEntrega.clear();
-                txtHoraEntrega.setDisable(true);
-                cldEntrega.getEditor().clear();
-                cldEntrega.setDisable(true);
-                btnConirmarAlquiler.setDisable(true);
-                editandoAlquiler = false;
                 iniciarTablas();
+                limpiarAlquiler();
             }
         }
 
@@ -1230,16 +1233,23 @@ public class controladorApp implements Initializable {
 
     @FXML
     void cancelarAlquiler(ActionEvent event) {
+        limpiarAlquiler();
+    }
+
+    private void limpiarAlquiler() {
         mnElegirMarca.setText("Marca");
         mnElegirMarca.setDisable(false);
         cmbElegirModelo.getSelectionModel().clearSelection();
         TblCoincidencias.getItems().clear();
+        cldRecoger.setValue(null);
         cldRecoger.getEditor().clear();
         cldRecoger.setDisable(true);
         txtHoraEntrega.clear();
         txtHoraEntrega.setDisable(true);
+        cldEntrega.setValue(null);
         cldEntrega.getEditor().clear();
         cldEntrega.setDisable(true);
+        if (cmbEstadoPagoAlquiler != null) cmbEstadoPagoAlquiler.getSelectionModel().selectFirst();
         btnConirmarAlquiler.setDisable(true);
         editandoAlquiler = false;
     }
@@ -2882,7 +2892,7 @@ public class controladorApp implements Initializable {
             clnDniRegistro.setCellValueFactory(new PropertyValueFactory<>("dni"));
 
             tblAlquiler.setItems(Conexion.mostrarAlquiler());
-            clnFechaAlq.setCellValueFactory(new PropertyValueFactory<>("fechaDevolucion"));
+            clnFechaAlq.setCellValueFactory(new PropertyValueFactory<>("fechaRecogidaStr"));
             clnHoraAlq.setCellValueFactory(new PropertyValueFactory<>("horaDevolucion"));
             clnDNIAlq.setCellValueFactory(new PropertyValueFactory<>("dni"));
             clnMatriculaAlq.setCellValueFactory(new PropertyValueFactory<>("matricula"));

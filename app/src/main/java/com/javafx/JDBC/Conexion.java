@@ -440,6 +440,7 @@ public class Conexion {
                 Cliente c = new Cliente(str(obj, "nombre"), str(obj, "apellidos"),
                         str(obj, "dni_nif"), tel, str(obj, "email"), str(obj, "direccion"));
                 c.setId(intVal(obj, "id"));
+                c.setFechaNacimiento(str(obj, "fecha_registro"));
                 lista.add(c);
             }
         } catch (Exception e) {
@@ -460,6 +461,7 @@ public class Conexion {
                 Cliente c = new Cliente(str(obj, "nombre"), str(obj, "apellidos"),
                         str(obj, "dni_nif"), tel, str(obj, "email"), str(obj, "direccion"));
                 c.setId(intVal(obj, "id"));
+                c.setFechaNacimiento(str(obj, "fecha_registro"));
                 lista.add(c);
             }
         } catch (Exception e) {
@@ -477,6 +479,7 @@ public class Conexion {
         body.addProperty("telefono",  telefono);
         body.addProperty("email",     email);
         body.addProperty("direccion", direccion);
+        if (fechaNac != null && !fechaNac.isBlank()) body.addProperty("fecha_registro", fechaNac);
 
         HttpResponse<String> resp = post("clientes", body.toString());
         if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
@@ -918,8 +921,8 @@ public class Conexion {
                     if (det != null) {
                         fechaRecogida   = parseTimestamp(str(det, "fecha_inicio"));
                         fechaDevolucion = parseTimestamp(str(det, "fecha_fin_prevista"));
-                        if (fechaRecogida != null) {
-                            hora = fechaRecogida.toLocalDateTime()
+                        if (fechaDevolucion != null) {
+                            hora = fechaDevolucion.toLocalDateTime()
                                     .format(DateTimeFormatter.ofPattern("HH:mm"));
                         }
                     }
@@ -950,8 +953,9 @@ public class Conexion {
         body.addProperty("monto_total", parseDoubleSafe(precio_total, 0.0));
         body.addProperty("estado_pago", estado);
         if (agenteId > 0) body.addProperty("agente_id", agenteId);
+        String fechaFinConHora = (hora != null && !hora.isBlank()) ? fecha_fin + "T" + hora + ":00" : fecha_fin;
         body.addProperty("fecha_inicio",       fecha);
-        body.addProperty("fecha_fin_prevista", fecha_fin);
+        body.addProperty("fecha_fin_prevista", fechaFinConHora);
         body.addProperty("kilometraje_salida", 0);
 
         HttpResponse<String> resp = post("transacciones/alquiler", body.toString());
@@ -989,8 +993,11 @@ public class Conexion {
             if (transId == -1) { System.err.println("Alquiler no encontrado"); return; }
 
             JsonObject body = new JsonObject();
-            body.addProperty("fecha_inicio",       fmtDate(fechaRecogida));
-            body.addProperty("fecha_fin_prevista",  fmtDate(fechaEntrega));
+            body.addProperty("fecha_inicio", fmtDate(fechaRecogida));
+            String fechaFinConHora = (hora != null && !hora.isBlank())
+                    ? fmtDate(fechaEntrega) + "T" + hora + ":00"
+                    : fmtDate(fechaEntrega);
+            body.addProperty("fecha_fin_prevista", fechaFinConHora);
 
             put("transacciones/" + transId + "/fechas", body.toString());
             System.out.println("✓ Alquiler editado");
@@ -1036,7 +1043,7 @@ public class Conexion {
             int clienteId = resolverClienteId(dniCliente);
             if (clienteId == -1) return matriculas;
 
-            JsonArray arr = getArray("clientes/" + clienteId + "/transacciones");
+            JsonArray arr = getArray("transacciones?cliente_id=" + clienteId);
             for (JsonElement el : arr) {
                 JsonObject obj = el.getAsJsonObject();
                 JsonElement cocEl = obj.get("coche");

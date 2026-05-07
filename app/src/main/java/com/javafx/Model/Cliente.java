@@ -8,19 +8,18 @@ public class Cliente {
     private String nombre;
     private String apellidos;
     private String dni;
-    private long telefono;  // Cambiado de double a long para evitar perdida de precision
+    private long telefono;
     private String email;
     private String direccion;
+    private String fechaNacimiento;
 
     public Cliente(String nombre, String apellidos, String dni, long telefono, String email, String direccion) {
-
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.dni = dni;
         this.telefono = telefono;
         this.email = email;
         this.direccion = direccion;
-
     }
 
     public int getId() { return id; }
@@ -80,8 +79,7 @@ public class Cliente {
         this.direccion = direccion;
     }
 
-    
-
-    
+    public String getFechaNacimiento() { return fechaNacimiento; }
+    public void setFechaNacimiento(String f) { this.fechaNacimiento = f; }
 
 }

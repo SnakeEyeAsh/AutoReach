@@ -11,6 +11,7 @@
 <?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ToggleGroup?>
@@ -185,7 +186,7 @@
                                                     -fx-background-radius: 5 0 0 5; -fx-padding: 5 10; -fx-font-size: 13;">
                                  <tooltip><Tooltip text="Introduce tu contraseña" /></tooltip>
                               </PasswordField>
-                              <TextField fx:id="txtContraseñaVisible" prefHeight="36.0"
+                              <TextField fx:id="txtPasswordVisible" prefHeight="36.0"
                                          promptText="Introduce tu contraseña"
                                          visible="false" managed="false"
                                          style="-fx-border-color: #D1D5DB; -fx-border-radius: 5 0 0 5;
