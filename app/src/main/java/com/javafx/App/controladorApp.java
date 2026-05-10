@@ -11,6 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -97,6 +101,14 @@ public class controladorApp implements Initializable {
     private boolean editandoAlquiler = false;
 
     private boolean sesionActiva = false;
+
+    private String matriculaSeleccionada = null;
+    private final ScheduledExecutorService refreshScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "matriculas-refresh");
+        t.setDaemon(true);
+        return t;
+    });
+    private ScheduledFuture<?> refreshTask = null;
 
     // Backing lists para los ComboBox de modelo (evita acumular listeners)
     private final ObservableList<String> modelosAlquilerData =
@@ -911,6 +923,7 @@ public class controladorApp implements Initializable {
 
                 // Cargar matrículas de coches del cliente
                 cargarMatriculasCliente();
+                iniciarRefrescoMatriculas();
 
                 // Mostrar el panel de sesión
                 mostrarPanel(pantallaSesion);
@@ -2377,6 +2390,7 @@ public class controladorApp implements Initializable {
             // Desactivar sesión antes de cerrar
             sesionActiva = false;
             cliente = null;
+            detenerRefrescoMatriculas();
             if (btnIrAInicio.getScene() != null && btnIrAInicio.getScene().getWindow() != null) {
                 Stage escena = (Stage) btnIrAInicio.getScene().getWindow();
                 escena.close();
@@ -2414,6 +2428,8 @@ public class controladorApp implements Initializable {
         // Limpiar datos de sesión
         sesionActiva = false;
         cliente = null;
+        detenerRefrescoMatriculas();
+        matriculaSeleccionada = null;
 
         // Limpiar labels del perfil
         lblNombre.setText("Nombre");
@@ -2747,6 +2763,7 @@ public class controladorApp implements Initializable {
 
                 // Cargar matrículas de coches del cliente
                 cargarMatriculasCliente();
+                iniciarRefrescoMatriculas();
 
                 // Mostrar el panel de sesión
                 mostrarPanel(pantallaSesion);
@@ -3052,11 +3069,29 @@ public class controladorApp implements Initializable {
         }
     }
 
+    private void iniciarRefrescoMatriculas() {
+        detenerRefrescoMatriculas();
+        refreshTask = refreshScheduler.scheduleAtFixedRate(() ->
+            javafx.application.Platform.runLater(() -> {
+                if (matriculaSeleccionada != null) mostrarInfoCoche(matriculaSeleccionada);
+                else cargarMatriculasCliente();
+            }),
+        5, 5, TimeUnit.SECONDS);
+    }
+
+    private void detenerRefrescoMatriculas() {
+        if (refreshTask != null && !refreshTask.isDone()) {
+            refreshTask.cancel(false);
+            refreshTask = null;
+        }
+    }
+
     /**
      * Muestra la información del coche en los labels correspondientes
      * @param matricula La matrícula del coche a mostrar
      */
     private void mostrarInfoCoche(String matricula) {
+        matriculaSeleccionada = matricula;
         slcMatriculaLogin.setText(matricula);
 
         CocheCompleto coche = Conexion.buscarCochePorMatricula(matricula);
