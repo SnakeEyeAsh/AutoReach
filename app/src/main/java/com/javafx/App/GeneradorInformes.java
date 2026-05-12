@@ -130,7 +130,7 @@ public class GeneradorInformes {
 
             // Crear nombre de archivo
             String nombreArchivo = "informe_vehiculo_" + matricula + "_" + LocalDate.now() + ".pdf";
-            File carpetaInformer = new File(System.getProperty("user.dir"), "Informer");
+            File carpetaInformer = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "AutoReach", "Informer");
             if (!carpetaInformer.exists()) {
                 carpetaInformer.mkdirs();
             }

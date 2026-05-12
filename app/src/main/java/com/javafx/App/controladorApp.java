@@ -1649,7 +1649,7 @@ public class controladorApp implements Initializable {
 
             // Guardar automaticamente en la carpeta Informer
             String nombreArchivo = "informe_vehiculo_" + matricula + "_" + LocalDate.now() + ".pdf";
-            File carpetaInformer = new File(System.getProperty("user.dir"), "Informer");
+            File carpetaInformer = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "AutoReach", "Informer");
             if (!carpetaInformer.exists()) {
                 carpetaInformer.mkdirs();
             }
@@ -1667,7 +1667,7 @@ public class controladorApp implements Initializable {
             AlertaEstilizada.mostrarInformacion(
                 "Informe exportado",
                 "Exito",
-                "El informe del vehiculo se ha guardado correctamente.\n\n" + archivoDestino.getAbsolutePath()
+                "El informe del vehiculo se ha exportado correctamente.\n\nUbicación del archivo:\n" + archivoDestino.getAbsolutePath()
             );
 
         } catch (Exception e) {
@@ -1859,7 +1859,7 @@ public class controladorApp implements Initializable {
 
             // Guardar automaticamente en la carpeta Informer
             String nombreArchivo = "informe_vehiculos_" + marca.toLowerCase() + "_" + LocalDate.now() + ".pdf";
-            File carpetaInformer = new File(System.getProperty("user.dir"), "Informer");
+            File carpetaInformer = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "AutoReach", "Informer");
             if (!carpetaInformer.exists()) {
                 carpetaInformer.mkdirs();
             }
@@ -1870,7 +1870,7 @@ public class controladorApp implements Initializable {
             AlertaEstilizada.mostrarInformacion(
                 "Informe exportado",
                 "Éxito",
-                "El informe se ha guardado correctamente en:\n" + archivoDestino.getAbsolutePath()
+                "El informe se ha exportado correctamente.\n\nUbicación del archivo:\n" + archivoDestino.getAbsolutePath()
             );
 
         } catch (Exception e) {
@@ -2325,7 +2325,7 @@ public class controladorApp implements Initializable {
 
             // Guardar automaticamente en la carpeta Informer
             String nombreArchivo = "reporte_inventario_coches_" + LocalDate.now() + ".pdf";
-            File carpetaInformer = new File(System.getProperty("user.dir"), "Informer");
+            File carpetaInformer = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "AutoReach", "Informer");
             if (!carpetaInformer.exists()) {
                 carpetaInformer.mkdirs();
             }
@@ -2343,7 +2343,7 @@ public class controladorApp implements Initializable {
             AlertaEstilizada.mostrarInformacion(
                 "Reporte exportado",
                 "Éxito",
-                "El reporte PDF se ha guardado correctamente.\n\n" + archivoDestino.getAbsolutePath()
+                "El reporte PDF se ha exportado correctamente.\n\nUbicación del archivo:\n" + archivoDestino.getAbsolutePath()
             );
 
         } catch (Exception e) {

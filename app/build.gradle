@@ -1,7 +1,6 @@
 plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.14'
-    id 'org.beryx.runtime' version '1.13.1'
 }
 
 repositories {
@@ -61,20 +60,29 @@ sourceSets {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// 2. TAREA PARA COPIAR DEPENDENCIAS A build/libs/lib
+// 2a. COPIAR DEPENDENCIAS (sin JavaFX) A build/libs/lib
 // ═══════════════════════════════════════════════════════════════════
 task copyDependencies(type: Copy) {
-    description = 'Copia todas las dependencias del runtimeClasspath a build/libs/lib'
+    description = 'Copia dependencias (sin JavaFX) a build/libs/lib'
     group = 'build'
 
-    from configurations.runtimeClasspath
+    from configurations.runtimeClasspath.filter { !it.name.startsWith('javafx-') }
     into "${buildDir}/libs/lib"
-
-    // Incluir librerías nativas de JavaFX (.dll, .so, .dylib)
     include '**/*.jar'
-    include '**/*.dll'
-    include '**/*.so'
-    include '**/*.dylib'
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 2b. COPIAR JARs NATIVOS DE JAVAFX A build/libs/javafx
+//     Solo los -win.jar (con código real + DLLs embebidas)
+// ═══════════════════════════════════════════════════════════════════
+task copyJavaFXLibs(type: Copy) {
+    description = 'Copia JARs nativos de JavaFX (Windows) a build/libs/javafx'
+    group = 'build'
+
+    from configurations.runtimeClasspath.filter {
+        it.name.startsWith('javafx-') && it.name.contains('-win')
+    }
+    into "${buildDir}/libs/javafx"
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -90,7 +98,10 @@ jar {
         manifest {
             attributes(
                 'Main-Class': application.mainClass.get(),
-                'Class-Path': configurations.runtimeClasspath.files.collect { "lib/${it.name}" }.join(' '),
+                'Class-Path': configurations.runtimeClasspath.files
+                    .findAll { !it.name.startsWith('javafx-') }
+                    .collect { "lib/${it.name}" }
+                    .join(' '),
                 'Implementation-Title': project.name,
                 'Implementation-Version': project.version ?: '1.0.0'
             )
@@ -104,7 +115,7 @@ jar {
 }
 
 // Tarea para construir todo listo para InstallBuilder
-task buildForInstaller(dependsOn: ['clean', 'jar', 'copyDependencies']) {
+task buildForInstaller(dependsOn: ['clean', 'jar', 'copyDependencies', 'copyJavaFXLibs']) {
     description = 'Construye el JAR y copia dependencias para InstallBuilder'
     group = 'distribution'
 
@@ -134,39 +145,50 @@ dependencies {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// RUNTIME + JPACKAGE (instalador nativo Windows)
+// JPACKAGE — instalador nativo Windows (sin plugin externo)
 // ═══════════════════════════════════════════════════════════════════
-runtime {
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+task jpackage(type: Exec, dependsOn: buildForInstaller) {
+    group       = 'distribution'
+    description = 'Genera instalador nativo Windows con JavaFX embebido en la JRE'
 
-    // Módulos Java necesarios (JavaFX los añade el plugin automáticamente)
-    modules = [
-        'java.base', 'java.desktop', 'java.logging',
-        'java.net.http', 'java.sql', 'java.xml',
-        'java.naming', 'java.management',
-        'jdk.crypto.ec', 'jdk.unsupported'
-    ]
+    def javaHome    = org.gradle.internal.jvm.Jvm.current().javaHome.absolutePath
+    def outputDir   = "${buildDir}/jpackage"
+    def inputDir    = "${buildDir}/libs"
+    def javafxDir   = "${buildDir}/libs/javafx"
+    def mainJarName = "${project.name}.jar"
 
-    jpackage {
-        imageName     = 'AutoReach'
-        appVersion    = '1.0.0'
-        vendor        = 'AutoReach'
+    doFirst {
+        file(outputDir).deleteDir()
+        file(outputDir).mkdirs()
+    }
 
-        // 'app-image' → carpeta autocontenida, sin necesidad de WiX
-        // Cambia a 'msi' si tienes WiX Toolset instalado (wixtoolset.org)
-        installerType = 'app-image'
+    commandLine(
+        "${javaHome}/bin/jpackage",
+        '--type',         'exe',
+        '--name',         'AutoReach',
+        '--app-version',  '1.0.0',
+        '--vendor',       'AutoReach',
+        '--description',  'AutoReach - Gestión de concesionario',
+        '--input',        inputDir,
+        '--main-jar',     mainJarName,
+        '--main-class',   'com.javafx.App.App',
+        '--module-path',  javafxDir,
+        '--add-modules',  'javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.media,javafx.swing,javafx.web,java.sql,java.net.http,java.xml,java.logging,java.naming,java.management,java.desktop,jdk.crypto.ec,jdk.unsupported',
+        '--dest',         outputDir,
+        '--icon',         'src/main/resources/Assets/autoIcon.ico',
+        '--java-options', '--add-opens javafx.graphics/javafx.scene=org.controlsfx.controls',
+        '--java-options', '--add-opens javafx.graphics/javafx.scene=ALL-UNNAMED',
+        '--java-options', '-Dfile.encoding=UTF-8',
+        '--win-dir-chooser',
+        '--win-menu',
+        '--win-shortcut'
+    )
 
-        // Icono: convierte autoIcon.png a autoIcon.ico y descomenta:
-        // imageOptions = ['--icon', 'src/main/resources/Assets/autoIcon.ico']
-
-        jvmArgs = [
-            '--add-opens', 'javafx.graphics/javafx.scene=org.controlsfx.controls',
-            '--add-opens', 'javafx.graphics/javafx.scene=ALL-UNNAMED'
-        ]
-
-        installerOptions = [
-            '--description', 'AutoReach - Sistema de gestión de concesionario'
-        ]
+    doLast {
+        println "══════════════════════════════════════════════"
+        println " Instalador generado en: ${outputDir}/AutoReach"
+        println " Ejecuta AutoReach/AutoReach.exe para lanzar"
+        println "══════════════════════════════════════════════"
     }
 }
 

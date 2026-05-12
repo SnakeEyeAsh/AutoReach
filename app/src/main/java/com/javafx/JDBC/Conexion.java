@@ -532,6 +532,7 @@ public class Conexion {
             JsonArray arr = getArray("coches");
             for (JsonElement el : arr) {
                 JsonObject obj = el.getAsJsonObject();
+                if (!esDisponible(obj)) continue;
                 String[] mm  = extractMarcaModelo(obj);
                 String[] det = parseDetalles(obj);
 

@@ -114,7 +114,7 @@ public class controladorCompra implements Initializable{
             AlertaEstilizada.mostrarInformacion(
                 "Informe exportado",
                 "Exito",
-                "El informe del vehiculo se ha guardado correctamente.\n\n" + archivoDestino.getAbsolutePath()
+                "El informe del vehiculo se ha exportado correctamente.\n\nUbicación del archivo:\n" + archivoDestino.getAbsolutePath()
             );
         } else {
             AlertaEstilizada.mostrarError(
@@ -175,7 +175,7 @@ public class controladorCompra implements Initializable{
 
             // Guardar automaticamente en la carpeta Informer
             String nombreArchivo = "informe_compra_" + LocalDate.now() + ".pdf";
-            File carpetaInformer = new File(System.getProperty("user.dir"), "Informer");
+            File carpetaInformer = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "AutoReach", "Informer");
             if (!carpetaInformer.exists()) {
                 carpetaInformer.mkdirs();
             }
@@ -187,7 +187,7 @@ public class controladorCompra implements Initializable{
             AlertaEstilizada.mostrarInformacion(
                 "Informe exportado",
                 "Exito",
-                "El informe PDF se ha guardado correctamente.\n\n" + archivoDestino.getAbsolutePath()
+                "El informe PDF se ha exportado correctamente.\n\nUbicación del archivo:\n" + archivoDestino.getAbsolutePath()
             );
 
         } catch (Exception e) {
