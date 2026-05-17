@@ -614,7 +614,7 @@ public class controladorApp implements Initializable {
         ingresoModelo.setTooltip(new Tooltip("Modelo del vehículo (ejemplo: Corolla, Serie 3, Focus)"));
         ingresoPrecio.setTooltip(new Tooltip("Precio base del vehículo (ejemplo: 25000.00)"));
 
-        btnIrAInicio.setStyle("-fx-background-color:darkgrey");
+        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso);
         iniciarTablas();
         ocultarTodos();
         desactivarBotones();
@@ -1302,6 +1302,7 @@ public class controladorApp implements Initializable {
         cldEntrega.setDisable(false);
         txtHoraEntrega.setDisable(false);
         btnConirmarAlquiler.setDisable(false);
+        btnCancelarAlquiler.setDisable(false);
 
         Timestamp fechaR = a.getFechaRecogida();
         Timestamp fechaE = a.getFechaDevolucion();

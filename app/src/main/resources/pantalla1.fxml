@@ -37,14 +37,14 @@
            SIDEBAR — Azul marino profesional
            ═══════════════════════════════════════════════════════════ -->
       <ToolBar depthTest="DISABLE" orientation="VERTICAL" prefHeight="534.0" prefWidth="110.0"
-               style="-fx-background-color: #1E3A8A; -fx-padding: 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 10, 0, 4, 0);">
+               style="-fx-background-color: #1a1a2e; -fx-padding: 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 10, 0, 4, 0);">
          <items>
             <VBox alignment="CENTER" prefHeight="520.0" prefWidth="110.0" spacing="2.0">
                <children>
 
                   <Button fx:id="btnIrAInicio" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
                           mnemonicParsing="false" onAction="#irAInicio" prefWidth="110.0"
-                          style="-fx-background-color: transparent; -fx-text-fill: #CBD5E1;
+                          style="-fx-background-color: transparent; -fx-text-fill: #b0bcd4;
                                  -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
                           text="Inicio" VBox.vgrow="ALWAYS">
                      <tooltip><Tooltip text="Ir a la pantalla principal del cliente" /></tooltip>
@@ -57,7 +57,7 @@
 
                   <Button fx:id="btnAlquiler" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
                           mnemonicParsing="false" onAction="#irAalquiler" prefWidth="110.0"
-                          style="-fx-background-color: transparent; -fx-text-fill: #CBD5E1;
+                          style="-fx-background-color: transparent; -fx-text-fill: #b0bcd4;
                                  -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
                           text="Alquiler" VBox.vgrow="ALWAYS">
                      <tooltip><Tooltip text="Gestionar alquileres de vehiculos" /></tooltip>
@@ -70,7 +70,7 @@
 
                   <Button fx:id="btnCompras" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
                           mnemonicParsing="false" onAction="#irAcompras" prefWidth="110.0"
-                          style="-fx-background-color: transparent; -fx-text-fill: #CBD5E1;
+                          style="-fx-background-color: transparent; -fx-text-fill: #b0bcd4;
                                  -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
                           text="Compras" VBox.vgrow="ALWAYS">
                      <tooltip><Tooltip text="Comprar vehiculos disponibles" /></tooltip>
@@ -83,7 +83,7 @@
 
                   <Button fx:id="btnIrAIngreso" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
                           mnemonicParsing="false" onAction="#irAIngresos" prefWidth="110.0"
-                          style="-fx-background-color: transparent; -fx-text-fill: #CBD5E1;
+                          style="-fx-background-color: transparent; -fx-text-fill: #b0bcd4;
                                  -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
                           text="Ingresos" VBox.vgrow="ALWAYS">
                      <tooltip><Tooltip text="Registrar nuevos vehiculos en inventario" /></tooltip>
@@ -97,7 +97,7 @@
 
                   <Button fx:id="btnAcercaDe" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
                           mnemonicParsing="false" onAction="#mostrarAcercaDe" prefWidth="110.0"
-                          style="-fx-background-color: transparent; -fx-text-fill: #CBD5E1;
+                          style="-fx-background-color: transparent; -fx-text-fill: #b0bcd4;
                                  -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
                           text="Acerca de" VBox.vgrow="ALWAYS">
                      <tooltip><Tooltip text="Informacion sobre la aplicacion" /></tooltip>
@@ -110,7 +110,7 @@
 
                   <Button fx:id="btnCerrarSesion" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
                           mnemonicParsing="false" onAction="#cerrarSesion" prefWidth="110.0"
-                          style="-fx-background-color: #7F1D1D; -fx-text-fill: white;
+                          style="-fx-background-color: #c0392b; -fx-text-fill: white;
                                  -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
                           text="Salir" VBox.vgrow="ALWAYS">
                      <tooltip><Tooltip text="Cerrar la aplicacion" /></tooltip>
@@ -136,14 +136,14 @@
 
             <!-- ── LOGIN ─────────────────────────────────────────── -->
             <Pane fx:id="paneLogin" prefHeight="578.0" prefWidth="724.0" visible="false"
-                  style="-fx-background-color: #EFF6FF;">
+                  style="-fx-background-color: #f0f4f8;">
                <children>
                   <VBox fx:id="ventanaLogin" alignment="CENTER" layoutX="212.0" layoutY="50.0"
                         prefHeight="460.0" prefWidth="300.0"
                         style="-fx-background-color: white;
-                               -fx-border-color: #DBEAFE; -fx-border-radius: 10;
+                               -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 10;
                                -fx-background-radius: 10;
-                               -fx-effect: dropshadow(gaussian, rgba(30,58,138,0.12), 14, 0, 0, 4);
+                               -fx-effect: dropshadow(gaussian, rgba(0,118,168,0.12), 14, 0, 0, 4);
                                -fx-padding: 28 32;">
                      <children>
 
@@ -153,7 +153,7 @@
                         </ImageView>
 
                         <Label text="Bienvenido"
-                               style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #1E3A8A; -fx-font-family: 'Segoe UI';">
+                               style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #0076a8; -fx-font-family: 'Segoe UI';">
                            <VBox.margin><Insets bottom="4.0" /></VBox.margin>
                         </Label>
                         <Label text="Inicia sesión para continuar"
@@ -205,7 +205,7 @@
                         <Button fx:id="btnInicioSesion" defaultButton="true" mnemonicParsing="false"
                                 onAction="#IniciarSesion" prefHeight="38.0" prefWidth="236.0"
                                 text="Iniciar Sesión"
-                                style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                style="-fx-background-color: #0076a8; -fx-text-fill: white;
                                        -fx-font-size: 14; -fx-font-weight: bold;
                                        -fx-background-radius: 5; -fx-cursor: hand;">
                            <tooltip><Tooltip text="Iniciar sesion en el sistema" /></tooltip>
@@ -218,11 +218,11 @@
 
             <!-- ── SESIÓN ─────────────────────────────────────────── -->
             <Pane fx:id="pantallaSesion" prefHeight="578.0" prefWidth="724.0" visible="false"
-                  style="-fx-background-color: #EFF6FF;">
+                  style="-fx-background-color: #f0f4f8;">
                <children>
                   <!-- Barra superior -->
                   <HBox alignment="CENTER_RIGHT" prefHeight="48.0" prefWidth="724.0"
-                        style="-fx-background-color: white; -fx-border-color: #DBEAFE;
+                        style="-fx-background-color: white; -fx-border-color: #e2e8f0;
                                -fx-border-width: 0 0 1 0; -fx-padding: 0 20;">
                      <Button fx:id="btnCerrarSesionCliente" mnemonicParsing="false"
                              onAction="#cerrarSesionCliente" prefHeight="30.0" prefWidth="130.0"
@@ -236,7 +236,7 @@
 
                   <!-- Card perfil -->
                   <HBox layoutX="16.0" layoutY="60.0" prefHeight="140.0" prefWidth="692.0" spacing="20.0"
-                        style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                        style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                -fx-background-radius: 8; -fx-padding: 16;
                                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                      <children>
@@ -266,12 +266,12 @@
                   <HBox layoutX="16.0" layoutY="212.0" prefHeight="350.0" prefWidth="692.0" spacing="14.0">
                      <children>
                         <VBox prefHeight="350.0" prefWidth="330.0" spacing="8.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 16;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
                               <Label text="Información del Vehículo"
-                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;">
+                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #0076a8;">
                                  <VBox.margin><Insets bottom="8.0" /></VBox.margin>
                               </Label>
                               <Label fx:id="lblMarca" text="Marca" style="-fx-font-size: 13; -fx-text-fill: #374151;" />
@@ -288,12 +288,12 @@
                            </children>
                         </VBox>
                         <VBox prefHeight="350.0" prefWidth="348.0" spacing="8.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 16;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
                               <Label text="Información Adicional"
-                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;">
+                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #0076a8;">
                                  <VBox.margin><Insets bottom="8.0" /></VBox.margin>
                               </Label>
                               <ListView fx:id="tablaDeInformacion" prefHeight="298.0" prefWidth="316.0" />
@@ -306,13 +306,13 @@
 
             <!-- ── COMPRAS ─────────────────────────────────────────── -->
             <Pane fx:id="panelVentas" prefHeight="578.0" prefWidth="724.0" visible="false"
-                  style="-fx-background-color: #EFF6FF;">
+                  style="-fx-background-color: #f0f4f8;">
                <children>
                   <!-- Filtros + WebView -->
                   <HBox layoutX="12.0" layoutY="12.0" prefHeight="236.0" prefWidth="700.0" spacing="14.0">
                      <children>
                         <VBox prefHeight="236.0" prefWidth="256.0" spacing="12.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 14;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
@@ -333,12 +333,12 @@
                            </children>
                         </VBox>
                         <VBox prefHeight="236.0" prefWidth="430.0" spacing="6.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 12;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
                               <Label text="Detalles del Vehículo"
-                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #0076a8;" />
                               <WebView fx:id="webViewInformeCompra" prefHeight="204.0" prefWidth="406.0" />
                            </children>
                         </VBox>
@@ -347,12 +347,12 @@
 
                   <!-- Tabla + botones -->
                   <VBox layoutX="12.0" layoutY="260.0" prefWidth="700.0" spacing="8.0"
-                        style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                        style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                -fx-background-radius: 8; -fx-padding: 14;
                                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                      <children>
                         <Label text="Coches Disponibles"
-                               style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+                               style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #0076a8;" />
                         <TableView fx:id="tblCochesCompra" prefHeight="196.0" prefWidth="672.0">
                            <columns>
                               <TableColumn fx:id="colMatriculaCompra" prefWidth="120.0" text="Matrícula" />
@@ -409,14 +409,14 @@
 
             <!-- ── INGRESOS ───────────────────────────────────────── -->
             <Pane fx:id="panelIngreso" prefHeight="578.0" prefWidth="724.0" visible="false"
-                  style="-fx-background-color: #EFF6FF;">
+                  style="-fx-background-color: #f0f4f8;">
                <children>
                   <!-- Header -->
                   <HBox prefHeight="44.0" prefWidth="724.0"
-                        style="-fx-background-color: white; -fx-border-color: #DBEAFE;
+                        style="-fx-background-color: white; -fx-border-color: #e2e8f0;
                                -fx-border-width: 0 0 1 0; -fx-padding: 0 16;">
                      <Label text="INVENTARIO — Nuevos Ingresos"
-                            style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;
+                            style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #0076a8;
                                    -fx-padding: 12 0 0 0;" />
                   </HBox>
 
@@ -425,7 +425,7 @@
 
                         <!-- Formulario -->
                         <VBox prefHeight="510.0" prefWidth="300.0" spacing="2.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 10;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
@@ -487,7 +487,7 @@
                                  <children>
                                     <Button fx:id="btnAceptarIngreso" mnemonicParsing="false" onAction="#aceptarIngreso"
                                             prefHeight="28.0" prefWidth="80.0" text="Guardar"
-                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                            style="-fx-background-color: #0076a8; -fx-text-fill: white;
                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
                                        <tooltip><Tooltip text="Guardar vehiculo en inventario" /></tooltip>
                                     </Button>
@@ -505,7 +505,7 @@
 
                         <!-- Tabla + gráfico -->
                         <VBox prefHeight="510.0" prefWidth="388.0" spacing="8.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 14;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
@@ -519,7 +519,7 @@
                                     </Button>
                                     <Button fx:id="btnDescargarPDF" mnemonicParsing="false" onAction="#descargarReportePDF"
                                             prefHeight="28.0" text="Descargar PDF"
-                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                            style="-fx-background-color: #0076a8; -fx-text-fill: white;
                                                    -fx-font-weight: bold; -fx-background-radius: 4;
                                                    -fx-cursor: hand; -fx-font-size: 12;">
                                        <tooltip><Tooltip text="Descargar reporte en formato PDF" /></tooltip>
@@ -544,7 +544,7 @@
                                  <children>
                                     <Button fx:id="btnEditarCoche" mnemonicParsing="false" onAction="#editarCoche"
                                             prefHeight="28.0" prefWidth="72.0" text="Guardar"
-                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                            style="-fx-background-color: #0076a8; -fx-text-fill: white;
                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
                                        <tooltip><Tooltip text="Guardar nuevo vehiculo en inventario" /></tooltip>
                                     </Button>
@@ -578,13 +578,13 @@
 
             <!-- ── ALQUILER ───────────────────────────────────────── -->
             <Pane fx:id="pantallaAlquiler" prefHeight="578.0" prefWidth="768.0" visible="false"
-                  style="-fx-background-color: #EFF6FF;">
+                  style="-fx-background-color: #f0f4f8;">
                <children>
                   <!-- Selección vehículo -->
                   <HBox layoutX="12.0" layoutY="12.0" prefHeight="218.0" prefWidth="700.0" spacing="12.0">
                      <children>
                         <VBox prefHeight="218.0" prefWidth="200.0" spacing="10.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 14;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
@@ -603,12 +603,12 @@
                            </children>
                         </VBox>
                         <VBox prefHeight="218.0" prefWidth="488.0" spacing="6.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 14;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
                               <Label text="Vehículos Disponibles"
-                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #0076a8;" />
                               <TableView fx:id="TblCoincidencias" prefHeight="182.0" prefWidth="460.0">
                                  <columns>
                                     <TableColumn fx:id="clnAñoCoche" prefWidth="75.0" text="Año" />
@@ -627,7 +627,7 @@
                   <HBox layoutX="12.0" layoutY="242.0" prefHeight="324.0" prefWidth="700.0" spacing="12.0">
                      <children>
                         <VBox prefHeight="324.0" prefWidth="200.0" spacing="10.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 14;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
@@ -655,12 +655,12 @@
                            </children>
                         </VBox>
                         <VBox prefHeight="324.0" prefWidth="488.0" spacing="8.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 14;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
                               <Label text="Alquileres Registrados"
-                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+                                     style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #0076a8;" />
                               <TableView fx:id="tblAlquiler" prefHeight="232.0" prefWidth="460.0">
                                  <columns>
                                     <TableColumn fx:id="clnFechaAlq" prefWidth="115.0" text="Fecha" />
@@ -674,7 +674,7 @@
                                  <children>
                                     <Button fx:id="btnConirmarAlquiler" mnemonicParsing="false" onAction="#confirmarAlquiler"
                                             prefHeight="30.0" prefWidth="100.0" text="Confirmar" disable="true"
-                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                            style="-fx-background-color: #0076a8; -fx-text-fill: white;
                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
                                        <tooltip><Tooltip text="Confirmar y registrar el alquiler" /></tooltip>
                                     </Button>
@@ -726,7 +726,7 @@
 
             <!-- ── REGISTRO CLIENTES ──────────────────────────────── -->
             <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="724.0" visible="false"
-                  style="-fx-background-color: #EFF6FF;">
+                  style="-fx-background-color: #f0f4f8;">
                <children>
                   <HBox alignment="CENTER" prefHeight="578.0" prefWidth="724.0" spacing="14.0"
                         style="-fx-padding: 14;">
@@ -734,13 +734,13 @@
 
                         <!-- Card: Nuevo Cliente -->
                         <VBox prefHeight="546.0" prefWidth="324.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 16;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
                               <Button fx:id="btnNuevoCliente" mnemonicParsing="false" onAction="#crearCliente"
                                       prefHeight="28.0" prefWidth="150.0" text="+ Nuevo Cliente"
-                                      style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                      style="-fx-background-color: #0076a8; -fx-text-fill: white;
                                              -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
                                  <tooltip><Tooltip text="Crear un nuevo cliente en el sistema" /></tooltip>
                               </Button>
@@ -803,7 +803,7 @@
                                     <Button fx:id="btnAñadirNuevoCliente" layoutX="56.0" layoutY="400.0"
                                             mnemonicParsing="false" onAction="#añadirCliente"
                                             prefHeight="28.0" prefWidth="84.0" text="Añadir"
-                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                            style="-fx-background-color: #0076a8; -fx-text-fill: white;
                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
                                        <tooltip><Tooltip text="Guardar el nuevo cliente" /></tooltip>
                                     </Button>
@@ -822,7 +822,7 @@
 
                         <!-- Card: Buscar Cliente -->
                         <VBox prefHeight="546.0" prefWidth="352.0"
-                              style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+                              style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 16;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
                            <children>
@@ -850,7 +850,7 @@
                                     <Button fx:id="btnSeleccionCLiente" layoutX="10.0" layoutY="420.0"
                                             mnemonicParsing="false" onAction="#seleccionarCliente"
                                             prefHeight="28.0" prefWidth="68.0" text="Aceptar"
-                                            style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                                            style="-fx-background-color: #0076a8; -fx-text-fill: white;
                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
                                        <tooltip><Tooltip text="Seleccionar cliente e iniciar sesion" /></tooltip>
                                     </Button>

@@ -7,7 +7,7 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.javafx.App.controladorDocumentos"
       prefWidth="780.0" prefHeight="500.0" spacing="12.0"
-      style="-fx-background-color: #EFF6FF; -fx-padding: 20;">
+      style="-fx-background-color: #f0f4f8; -fx-padding: 20;">
 
    <children>
 
@@ -15,7 +15,7 @@
       <HBox alignment="CENTER_LEFT" spacing="12.0">
          <children>
             <Label fx:id="lblTitulo" text="Documentos"
-                   style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" />
+                   style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #0076a8;" />
             <Region HBox.hgrow="ALWAYS" />
             <Label text="Estado:" style="-fx-font-size: 12; -fx-text-fill: #374151;" />
             <ComboBox fx:id="cmbFiltroEstado" prefWidth="170.0" onAction="#aplicarFiltro" />
@@ -28,7 +28,7 @@
 
       <!-- Tabla -->
       <VBox VBox.vgrow="ALWAYS" spacing="0"
-            style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+            style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                    -fx-background-radius: 8; -fx-padding: 12;
                    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
          <children>
@@ -52,7 +52,7 @@
 
       <!-- Acciones -->
       <HBox alignment="CENTER_LEFT" spacing="10.0"
-            style="-fx-background-color: white; -fx-border-color: #DBEAFE; -fx-border-radius: 8;
+            style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
                    -fx-background-radius: 8; -fx-padding: 12;
                    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
          <children>

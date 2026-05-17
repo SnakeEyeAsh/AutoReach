@@ -21,7 +21,7 @@
 
       <!-- ── Cabecera ─────────────────────────────────────────── -->
       <Label text="Confirmar Compra" prefWidth="460.0" prefHeight="48.0"
-             style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+             style="-fx-background-color: #0076a8; -fx-text-fill: white;
                     -fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 0 0 0 20;" />
 
       <!-- ── Cuerpo ─────────────────────────────────────────────── -->
@@ -71,7 +71,7 @@
                <font><Font name="System Bold Italic" size="13.0" /></font>
             </Label>
             <Label text="VENTA"
-                   style="-fx-font-size: 13; -fx-text-fill: #1E3A8A; -fx-font-weight: bold;" />
+                   style="-fx-font-size: 13; -fx-text-fill: #0076a8; -fx-font-weight: bold;" />
          </HBox>
 
          <!-- cliente_id / nombre -->
@@ -110,7 +110,7 @@
             style="-fx-padding: 12 24; -fx-border-color: #E5E7EB; -fx-border-width: 1 0 0 0;">
          <Button fx:id="btnAceptarCompra" mnemonicParsing="false" onAction="#RealizarCompra"
                  text="Confirmar Compra" prefWidth="150.0" prefHeight="34.0"
-                 style="-fx-background-color: #1E3A8A; -fx-text-fill: white;
+                 style="-fx-background-color: #0076a8; -fx-text-fill: white;
                         -fx-font-weight: bold; -fx-cursor: hand;" />
          <Button fx:id="brnCancelarCompra" mnemonicParsing="false" onAction="#btnCancelarCompra"
                  text="Cancelar" prefWidth="90.0" prefHeight="34.0"
