@@ -760,6 +760,7 @@ public class controladorApp implements Initializable {
         btnEditarCliente.setDisable(true);
         btnCancelarSeleccion.setDisable(true);
         btnEliminarCliente.setDisable(true);
+        btnInvitarCliente.setDisable(true);
 
         txtNombre.setDisable(false);
         txtApellidos.setDisable(false);
@@ -838,6 +839,7 @@ public class controladorApp implements Initializable {
         btnEditarCliente.setDisable(false);
         btnCancelarSeleccion.setDisable(false);
         btnEliminarCliente.setDisable(false);
+        btnInvitarCliente.setDisable(false);
 
         txtNombre.setDisable(true);
         txtApellidos.setDisable(true);
@@ -1005,6 +1007,7 @@ public class controladorApp implements Initializable {
         btnCancelarSeleccion.setDisable(false);
         btnSeleccionCLiente.setDisable(false); // Este boton guardara los cambios
         btnEditarCliente.setDisable(true);
+        btnInvitarCliente.setDisable(true);
         btnNuevoCliente.setDisable(true);
         btnBuscarCliente.setDisable(true);
         btnAñadirNuevoCliente.setDisable(true); // Deshabilitar para evitar confusión
@@ -1109,6 +1112,7 @@ public class controladorApp implements Initializable {
         btnSeleccionCLiente.setDisable(false);
         btnEditarCliente.setDisable(false);
         btnEliminarCliente.setDisable(false);
+        btnInvitarCliente.setDisable(false);
     }
 
     //////////////////////////////////////////////////////////////////////////////// -
@@ -2908,6 +2912,7 @@ public class controladorApp implements Initializable {
         dpFechaNac.setDisable(true);
         txtDni.setDisable(true);
         txtEmail.setDisable(true);
+        btnInvitarCliente.setDisable(true);
         btnAñadirNuevoCliente.setDisable(true);
         btnCancelarNuevoCliente.setDisable(true);
         rbMasculino.setDisable(true);
