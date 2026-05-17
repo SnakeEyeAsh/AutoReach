@@ -488,6 +488,16 @@ public class Conexion {
         System.out.println("✓ Cliente creado");
     }
 
+    public static void registrarAuth(String email) throws Exception {
+        JsonObject body = new JsonObject();
+        body.addProperty("email", email);
+        HttpResponse<String> resp = post("clientes/registrar-auth", body.toString());
+        if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
+            throw new Exception("Error al invitar cliente: " + resp.body());
+        }
+        System.out.println("✓ Invitación enviada a " + email);
+    }
+
     public static void editarCliente(Cliente c) {
         JsonObject body = new JsonObject();
         body.addProperty("nombre",    c.getNombre());

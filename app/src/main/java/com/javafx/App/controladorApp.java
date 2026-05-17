@@ -209,6 +209,9 @@ public class controladorApp implements Initializable {
     private Button btnEliminarCliente;
 
     @FXML
+    private Button btnInvitarCliente;
+
+    @FXML
     private Button btnCerrarSesionCliente;
 
     @FXML
@@ -1050,6 +1053,48 @@ public class controladorApp implements Initializable {
                     "Error: " + e.getMessage()
                 );
             }
+        }
+    }
+
+    @FXML
+    void invitarCliente(ActionEvent event) {
+        Cliente c = tablaRegistro.getSelectionModel().getSelectedItem();
+        if (c == null) {
+            AlertaEstilizada.mostrarAdvertencia(
+                "Ningún cliente seleccionado",
+                "Selecciona un cliente",
+                "Por favor, selecciona un cliente de la tabla para invitarlo"
+            );
+            return;
+        }
+        String email = c.getEmail();
+        if (email == null || email.isBlank()) {
+            AlertaEstilizada.mostrarAdvertencia(
+                "Sin email",
+                "El cliente no tiene email",
+                "No se puede enviar la invitación porque el cliente no tiene email registrado"
+            );
+            return;
+        }
+        boolean confirmado = AlertaEstilizada.confirmar(
+            "Enviar invitación",
+            "¿Invitar a " + c.getNombre() + "?",
+            "Se enviará un email a " + email + " para que configure su acceso al sistema"
+        );
+        if (!confirmado) return;
+        try {
+            Conexion.registrarAuth(email);
+            AlertaEstilizada.mostrarInformacion(
+                "Invitación enviada",
+                "Éxito",
+                "Se ha enviado el email de configuración a " + email
+            );
+        } catch (Exception e) {
+            AlertaEstilizada.mostrarError(
+                "Error al invitar",
+                "No se pudo enviar la invitación",
+                e.getMessage()
+            );
         }
     }
 
