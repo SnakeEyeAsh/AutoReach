@@ -95,18 +95,31 @@
                      </graphic>
                   </Button>
 
-                  <Button fx:id="btnAcercaDe" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
-                          mnemonicParsing="false" onAction="#mostrarAcercaDe" prefWidth="110.0"
-                          style="-fx-background-color: transparent; -fx-text-fill: #b0bcd4;
-                                 -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
-                          text="Acerca de" VBox.vgrow="ALWAYS">
-                     <tooltip><Tooltip text="Informacion sobre la aplicacion" /></tooltip>
-                     <graphic>
-                        <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
-                           <image><Image url="@Assets/blog.png" /></image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
+                   <Button fx:id="btnAgentes" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
+                           mnemonicParsing="false" onAction="#irAAgentes" prefWidth="110.0"
+                           style="-fx-background-color: transparent; -fx-text-fill: #b0bcd4;
+                                  -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
+                           text="Agentes" VBox.vgrow="ALWAYS">
+                      <tooltip><Tooltip text="Gestionar agentes del sistema" /></tooltip>
+                      <graphic>
+                         <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                            <image><Image url="@Assets/perfil.png" /></image>
+                         </ImageView>
+                      </graphic>
+                   </Button>
+
+                   <Button fx:id="btnAcercaDe" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
+                           mnemonicParsing="false" onAction="#mostrarAcercaDe" prefWidth="110.0"
+                           style="-fx-background-color: transparent; -fx-text-fill: #b0bcd4;
+                                  -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
+                           text="Acerca de" VBox.vgrow="ALWAYS">
+                      <tooltip><Tooltip text="Informacion sobre la aplicacion" /></tooltip>
+                      <graphic>
+                         <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                            <image><Image url="@Assets/blog.png" /></image>
+                         </ImageView>
+                      </graphic>
+                   </Button>
 
                   <Button fx:id="btnCerrarSesion" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
                           mnemonicParsing="false" onAction="#cerrarSesion" prefWidth="110.0"
@@ -724,8 +737,161 @@
                </children>
             </Pane>
 
-            <!-- ── REGISTRO CLIENTES ──────────────────────────────── -->
-            <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="724.0" visible="false"
+             <!-- ── GESTIÓN DE AGENTES ─────────────────────────────── -->
+             <Pane fx:id="panelAgentes" prefHeight="578.0" prefWidth="724.0" visible="false"
+                   style="-fx-background-color: #f0f4f8;">
+                <children>
+                   <HBox alignment="CENTER" prefHeight="578.0" prefWidth="724.0" spacing="14.0"
+                         style="-fx-padding: 14;">
+                      <children>
+
+                         <!-- Card: Nuevo Agente -->
+                         <VBox prefHeight="546.0" prefWidth="324.0"
+                               style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
+                                      -fx-background-radius: 8; -fx-padding: 16;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                            <children>
+                               <Label text="Nuevo Agente"
+                                      style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #111827;">
+                                  <VBox.margin><Insets bottom="12.0" /></VBox.margin>
+                               </Label>
+                               <AnchorPane prefHeight="480.0" prefWidth="292.0">
+                                  <children>
+                                     <Label layoutX="8.0" layoutY="20.0" text="Usuario"
+                                            style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                     <TextField fx:id="txtAgenteUsername" layoutX="100.0" layoutY="16.0"
+                                                prefHeight="26.0" prefWidth="184.0"
+                                                style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                        <tooltip><Tooltip text="Nombre de usuario del agente" /></tooltip>
+                                     </TextField>
+
+                                     <Label layoutX="8.0" layoutY="64.0" text="Contraseña"
+                                            style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                     <PasswordField fx:id="pfAgentePassword" layoutX="100.0" layoutY="60.0"
+                                                     prefHeight="26.0" prefWidth="184.0"
+                                                     style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                        <tooltip><Tooltip text="Contraseña del agente" /></tooltip>
+                                     </PasswordField>
+
+                                     <Label layoutX="8.0" layoutY="108.0" text="Nombre"
+                                            style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                     <TextField fx:id="txtAgenteNombre" layoutX="100.0" layoutY="104.0"
+                                                prefHeight="26.0" prefWidth="184.0"
+                                                style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                        <tooltip><Tooltip text="Nombre del agente" /></tooltip>
+                                     </TextField>
+
+                                     <Label layoutX="8.0" layoutY="152.0" text="Apellidos"
+                                            style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                     <TextField fx:id="txtAgenteApellidos" layoutX="100.0" layoutY="148.0"
+                                                prefHeight="26.0" prefWidth="184.0"
+                                                style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                        <tooltip><Tooltip text="Apellidos del agente" /></tooltip>
+                                     </TextField>
+
+                                     <Label layoutX="8.0" layoutY="196.0" text="Teléfono"
+                                            style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                     <TextField fx:id="txtAgenteTelefono" layoutX="100.0" layoutY="192.0"
+                                                prefHeight="26.0" prefWidth="184.0"
+                                                style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                        <tooltip><Tooltip text="Teléfono del agente (9-15 dígitos)" /></tooltip>
+                                     </TextField>
+
+                                     <Label layoutX="8.0" layoutY="240.0" text="Email"
+                                            style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                     <TextField fx:id="txtAgenteEmail" layoutX="100.0" layoutY="236.0"
+                                                prefHeight="26.0" prefWidth="184.0"
+                                                style="-fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 3 8; -fx-font-size: 13;">
+                                        <tooltip><Tooltip text="Correo electrónico del agente" /></tooltip>
+                                     </TextField>
+
+                                     <Button fx:id="btnGuardarAgente" layoutX="56.0" layoutY="310.0"
+                                             mnemonicParsing="false" onAction="#guardarAgente"
+                                             prefHeight="28.0" prefWidth="84.0" text="Guardar"
+                                             style="-fx-background-color: #0076a8; -fx-text-fill: white;
+                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
+                                        <tooltip><Tooltip text="Guardar nuevo agente" /></tooltip>
+                                     </Button>
+                                     <Button fx:id="btnCancelarAgente" layoutX="152.0" layoutY="310.0"
+                                             mnemonicParsing="false" onAction="#cancelarNuevoAgente"
+                                             prefHeight="28.0" prefWidth="84.0" text="Cancelar"
+                                             style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                    -fx-border-radius: 4; -fx-cursor: hand;">
+                                        <tooltip><Tooltip text="Cancelar y limpiar formulario" /></tooltip>
+                                     </Button>
+                                  </children>
+                                  <VBox.margin><Insets top="8.0" /></VBox.margin>
+                               </AnchorPane>
+                            </children>
+                         </VBox>
+
+                         <!-- Card: Listado de Agentes -->
+                         <VBox prefHeight="546.0" prefWidth="352.0"
+                               style="-fx-background-color: white; -fx-border-color: transparent transparent transparent #0076a8; -fx-border-width: 0 0 0 3; -fx-border-radius: 8;
+                                      -fx-background-radius: 8; -fx-padding: 16;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                            <children>
+                               <Label text="Agentes del Sistema"
+                                      style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #111827;">
+                                  <VBox.margin><Insets bottom="8.0" /></VBox.margin>
+                               </Label>
+                               <TableView fx:id="tablaAgentes" prefHeight="400.0" prefWidth="320.0">
+                                  <columns>
+                                     <TableColumn fx:id="colAgenteUsuario" prefWidth="100.0" text="Usuario" />
+                                     <TableColumn fx:id="colAgenteNombre" prefWidth="120.0" text="Nombre" />
+                                     <TableColumn fx:id="colAgenteEmail" prefWidth="100.0" text="Email" />
+                                  </columns>
+                                  <VBox.margin><Insets bottom="8.0" /></VBox.margin>
+                               </TableView>
+                               <HBox spacing="8.0">
+                                  <children>
+                                     <Button fx:id="btnEditarAgente" mnemonicParsing="false"
+                                             onAction="#editarAgente"
+                                             prefHeight="28.0" prefWidth="74.0" text="Editar"
+                                             style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                    -fx-border-radius: 4; -fx-cursor: hand;">
+                                        <tooltip><Tooltip text="Editar agente seleccionado" /></tooltip>
+                                     </Button>
+                                     <Button fx:id="btnEliminarAgente" mnemonicParsing="false"
+                                             onAction="#eliminarAgente"
+                                             prefHeight="28.0" prefWidth="74.0" text="Eliminar"
+                                             style="-fx-background-color: #DC2626; -fx-text-fill: white;
+                                                    -fx-background-radius: 4; -fx-cursor: hand;">
+                                        <tooltip><Tooltip text="Eliminar agente seleccionado" /></tooltip>
+                                     </Button>
+                                     <Button fx:id="btnRefrescarAgentes" mnemonicParsing="false"
+                                             onAction="#refrescarAgentes"
+                                             prefHeight="28.0" prefWidth="84.0" text="Refrescar"
+                                             style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                    -fx-border-radius: 4; -fx-cursor: hand;">
+                                        <tooltip><Tooltip text="Refrescar lista de agentes" /></tooltip>
+                                     </Button>
+                                     <Button fx:id="btnVistaPreviaAgente" mnemonicParsing="false"
+                                             onAction="#vistaPreviaAgente"
+                                             prefHeight="28.0" prefWidth="82.0" text="Vista Previa"
+                                             style="-fx-background-color: #0076a8; -fx-text-fill: white;
+                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 11;">
+                                        <tooltip><Tooltip text="Vista previa del informe del agente" /></tooltip>
+                                     </Button>
+                                     <Button fx:id="btnDescargarPDFAgente" mnemonicParsing="false"
+                                             onAction="#descargarPDFAgente"
+                                             prefHeight="28.0" prefWidth="82.0" text="Descargar PDF"
+                                             style="-fx-background-color: #047857; -fx-text-fill: white;
+                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 11;">
+                                        <tooltip><Tooltip text="Descargar informe PDF del agente seleccionado" /></tooltip>
+                                     </Button>
+                                  </children>
+                               </HBox>
+                            </children>
+                         </VBox>
+
+                      </children>
+                   </HBox>
+                </children>
+             </Pane>
+
+             <!-- ── REGISTRO CLIENTES ──────────────────────────────── -->
+             <Pane fx:id="panelRegistro" prefHeight="578.0" prefWidth="724.0" visible="false"
                   style="-fx-background-color: #f0f4f8;">
                <children>
                   <HBox alignment="CENTER" prefHeight="578.0" prefWidth="724.0" spacing="14.0"

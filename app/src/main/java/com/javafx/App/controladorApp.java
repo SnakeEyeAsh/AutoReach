@@ -1,12 +1,15 @@
 package com.javafx.App;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +19,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -24,33 +27,27 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import java.util.ArrayList;
+import javafx.collections.transformation.FilteredList;
+import javafx.util.Duration;
 
-import javafx.scene.web.WebView;
+import javafx.animation.TranslateTransition;
 
-import com.javafx.Data.Datos;
-import com.javafx.JDBC.Conexion;
+import com.javafx.Model.Agente;
 import com.javafx.Model.Alquiler;
 import com.javafx.Model.Cliente;
 import com.javafx.Model.Coche;
 import com.javafx.Model.CocheCompleto;
 import com.javafx.Model.CocheCompra;
 import com.javafx.Model.Disponible;
+import com.javafx.Model.ValidadorAgente;
 import com.javafx.Model.ValidadorAlquiler;
 import com.javafx.Model.ValidadorCliente;
+import com.javafx.JDBC.Conexion;
 import com.javafx.Model.ValidadorCoche;
-
-
-import javafx.animation.TranslateTransition;
-import javafx.application.Platform;
-import javafx.collections.transformation.FilteredList;
-import javafx.util.Duration;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 import javafx.event.ActionEvent;
 import javafx.scene.input.KeyEvent;
@@ -80,6 +77,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.web.WebView;
 
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -269,6 +267,9 @@ public class controladorApp implements Initializable {
     private Button btnIrAIngreso;
 
     @FXML
+    private Button btnAgentes;
+
+    @FXML
     private Button btnAceptarIngreso;
 
     @FXML
@@ -452,6 +453,9 @@ public class controladorApp implements Initializable {
     @FXML
     private Pane panelIngreso;
 
+    @FXML
+    private Pane panelAgentes;
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     @FXML
@@ -509,11 +513,64 @@ public class controladorApp implements Initializable {
     private TextField txtUser;
 
     @FXML
+    private TextField txtAgenteUsername;
+
+    @FXML
+    private PasswordField pfAgentePassword;
+
+    @FXML
+    private TextField txtAgenteNombre;
+
+    @FXML
+    private TextField txtAgenteApellidos;
+
+    @FXML
+    private TextField txtAgenteTelefono;
+
+    @FXML
+    private TextField txtAgenteEmail;
+
+    @FXML
+    private TableView<Agente> tablaAgentes;
+
+    @FXML
+    private TableColumn<Agente, String> colAgenteUsuario;
+
+    @FXML
+    private TableColumn<Agente, String> colAgenteNombre;
+
+    @FXML
+    private TableColumn<Agente, String> colAgenteEmail;
+
+    @FXML
+    private Button btnGuardarAgente;
+
+    @FXML
+    private Button btnCancelarAgente;
+
+    @FXML
+    private Button btnEditarAgente;
+
+    @FXML
+    private Button btnEliminarAgente;
+
+    @FXML
+    private Button btnRefrescarAgentes;
+
+    @FXML
+    private Button btnVistaPreviaAgente;
+
+    @FXML
+    private Button btnDescargarPDFAgente;
+
+    @FXML
     private VBox ventanaLogin;
 
     private ValidadorCliente validador;
     private ValidadorCoche validadorC;
     private ValidadorAlquiler validadorAlquiler;
+    private ValidadorAgente validadorAgente;
+    private Agente agenteEnEdicion = null;
     
 
     @Override
@@ -589,12 +646,16 @@ public class controladorApp implements Initializable {
         validador = new ValidadorCliente();
         validadorC = new ValidadorCoche();
         validadorAlquiler = new ValidadorAlquiler();
+        validadorAgente = new ValidadorAgente();
 
         validadorAlquiler.inicializarValidadores(cldRecoger, cldEntrega, txtHoraEntrega);
         validadorC.inicializarValidadores(ingresoMarca, ingresoModelo, ingresoAño, ingresoKms, ingresoBastidor,
                 ingresoPrecio, ingresoDllantas, ingresoDiseñoLlantas, ingresoColor, ingresoMatricula);
         validador.inicializarValidadores(txtNombre, txtApellidos, txtDireccion, txtTelefono, dpFechaNac, txtDni,
                 txtEmail, toggleSexo);
+
+        validadorAgente.inicializarValidadores(txtAgenteUsername, txtAgenteNombre, txtAgenteApellidos,
+                txtAgenteTelefono, txtAgenteEmail);
 
         // Configurar tooltip para el campo de hora de entrega
         Tooltip tooltipHora = new Tooltip("Formato: HH:mm (ejemplo: 14:30, 09:15)");
@@ -617,7 +678,7 @@ public class controladorApp implements Initializable {
         ingresoModelo.setTooltip(new Tooltip("Modelo del vehículo (ejemplo: Corolla, Serie 3, Focus)"));
         ingresoPrecio.setTooltip(new Tooltip("Precio base del vehículo (ejemplo: 25000.00)"));
 
-        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso);
+        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso, btnAgentes);
         iniciarTablas();
         ocultarTodos();
         desactivarBotones();
@@ -728,6 +789,7 @@ public class controladorApp implements Initializable {
                     btnCerrarSesion.setDisable(false);
                     btnIrAIngreso.setDisable(false);
                     btnCompras.setDisable(false);
+                    btnAgentes.setDisable(false);
                 });
 
             } catch (Exception ex) {
@@ -2458,7 +2520,7 @@ public class controladorApp implements Initializable {
         } else {
             mostrarPanel(panelRegistro);
         }
-        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso);
+        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso, btnAgentes);
     }
 
     @FXML
@@ -2516,7 +2578,7 @@ public class controladorApp implements Initializable {
             return;
         }
         mostrarPanel(pantallaAlquiler);
-        cambiarColores.cambiar(btnAlquiler, btnIrAInicio, btnCompras, btnIrAIngreso);
+        cambiarColores.cambiar(btnAlquiler, btnIrAInicio, btnCompras, btnIrAIngreso, btnAgentes);
     }
 
     @FXML
@@ -2530,13 +2592,256 @@ public class controladorApp implements Initializable {
             return;
         }
         mostrarPanel(panelVentas);
-        cambiarColores.cambiar(btnCompras, btnIrAInicio, btnAlquiler, btnIrAIngreso);
+        cambiarColores.cambiar(btnCompras, btnIrAInicio, btnAlquiler, btnIrAIngreso, btnAgentes);
     }
 
     @FXML
     void irAIngresos(ActionEvent event) {
         mostrarPanel(panelIngreso);
-        cambiarColores.cambiar(btnIrAIngreso, btnCompras, btnIrAInicio, btnAlquiler);
+        cambiarColores.cambiar(btnIrAIngreso, btnCompras, btnIrAInicio, btnAlquiler, btnAgentes);
+    }
+
+    @FXML
+    void irAAgentes(ActionEvent event) {
+        refrescarTablaAgentes();
+        mostrarPanel(panelAgentes);
+        cambiarColores.cambiar(btnAgentes, btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso);
+    }
+
+    @FXML
+    void guardarAgente(ActionEvent event) {
+        String username  = txtAgenteUsername.getText().trim();
+        String password  = pfAgentePassword.getText();
+        String nombre    = txtAgenteNombre.getText().trim();
+        String apellidos = txtAgenteApellidos.getText().trim();
+        String telefono  = txtAgenteTelefono.getText().trim();
+        String email     = txtAgenteEmail.getText().trim();
+
+        boolean hayErrores = false;
+        if (username.isEmpty()) {
+            aplicarEfectoShake(txtAgenteUsername);
+            aplicarEstiloError(txtAgenteUsername);
+            hayErrores = true;
+        }
+        if (nombre.isEmpty()) {
+            aplicarEfectoShake(txtAgenteNombre);
+            aplicarEstiloError(txtAgenteNombre);
+            hayErrores = true;
+        }
+        if (apellidos.isEmpty()) {
+            aplicarEfectoShake(txtAgenteApellidos);
+            aplicarEstiloError(txtAgenteApellidos);
+            hayErrores = true;
+        }
+        if (hayErrores) {
+            AlertaEstilizada.mostrarAdvertencia("Campos incompletos",
+                    "Datos requeridos", "Usuario, nombre y apellidos son obligatorios");
+            return;
+        }
+
+        if (agenteEnEdicion == null && password.isEmpty()) {
+            aplicarEfectoShake(pfAgentePassword);
+            aplicarEstiloError(pfAgentePassword);
+            AlertaEstilizada.mostrarAdvertencia("Contraseña requerida",
+                    "Dato requerido", "La contraseña es obligatoria al crear un agente");
+            return;
+        }
+
+        if (!password.isEmpty() && !password.matches(".{6,}")) {
+            aplicarEfectoShake(pfAgentePassword);
+            aplicarEstiloError(pfAgentePassword);
+            AlertaEstilizada.mostrarAdvertencia("Contraseña débil",
+                    "Longitud mínima", "La contraseña debe tener al menos 6 caracteres");
+            return;
+        }
+
+        if (!txtAgenteTelefono.getText().trim().isEmpty() &&
+                !txtAgenteTelefono.getText().trim().matches("\\d{9,15}")) {
+            aplicarEfectoShake(txtAgenteTelefono);
+            aplicarEstiloError(txtAgenteTelefono);
+            AlertaEstilizada.mostrarAdvertencia("Teléfono inválido",
+                    "Formato incorrecto", "El teléfono debe tener entre 9 y 15 dígitos");
+            return;
+        }
+
+        if (!txtAgenteEmail.getText().trim().isEmpty() &&
+                !txtAgenteEmail.getText().trim().matches("^[\\w.-]+@[\\w.-]+\\.\\w{2,}$")) {
+            aplicarEfectoShake(txtAgenteEmail);
+            aplicarEstiloError(txtAgenteEmail);
+            AlertaEstilizada.mostrarAdvertencia("Email inválido",
+                    "Formato incorrecto", "Introduce un email válido (ejemplo: nombre@dominio.com)");
+            return;
+        }
+
+        if (agenteEnEdicion != null) {
+            agenteEnEdicion.setUsername(username);
+            agenteEnEdicion.setNombre(nombre);
+            agenteEnEdicion.setApellidos(apellidos);
+            agenteEnEdicion.setTelefono(telefono);
+            agenteEnEdicion.setEmail(email);
+            try {
+                Conexion.editarAgente(agenteEnEdicion, password.isEmpty() ? null : password);
+                AlertaEstilizada.mostrarInformacion("Agente actualizado", "Éxito",
+                        "Los datos del agente han sido actualizados");
+                agenteEnEdicion = null;
+                limpiarFormularioAgente();
+                refrescarTablaAgentes();
+            } catch (Exception e) {
+                AlertaEstilizada.mostrarError("Error al actualizar agente",
+                        "No se pudo actualizar", e.getMessage());
+            }
+        } else {
+            try {
+                Conexion.crearAgente(username, password, nombre, apellidos, telefono, email);
+                AlertaEstilizada.mostrarInformacion("Agente creado", "Éxito",
+                        "El agente " + username + " ha sido creado correctamente");
+                limpiarFormularioAgente();
+                refrescarTablaAgentes();
+            } catch (Exception e) {
+                AlertaEstilizada.mostrarError("Error al crear agente",
+                        "No se pudo crear", e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    void cancelarNuevoAgente(ActionEvent event) {
+        agenteEnEdicion = null;
+        limpiarFormularioAgente();
+    }
+
+    @FXML
+    void editarAgente(ActionEvent event) {
+        Agente seleccionado = tablaAgentes.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            AlertaEstilizada.mostrarAdvertencia("Sin selección",
+                    "Ningún agente seleccionado", "Selecciona un agente de la tabla para editar");
+            return;
+        }
+
+        agenteEnEdicion = seleccionado;
+        txtAgenteUsername.setText(seleccionado.getUsername());
+        txtAgenteNombre.setText(seleccionado.getNombre());
+        txtAgenteApellidos.setText(seleccionado.getApellidos());
+        txtAgenteTelefono.setText(seleccionado.getTelefono());
+        txtAgenteEmail.setText(seleccionado.getEmail());
+        pfAgentePassword.clear();
+        pfAgentePassword.setPromptText("Dejar vacío para no cambiar");
+
+        AlertaEstilizada.mostrarInformacion("Editar Agente",
+                "Datos cargados", "Modifica los campos y pulsa Guardar para guardar los cambios");
+    }
+
+    @FXML
+    void eliminarAgente(ActionEvent event) {
+        Agente seleccionado = tablaAgentes.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            AlertaEstilizada.mostrarAdvertencia("Sin selección",
+                    "Ningún agente seleccionado", "Selecciona un agente de la tabla para eliminar");
+            return;
+        }
+
+        boolean confirmado = AlertaEstilizada.confirmar(
+                "Eliminar Agente",
+                "¿Estás seguro?",
+                "Se eliminará permanentemente el agente " + seleccionado.getUsername() +
+                ".\n\nEsta acción no se puede deshacer."
+        );
+
+        if (!confirmado) return;
+
+        Conexion.eliminarAgente(seleccionado.getId());
+        AlertaEstilizada.mostrarInformacion("Agente eliminado", "Éxito",
+                "El agente " + seleccionado.getUsername() + " ha sido eliminado");
+        limpiarFormularioAgente();
+        refrescarTablaAgentes();
+    }
+
+    @FXML
+    void refrescarAgentes(ActionEvent event) {
+        refrescarTablaAgentes();
+        AlertaEstilizada.mostrarInformacion("Lista actualizada", "Éxito",
+                "La lista de agentes se ha actualizado correctamente");
+    }
+
+    @FXML
+    void vistaPreviaAgente(ActionEvent event) {
+        Agente seleccionado = tablaAgentes.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            AlertaEstilizada.mostrarAdvertencia("Sin selección",
+                    "Ningún agente seleccionado", "Selecciona un agente de la tabla para previsualizar su informe");
+            return;
+        }
+
+        try {
+            String htmlContent = GeneradorInformes.generarHtmlInformeAgente(seleccionado);
+            Stage reporteStage = new Stage();
+            reporteStage.setTitle("Informe de Agente - " + seleccionado.getUsername());
+            reporteStage.initModality(Modality.WINDOW_MODAL);
+            if (btnVistaPreviaAgente.getScene() != null && btnVistaPreviaAgente.getScene().getWindow() != null) {
+                reporteStage.initOwner(btnVistaPreviaAgente.getScene().getWindow());
+            }
+
+            WebView webView = new WebView();
+            webView.getEngine().loadContent(htmlContent);
+
+            Scene scene = new Scene(webView, 700, 500);
+            reporteStage.setScene(scene);
+            reporteStage.show();
+
+        } catch (Exception e) {
+            AlertaEstilizada.mostrarError("Error al generar informe",
+                    "No se pudo generar la vista previa", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void descargarPDFAgente(ActionEvent event) {
+        Agente seleccionado = tablaAgentes.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            AlertaEstilizada.mostrarAdvertencia("Sin selección",
+                    "Ningún agente seleccionado", "Selecciona un agente de la tabla para descargar su informe");
+            return;
+        }
+
+        boolean confirmado = AlertaEstilizada.confirmar(
+                "Descargar Informe",
+                "¿Descargar PDF?",
+                "Se generará un informe PDF del agente " + seleccionado.getUsername() +
+                ".\n\nSe guardará en Documents/AutoReach/Informer/"
+        );
+
+        if (!confirmado) return;
+
+        try {
+            File archivoDestino = GeneradorInformes.exportarInformeAgentePDF(seleccionado);
+            if (archivoDestino != null) {
+                AlertaEstilizada.mostrarInformacion("Informe exportado", "Éxito",
+                        "El PDF se ha guardado en:\n" + archivoDestino.getAbsolutePath());
+            } else {
+                AlertaEstilizada.mostrarError("Error al exportar PDF",
+                        "No se pudo generar el PDF", "Ocurrió un error al generar el informe");
+            }
+        } catch (Exception e) {
+            AlertaEstilizada.mostrarError("Error al exportar PDF",
+                    "No se pudo generar el PDF", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void refrescarTablaAgentes() {
+        tablaAgentes.setItems(Conexion.mostrarAgentes());
+    }
+
+    private void limpiarFormularioAgente() {
+        txtAgenteUsername.clear();
+        pfAgentePassword.clear();
+        pfAgentePassword.setPromptText("Contraseña");
+        txtAgenteNombre.clear();
+        txtAgenteApellidos.clear();
+        txtAgenteTelefono.clear();
+        txtAgenteEmail.clear();
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////// -
@@ -2926,6 +3231,7 @@ public class controladorApp implements Initializable {
         pantallaSesion.setVisible(false);
         panelRegistro.setVisible(false);
         panelIngreso.setVisible(false);
+        panelAgentes.setVisible(false);
     }
 
     private void mostrarPanel(Pane panel) {
@@ -2943,6 +3249,7 @@ public class controladorApp implements Initializable {
         btnCompras.setDisable(true);
         btnCerrarSesion.setDisable(true);
         btnIrAIngreso.setDisable(true);
+        btnAgentes.setDisable(true);
 
     }
 
@@ -2974,6 +3281,10 @@ public class controladorApp implements Initializable {
 
             // Actualizar gráfica de coches por año
             actualizarGraficaCochesPorAño();
+
+            colAgenteUsuario.setCellValueFactory(new PropertyValueFactory<>("username"));
+            colAgenteNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+            colAgenteEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         } catch (Exception e) {
             System.err.println("✗ Error al inicializar las tablas: " + e.getMessage());
             e.printStackTrace();

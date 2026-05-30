@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="informe_agente"
+              pageWidth="595" pageHeight="842"
+              columnWidth="535"
+              leftMargin="30" rightMargin="30" topMargin="30" bottomMargin="30"
+              uuid="a1b2c3d4-e5f6-7890-abcd-ef1234567891">
+
+    <style name="TituloHeader" fontSize="24" isBold="true" forecolor="#FFFFFF"/>
+    <style name="SubtituloHeader" fontSize="12" forecolor="#FFFFFF"/>
+    <style name="TituloSeccion" fontSize="14" isBold="true" forecolor="#1E3A8A"/>
+    <style name="LabelCampo" fontSize="11" isBold="true" forecolor="#374151"/>
+    <style name="ValorCampo" fontSize="11" forecolor="#1E3A8A"/>
+    <style name="Footer" fontSize="10" forecolor="#6B7280"/>
+
+    <parameter name="FECHA" class="java.lang.String"/>
+    <parameter name="USERNAME" class="java.lang.String"/>
+    <parameter name="NOMBRE" class="java.lang.String"/>
+    <parameter name="APELLIDOS" class="java.lang.String"/>
+    <parameter name="TELEFONO" class="java.lang.String"/>
+    <parameter name="EMAIL" class="java.lang.String"/>
+    <parameter name="ACTIVO" class="java.lang.String"/>
+
+    <title>
+        <band height="100">
+            <rectangle radius="10">
+                <reportElement x="0" y="0" width="535" height="90" backcolor="#1E3A8A" uuid="11111111-1111-1111-1111-111111111201"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="TituloHeader" x="20" y="15" width="495" height="35" uuid="11111111-1111-1111-1111-111111111202"/>
+                <text><![CDATA[Ficha de Agente - AutoReach]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="SubtituloHeader" x="20" y="55" width="495" height="20" uuid="11111111-1111-1111-1111-111111111203"/>
+                <textFieldExpression><![CDATA["Fecha: " + $P{FECHA}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <detail>
+        <band height="380">
+            <rectangle radius="8">
+                <reportElement x="0" y="10" width="535" height="180" backcolor="#FFFFFF" uuid="11111111-1111-1111-1111-111111111204"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#E5E7EB"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement style="TituloSeccion" x="15" y="20" width="250" height="25" uuid="11111111-1111-1111-1111-111111111205"/>
+                <text><![CDATA[Datos Personales]]></text>
+            </staticText>
+            <line>
+                <reportElement x="15" y="45" width="150" height="1" forecolor="#F97316" uuid="11111111-1111-1111-1111-111111111206"/>
+                <graphicElement>
+                    <pen lineWidth="3"/>
+                </graphicElement>
+            </line>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="60" width="100" height="20" uuid="11111111-1111-1111-1111-111111111207"/>
+                <text><![CDATA[Usuario:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="120" y="60" width="400" height="20" uuid="11111111-1111-1111-1111-111111111208"/>
+                <textFieldExpression><![CDATA[$P{USERNAME} != null && !$P{USERNAME}.isEmpty() ? $P{USERNAME} : "-"]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="85" width="100" height="20" uuid="11111111-1111-1111-1111-111111111209"/>
+                <text><![CDATA[Nombre:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="120" y="85" width="400" height="20" uuid="11111111-1111-1111-1111-111111111210"/>
+                <textFieldExpression><![CDATA[$P{NOMBRE} != null && !$P{NOMBRE}.isEmpty() ? $P{NOMBRE} : "-"]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="110" width="100" height="20" uuid="11111111-1111-1111-1111-111111111211"/>
+                <text><![CDATA[Apellidos:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="120" y="110" width="400" height="20" uuid="11111111-1111-1111-1111-111111111212"/>
+                <textFieldExpression><![CDATA[$P{APELLIDOS} != null && !$P{APELLIDOS}.isEmpty() ? $P{APELLIDOS} : "-"]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="135" width="100" height="20" uuid="11111111-1111-1111-1111-111111111213"/>
+                <text><![CDATA[Teléfono:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="120" y="135" width="400" height="20" uuid="11111111-1111-1111-1111-111111111214"/>
+                <textFieldExpression><![CDATA[$P{TELEFONO} != null && !$P{TELEFONO}.isEmpty() ? $P{TELEFONO} : "-"]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="LabelCampo" x="15" y="160" width="100" height="20" uuid="11111111-1111-1111-1111-111111111215"/>
+                <text><![CDATA[Email:]]></text>
+            </staticText>
+            <textField>
+                <reportElement style="ValorCampo" x="120" y="160" width="400" height="20" uuid="11111111-1111-1111-1111-111111111216"/>
+                <textFieldExpression><![CDATA[$P{EMAIL} != null && !$P{EMAIL}.isEmpty() ? $P{EMAIL} : "-"]]></textFieldExpression>
+            </textField>
+
+            <rectangle radius="8">
+                <reportElement x="0" y="210" width="535" height="80" backcolor="#FFFFFF" uuid="11111111-1111-1111-1111-111111111217"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#E5E7EB"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement style="TituloSeccion" x="15" y="220" width="250" height="25" uuid="11111111-1111-1111-1111-111111111218"/>
+                <text><![CDATA[Estado]]></text>
+            </staticText>
+            <line>
+                <reportElement x="15" y="245" width="100" height="1" forecolor="#F97316" uuid="11111111-1111-1111-1111-111111111219"/>
+                <graphicElement>
+                    <pen lineWidth="3"/>
+                </graphicElement>
+            </line>
+
+            <textField>
+                <reportElement style="ValorCampo" x="15" y="255" width="200" height="22" uuid="11111111-1111-1111-1111-111111111220"/>
+                <textFieldExpression><![CDATA[$P{ACTIVO}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="40">
+            <staticText>
+                <reportElement style="Footer" x="0" y="10" width="535" height="20" uuid="11111111-1111-1111-1111-111111111222"/>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[Documento generado automaticamente por AutoReach]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+
+</jasperReport>

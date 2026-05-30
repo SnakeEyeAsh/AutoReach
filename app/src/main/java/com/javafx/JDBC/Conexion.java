@@ -21,6 +21,7 @@ import com.google.gson.JsonParser;
 import com.javafx.Model.Alquiler;
 import com.javafx.Model.Cliente;
 import com.javafx.Model.Coche;
+import com.javafx.Model.Agente;
 import com.javafx.Model.CocheCompleto;
 import com.javafx.Model.CocheCompra;
 import com.javafx.Model.Disponible;
@@ -1230,6 +1231,99 @@ public class Conexion {
         } catch (Exception e) {
             System.err.println("Error al actualizar estado de pago: " + e.getMessage());
             return false;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // AGENTES - CRUD
+    // ═══════════════════════════════════════════════════════════════
+
+    public static ObservableList<Agente> mostrarAgentes() {
+        ObservableList<Agente> lista = FXCollections.observableArrayList();
+        if (!isConexionActiva()) { System.err.println("Sin conexión activa"); return lista; }
+        try {
+            JsonArray arr = getArray("agentes");
+            for (JsonElement el : arr) {
+                JsonObject obj = el.getAsJsonObject();
+                JsonElement activoEl = obj.get("activo");
+                boolean activo = activoEl != null && !activoEl.isJsonNull() && (
+                        (activoEl.isJsonPrimitive() && activoEl.getAsJsonPrimitive().isBoolean()
+                                ? activoEl.getAsBoolean()
+                                : "true".equalsIgnoreCase(activoEl.getAsString())
+                                  || "t".equalsIgnoreCase(activoEl.getAsString())
+                                  || "1".equals(activoEl.getAsString()))
+                );
+                Agente a = new Agente(
+                        str(obj, "username"),
+                        str(obj, "nombre"),
+                        str(obj, "apellidos"),
+                        str(obj, "telefono"),
+                        str(obj, "email"),
+                        activo);
+                a.setId(intVal(obj, "id"));
+                lista.add(a);
+            }
+        } catch (Exception e) {
+            System.err.println("Error al mostrar agentes: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public static void crearAgente(String username, String password, String nombre,
+            String apellidos, String telefono, String email) throws Exception {
+        JsonObject body = new JsonObject();
+        body.addProperty("username",  username);
+        body.addProperty("password",  password);
+        body.addProperty("nombre",    nombre);
+        body.addProperty("apellidos", apellidos);
+        body.addProperty("telefono",  telefono);
+        body.addProperty("email",     email);
+
+        System.out.println("[CREAR AGENTE] URL: " + apiUrl + "/api/agentes");
+        System.out.println("[CREAR AGENTE] Body: " + body.toString());
+        HttpResponse<String> resp = post("agentes", body.toString());
+        System.out.println("[CREAR AGENTE] Status: " + resp.statusCode());
+        System.out.println("[CREAR AGENTE] Response: " + resp.body());
+        if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
+            throw new Exception("Error al crear agente: " + resp.body());
+        }
+        System.out.println("✓ Agente creado");
+    }
+
+    public static void editarAgente(Agente a, String nuevaPassword) {
+        JsonObject body = new JsonObject();
+        body.addProperty("username",  a.getUsername());
+        body.addProperty("nombre",    a.getNombre());
+        body.addProperty("apellidos", a.getApellidos());
+        body.addProperty("telefono",  a.getTelefono());
+        body.addProperty("email",     a.getEmail());
+        body.addProperty("activo",    a.isActivo());
+        if (nuevaPassword != null && !nuevaPassword.isBlank()) {
+            body.addProperty("password", nuevaPassword);
+        }
+
+        try {
+            HttpResponse<String> resp = put("agentes/" + a.getId(), body.toString());
+            if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
+                System.out.println("✓ Agente actualizado");
+            } else {
+                System.err.println("Error al editar agente: " + resp.body());
+            }
+        } catch (Exception e) {
+            System.err.println("Error al editar agente: " + e.getMessage());
+        }
+    }
+
+    public static void eliminarAgente(int id) {
+        try {
+            HttpResponse<String> resp = delete("agentes/" + id);
+            if (resp.statusCode() >= 200 && resp.statusCode() < 300) {
+                System.out.println("✓ Agente eliminado");
+            } else {
+                System.err.println("Error al eliminar agente: " + resp.body());
+            }
+        } catch (Exception e) {
+            System.err.println("Error al eliminar agente: " + e.getMessage());
         }
     }
 }
