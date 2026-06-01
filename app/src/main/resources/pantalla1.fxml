@@ -117,7 +117,7 @@
                       <tooltip><Tooltip text="Chat con Asistente IA" /></tooltip>
                       <graphic>
                          <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
-                            <image><Image url="@Assets/gemini-color.png" /></image>
+                            <image><Image url="@Assets/groq.png" /></image>
                          </ImageView>
                       </graphic>
                    </Button>
