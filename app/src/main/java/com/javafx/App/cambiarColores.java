@@ -27,4 +27,14 @@ public class cambiarColores {
         cinco.setStyle(INACTIVO);
     }
 
+    public static void cambiar(Button presente, Button dos, Button tres,
+                                Button cuatro, Button cinco, Button seis) {
+        presente.setStyle(ACTIVO);
+        dos.setStyle(INACTIVO);
+        tres.setStyle(INACTIVO);
+        cuatro.setStyle(INACTIVO);
+        cinco.setStyle(INACTIVO);
+        seis.setStyle(INACTIVO);
+    }
+
 }

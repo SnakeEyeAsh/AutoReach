@@ -14,6 +14,7 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
@@ -104,6 +105,19 @@
                       <graphic>
                          <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
                             <image><Image url="@Assets/perfil.png" /></image>
+                         </ImageView>
+                      </graphic>
+                   </Button>
+
+                   <Button fx:id="btnChat" contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity"
+                           mnemonicParsing="false" onAction="#irAChat" prefWidth="110.0"
+                           style="-fx-background-color: transparent; -fx-text-fill: #b0bcd4;
+                                  -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand; -fx-padding: 10 0;"
+                           text="IA Chat" VBox.vgrow="ALWAYS">
+                      <tooltip><Tooltip text="Chat con Asistente IA" /></tooltip>
+                      <graphic>
+                         <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                            <image><Image url="@Assets/gemini-color.png" /></image>
                          </ImageView>
                       </graphic>
                    </Button>
@@ -887,6 +901,72 @@
 
                       </children>
                    </HBox>
+                </children>
+             </Pane>
+
+             <!-- ── CHAT CON GEMINI IA ─────────────────────────────── -->
+             <Pane fx:id="panelChat" prefHeight="578.0" prefWidth="724.0" visible="false"
+                   style="-fx-background-color: #f0f4f8;">
+                <children>
+
+                   <!-- Cabecera -->
+                   <Pane layoutX="0" layoutY="0" prefHeight="56" prefWidth="724"
+                         style="-fx-background-color: #1a1a2e;">
+                      <children>
+                         <Label layoutX="24" layoutY="16" text="Asistente IA \u2014 AutoReach"
+                                style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;
+                                       -fx-font-family: 'Segoe UI';"/>
+                         <Label fx:id="lblEstadoChat" layoutX="420" layoutY="20" text=""
+                                style="-fx-text-fill: #00d4ff; -fx-font-size: 11; -fx-font-family: 'Segoe UI';"/>
+                         <Button fx:id="btnLimpiarChat" layoutX="640" layoutY="14"
+                                 mnemonicParsing="false" onAction="#limpiarChat" text="Limpiar"
+                                 style="-fx-background-color: transparent; -fx-text-fill: #b0bcd4;
+                                        -fx-font-size: 11; -fx-font-family: 'Segoe UI'; -fx-cursor: hand;
+                                        -fx-border-color: #b0bcd4; -fx-border-radius: 4; -fx-padding: 4 10;"/>
+                      </children>
+                   </Pane>
+
+                   <!-- Área de mensajes -->
+                   <ScrollPane fx:id="scrollChat" layoutX="0" layoutY="56" prefHeight="452" prefWidth="724"
+                               fitToWidth="true" hbarPolicy="NEVER"
+                               style="-fx-background: #f0f4f8; -fx-background-color: #f0f4f8;
+                                      -fx-border-color: transparent;">
+                      <content>
+                         <VBox fx:id="vboxMensajes" fillWidth="true" spacing="10"
+                               style="-fx-padding: 16; -fx-background-color: #f0f4f8;">
+                            <Label text="Hola, soy el asistente de AutoReach. Puedes preguntarme sobre clientes,
+coches, alquileres y agentes del sistema."
+                                   wrapText="true" maxWidth="560"
+                                   style="-fx-background-color: #1a1a2e; -fx-text-fill: #e0e6f0;
+                                          -fx-padding: 12 16; -fx-background-radius: 12;
+                                          -fx-font-family: 'Segoe UI'; -fx-font-size: 12;"/>
+                         </VBox>
+                      </content>
+                   </ScrollPane>
+
+                   <!-- Barra de entrada -->
+                   <Pane layoutX="0" layoutY="508" prefHeight="70" prefWidth="724"
+                         style="-fx-background-color: #1a1a2e; -fx-border-color: #0076a8;
+                                -fx-border-width: 1 0 0 0;">
+                      <children>
+                         <TextField fx:id="txtMensajeChat" layoutX="16" layoutY="18"
+                                    prefWidth="590" prefHeight="34"
+                                    promptText="Escribe tu pregunta..."
+                                    onAction="#enviarMensajeChat"
+                                    style="-fx-background-color: #252540; -fx-text-fill: white;
+                                           -fx-prompt-text-fill: #6b7a99; -fx-font-family: 'Segoe UI';
+                                           -fx-font-size: 13; -fx-background-radius: 8;
+                                           -fx-border-color: #0076a8; -fx-border-radius: 8;
+                                           -fx-padding: 0 12;"/>
+                         <Button fx:id="btnEnviarChat" layoutX="618" layoutY="18"
+                                 mnemonicParsing="false" onAction="#enviarMensajeChat"
+                                 prefWidth="90" prefHeight="34" text="Enviar"
+                                 style="-fx-background-color: #0076a8; -fx-text-fill: white;
+                                        -fx-font-family: 'Segoe UI'; -fx-font-size: 13;
+                                        -fx-background-radius: 8; -fx-cursor: hand;"/>
+                      </children>
+                   </Pane>
+
                 </children>
              </Pane>
 

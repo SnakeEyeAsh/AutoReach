@@ -44,6 +44,7 @@ import com.javafx.Model.CocheCompra;
 import com.javafx.Model.Disponible;
 import com.javafx.Model.ValidadorAgente;
 import com.javafx.Model.ValidadorAlquiler;
+import com.javafx.Service.GeminiService;
 import com.javafx.Model.ValidadorCliente;
 import com.javafx.JDBC.Conexion;
 import com.javafx.Model.ValidadorCoche;
@@ -64,6 +65,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -456,6 +458,15 @@ public class controladorApp implements Initializable {
     @FXML
     private Pane panelAgentes;
 
+    @FXML private Pane panelChat;
+    @FXML private Button btnChat;
+    @FXML private TextField txtMensajeChat;
+    @FXML private VBox vboxMensajes;
+    @FXML private ScrollPane scrollChat;
+    @FXML private Label lblEstadoChat;
+    @FXML private Button btnEnviarChat;
+    @FXML private Button btnLimpiarChat;
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     @FXML
@@ -571,6 +582,7 @@ public class controladorApp implements Initializable {
     private ValidadorAlquiler validadorAlquiler;
     private ValidadorAgente validadorAgente;
     private Agente agenteEnEdicion = null;
+    private final GeminiService geminiService = new GeminiService();
     
 
     @Override
@@ -678,7 +690,7 @@ public class controladorApp implements Initializable {
         ingresoModelo.setTooltip(new Tooltip("Modelo del vehículo (ejemplo: Corolla, Serie 3, Focus)"));
         ingresoPrecio.setTooltip(new Tooltip("Precio base del vehículo (ejemplo: 25000.00)"));
 
-        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso, btnAgentes);
+        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso, btnAgentes, btnChat);
         iniciarTablas();
         ocultarTodos();
         desactivarBotones();
@@ -790,6 +802,7 @@ public class controladorApp implements Initializable {
                     btnIrAIngreso.setDisable(false);
                     btnCompras.setDisable(false);
                     btnAgentes.setDisable(false);
+                    btnChat.setDisable(false);
                 });
 
             } catch (Exception ex) {
@@ -2520,7 +2533,7 @@ public class controladorApp implements Initializable {
         } else {
             mostrarPanel(panelRegistro);
         }
-        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso, btnAgentes);
+        cambiarColores.cambiar(btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso, btnAgentes, btnChat);
     }
 
     @FXML
@@ -2578,7 +2591,7 @@ public class controladorApp implements Initializable {
             return;
         }
         mostrarPanel(pantallaAlquiler);
-        cambiarColores.cambiar(btnAlquiler, btnIrAInicio, btnCompras, btnIrAIngreso, btnAgentes);
+        cambiarColores.cambiar(btnAlquiler, btnIrAInicio, btnCompras, btnIrAIngreso, btnAgentes, btnChat);
     }
 
     @FXML
@@ -2592,20 +2605,123 @@ public class controladorApp implements Initializable {
             return;
         }
         mostrarPanel(panelVentas);
-        cambiarColores.cambiar(btnCompras, btnIrAInicio, btnAlquiler, btnIrAIngreso, btnAgentes);
+        cambiarColores.cambiar(btnCompras, btnIrAInicio, btnAlquiler, btnIrAIngreso, btnAgentes, btnChat);
     }
 
     @FXML
     void irAIngresos(ActionEvent event) {
         mostrarPanel(panelIngreso);
-        cambiarColores.cambiar(btnIrAIngreso, btnCompras, btnIrAInicio, btnAlquiler, btnAgentes);
+        cambiarColores.cambiar(btnIrAIngreso, btnCompras, btnIrAInicio, btnAlquiler, btnAgentes, btnChat);
     }
 
     @FXML
     void irAAgentes(ActionEvent event) {
         refrescarTablaAgentes();
         mostrarPanel(panelAgentes);
-        cambiarColores.cambiar(btnAgentes, btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso);
+        cambiarColores.cambiar(btnAgentes, btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso, btnChat);
+    }
+
+    @FXML
+    void irAChat(ActionEvent event) {
+        mostrarPanel(panelChat);
+        cambiarColores.cambiar(btnChat, btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso, btnAgentes);
+        new Thread(() -> {
+            String contexto = construirContextoGemini();
+            geminiService.setContexto(contexto);
+            javafx.application.Platform.runLater(() ->
+                lblEstadoChat.setText("\u2713 Datos cargados"));
+        }).start();
+    }
+
+    @FXML
+    void enviarMensajeChat(ActionEvent event) {
+        String mensaje = txtMensajeChat.getText().trim();
+        if (mensaje.isEmpty()) return;
+
+        agregarMensajeChat(mensaje, true);
+        txtMensajeChat.clear();
+        btnEnviarChat.setDisable(true);
+        lblEstadoChat.setText("Pensando...");
+
+        new Thread(() -> {
+            try {
+                String respuesta = geminiService.enviarMensaje(mensaje);
+                javafx.application.Platform.runLater(() -> {
+                    agregarMensajeChat(respuesta, false);
+                    btnEnviarChat.setDisable(false);
+                    lblEstadoChat.setText("");
+                });
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    agregarMensajeChat("Error: " + e.getMessage(), false);
+                    btnEnviarChat.setDisable(false);
+                    lblEstadoChat.setText("Error");
+                });
+            }
+        }).start();
+    }
+
+    @FXML
+    void limpiarChat(ActionEvent event) {
+        vboxMensajes.getChildren().clear();
+        geminiService.limpiarHistorial();
+        lblEstadoChat.setText("");
+        agregarMensajeChat("Hola, soy el asistente de AutoReach. Puedes preguntarme sobre " +
+                "clientes, coches, alquileres y agentes del sistema.", false);
+    }
+
+    private void agregarMensajeChat(String texto, boolean esUsuario) {
+        javafx.scene.control.Label burbuja = new javafx.scene.control.Label(texto);
+        burbuja.setWrapText(true);
+        burbuja.setMaxWidth(560);
+        burbuja.setStyle(esUsuario
+                ? "-fx-background-color: #0076a8; -fx-text-fill: white; " +
+                  "-fx-padding: 12 16; -fx-background-radius: 12; " +
+                  "-fx-font-family: 'Segoe UI'; -fx-font-size: 12;"
+                : "-fx-background-color: #1a1a2e; -fx-text-fill: #e0e6f0; " +
+                  "-fx-padding: 12 16; -fx-background-radius: 12; " +
+                  "-fx-font-family: 'Segoe UI'; -fx-font-size: 12;");
+
+        javafx.scene.layout.HBox contenedor = new javafx.scene.layout.HBox(burbuja);
+        contenedor.setAlignment(esUsuario
+                ? javafx.geometry.Pos.CENTER_RIGHT
+                : javafx.geometry.Pos.CENTER_LEFT);
+
+        vboxMensajes.getChildren().add(contenedor);
+
+        javafx.application.Platform.runLater(() ->
+            scrollChat.setVvalue(1.0));
+    }
+
+    private String construirContextoGemini() {
+        StringBuilder ctx = new StringBuilder();
+        ctx.append("Eres el asistente inteligente de AutoReach, un sistema de gestión de ");
+        ctx.append("alquiler y venta de vehículos de una concesionaria. ");
+        ctx.append("Responde siempre en español, de forma concisa y precisa. ");
+        ctx.append("Solo responde preguntas relacionadas con los datos de AutoReach.\n\n");
+
+        try {
+            javafx.collections.ObservableList<com.javafx.Model.Cliente> clientes =
+                    com.javafx.JDBC.Conexion.mostrarClientes();
+            ctx.append("=== CLIENTES: ").append(clientes.size()).append(" registrados.\n");
+
+            javafx.collections.ObservableList<com.javafx.Model.Coche> coches =
+                    com.javafx.JDBC.Conexion.mostrarCoches();
+            ctx.append("=== COCHES DISPONIBLES: ").append(coches.size()).append(" unidades.\n");
+
+            javafx.collections.ObservableList<com.javafx.Model.Alquiler> alquileres =
+                    com.javafx.JDBC.Conexion.mostrarAlquiler();
+            ctx.append("=== ALQUILERES ACTIVOS: ").append(alquileres.size()).append(" registros.\n");
+
+            javafx.collections.ObservableList<com.javafx.Model.Agente> agentes =
+                    com.javafx.JDBC.Conexion.mostrarAgentes();
+            ctx.append("=== AGENTES DEL SISTEMA: ").append(agentes.size()).append(" operadores.\n");
+
+        } catch (Exception e) {
+            ctx.append("\n[Error al cargar datos: ").append(e.getMessage()).append("]\n");
+        }
+
+        return ctx.toString();
     }
 
     @FXML
@@ -3232,6 +3348,7 @@ public class controladorApp implements Initializable {
         panelRegistro.setVisible(false);
         panelIngreso.setVisible(false);
         panelAgentes.setVisible(false);
+        panelChat.setVisible(false);
     }
 
     private void mostrarPanel(Pane panel) {
@@ -3250,6 +3367,7 @@ public class controladorApp implements Initializable {
         btnCerrarSesion.setDisable(true);
         btnIrAIngreso.setDisable(true);
         btnAgentes.setDisable(true);
+        btnChat.setDisable(true);
 
     }
 
