@@ -1217,6 +1217,53 @@ public class Conexion {
         return lista;
     }
 
+    /** Devuelve TODAS las transacciones del tipo indicado con datos del agente incluidos. */
+    public static ObservableList<com.javafx.Model.Transaccion> obtenerTodasLasTransacciones(String tipo) {
+        ObservableList<com.javafx.Model.Transaccion> lista = FXCollections.observableArrayList();
+        if (!isConexionActiva()) return lista;
+        try {
+            JsonArray arr = getArray("transacciones?tipo=" + tipo);
+            for (JsonElement el : arr) {
+                JsonObject obj = el.getAsJsonObject();
+
+                int    id     = intVal(obj, "id");
+                String fecha  = str(obj, "fecha_transaccion").replace("T", " ").replaceAll("\\..*$", "");
+                String monto  = String.format("%.2f €", dblVal(obj, "monto_total"));
+                String estado = str(obj, "estado_pago");
+
+                String cliente = "";
+                if (obj.has("cliente") && !obj.get("cliente").isJsonNull()) {
+                    JsonObject c = obj.getAsJsonObject("cliente");
+                    cliente = str(c, "nombre") + " " + str(c, "apellidos");
+                }
+
+                String matricula = "";
+                if (obj.has("coche") && !obj.get("coche").isJsonNull()) {
+                    matricula = str(obj.getAsJsonObject("coche"), "matricula");
+                }
+
+                // Parsear agente — puede venir como objeto o como agente_id
+                String agente = "";
+                if (obj.has("agente") && !obj.get("agente").isJsonNull()) {
+                    JsonElement agenteEl = obj.get("agente");
+                    if (agenteEl.isJsonObject()) {
+                        JsonObject a = agenteEl.getAsJsonObject();
+                        agente = str(a, "nombre") + " " + str(a, "apellidos");
+                        if (agente.isBlank()) agente = str(a, "username");
+                    }
+                } else if (obj.has("agente_id") && !obj.get("agente_id").isJsonNull()) {
+                    agente = "ID:" + obj.get("agente_id").getAsString();
+                }
+
+                lista.add(new com.javafx.Model.Transaccion(id, tipo, fecha,
+                        cliente.trim(), matricula, monto, estado, agente.trim()));
+            }
+        } catch (Exception e) {
+            System.err.println("Error al obtener transacciones: " + e.getMessage());
+        }
+        return lista;
+    }
+
     /**
      * Actualiza el estado_pago de una transacción.
      * @return true si la operación fue exitosa

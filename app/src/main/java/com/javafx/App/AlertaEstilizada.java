@@ -1,10 +1,16 @@
 package com.javafx.App;
 
 import atlantafx.base.theme.NordDark;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 /**
@@ -108,6 +114,53 @@ public class AlertaEstilizada {
         Alert confirmacion = crearConfirmacion(titulo, encabezado, contenido);
         aplicarIcono(confirmacion);
         return confirmacion.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK;
+    }
+
+    /**
+     * Muestra un diálogo de login para acceder al panel de agentes.
+     * @return true si las credenciales son correctas (usuario: rai, contraseña: 123456)
+     */
+    public static boolean mostrarLoginAgentes() {
+        Dialog<String[]> dialogo = new Dialog<>();
+        dialogo.setTitle("Acceso a Gestión de Agentes");
+        dialogo.setHeaderText("Introduce credenciales de administrador");
+
+        ButtonType btnAcceder = new ButtonType("Acceder");
+        dialogo.getDialogPane().getButtonTypes().addAll(btnAcceder, ButtonType.CANCEL);
+        dialogo.getDialogPane().getStylesheets().add(TEMA_PROFESIONAL);
+        dialogo.getDialogPane().getStyleClass().add("alert");
+
+        try {
+            Stage stage = (Stage) dialogo.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(ICONO_APP));
+        } catch (Exception ignored) {}
+
+        TextField txtUsuario = new TextField();
+        txtUsuario.setPromptText("Usuario");
+        PasswordField txtPassword = new PasswordField();
+        txtPassword.setPromptText("Contraseña");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+        grid.add(new Label("Usuario:"), 0, 0);
+        grid.add(txtUsuario, 1, 0);
+        grid.add(new Label("Contraseña:"), 0, 1);
+        grid.add(txtPassword, 1, 1);
+
+        dialogo.getDialogPane().setContent(grid);
+
+        dialogo.setResultConverter(dialogButton -> {
+            if (dialogButton == btnAcceder) {
+                return new String[]{txtUsuario.getText(), txtPassword.getText()};
+            }
+            return null;
+        });
+
+        return dialogo.showAndWait().map(credenciales ->
+            "rai".equals(credenciales[0]) && "123456".equals(credenciales[1])
+        ).orElse(false);
     }
 
     /**

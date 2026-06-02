@@ -559,3 +559,74 @@ ctx.append("Si no encuentras el dato solicitado, dilo claramente en lugar de inv
 - **Groq free tier:** 14.400 peticiones/día, 30 req/minuto, sin tarjeta, sin restricciones EU
 - El chat mantiene **historial de conversación** durante la sesión — puede hacer preguntas de seguimiento
 - Al navegar al panel chat se cargan los datos de la BD en un hilo de fondo antes de responder
+
+---
+
+## Correcciones de comportamiento aplicadas
+
+### Fix 1 — Bloquear input hasta que el contexto esté cargado
+
+**Problema:** Si el usuario enviaba un mensaje antes de que el hilo de fondo terminase de construir el contexto, el modelo recibía un system prompt vacío y respondía en inglés con markdown sin restricciones.
+
+**Archivo:** `controladorApp.java` — método `irAChat()`  
+**Qué cambiar:** Deshabilitar `txtMensajeChat` y `btnEnviarChat` al abrir el panel y habilitarlos solo cuando el contexto esté listo.
+
+```java
+// Bloquear input hasta que el contexto esté listo
+txtMensajeChat.setDisable(true);
+btnEnviarChat.setDisable(true);
+lblEstadoChat.setText("Cargando datos...");
+
+new Thread(() -> {
+    String contexto = construirContextoGemini();
+    geminiService.setContexto(contexto);
+    javafx.application.Platform.runLater(() -> {
+        lblEstadoChat.setText("✓ Datos cargados");
+        txtMensajeChat.setDisable(false);
+        btnEnviarChat.setDisable(false);
+        txtMensajeChat.requestFocus();
+    });
+}).start();
+```
+
+---
+
+### Fix 2 — Prompt de sistema con reglas estrictas
+
+**Problema:** El modelo respondía en inglés y usaba formato markdown (`**negrita**`, `# títulos`) que JavaFX `Label` no renderiza, mostrando los asteriscos en crudo.
+
+**Archivo:** `controladorApp.java` — inicio de `construirContextoGemini()`  
+**Qué cambiar:** Reemplazar las líneas iniciales del StringBuilder por reglas numeradas explícitas:
+
+```java
+ctx.append("Eres el asistente inteligente de AutoReach, sistema de gestión de alquiler y venta de vehículos.\n");
+ctx.append("REGLAS OBLIGATORIAS — debes seguirlas siempre sin excepción:\n");
+ctx.append("1. Responde ÚNICAMENTE en español, sin importar el idioma del usuario.\n");
+ctx.append("2. Usa SOLO texto plano. Prohibido usar markdown: sin asteriscos, sin #, sin guiones de lista, sin negrita, sin cursiva.\n");
+ctx.append("3. Solo responde preguntas sobre AutoReach (clientes, coches, alquileres, agentes). Si preguntan otra cosa, di exactamente: 'Solo puedo ayudarte con información del sistema AutoReach.'\n");
+ctx.append("4. Usa los datos que te proporciono. No inventes información.\n");
+ctx.append("5. Para estadísticas o totales, calcula con los datos disponibles.\n");
+ctx.append("6. Los coches en 'COCHES DISPONIBLES' están libres ahora mismo.\n\n");
+```
+
+---
+
+### Fix 3 — Auto-scroll fiable con listener en altura del VBox
+
+**Problema:** El `Platform.runLater(() -> scrollChat.setVvalue(1.0))` dentro de `agregarMensajeChat()` no era fiable porque se ejecutaba antes de que el layout terminase de renderizar el nuevo mensaje.
+
+**Archivo:** `controladorApp.java` — método `irAChat()`  
+**Qué cambiar:** Añadir un `ChangeListener` en `vboxMensajes.heightProperty()` que se registra una sola vez mediante un flag booleano:
+
+```java
+private boolean chatScrollListenerActivo = false;
+
+// Dentro de irAChat(), antes del hilo de carga:
+if (!chatScrollListenerActivo) {
+    vboxMensajes.heightProperty().addListener((obs, oldVal, newVal) ->
+        javafx.application.Platform.runLater(() -> scrollChat.setVvalue(1.0)));
+    chatScrollListenerActivo = true;
+}
+```
+
+> El listener se dispara cada vez que el VBox crece (nuevo mensaje añadido) y garantiza el scroll al fondo tras el layout completo.

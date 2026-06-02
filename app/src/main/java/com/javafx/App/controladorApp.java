@@ -2616,20 +2616,42 @@ public class controladorApp implements Initializable {
 
     @FXML
     void irAAgentes(ActionEvent event) {
+        if (!AlertaEstilizada.mostrarLoginAgentes()) {
+            return;
+        }
         refrescarTablaAgentes();
         mostrarPanel(panelAgentes);
         cambiarColores.cambiar(btnAgentes, btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso, btnChat);
     }
 
+    private boolean chatScrollListenerActivo = false;
+
     @FXML
     void irAChat(ActionEvent event) {
         mostrarPanel(panelChat);
         cambiarColores.cambiar(btnChat, btnIrAInicio, btnAlquiler, btnCompras, btnIrAIngreso, btnAgentes);
+
+        // Registrar listener de auto-scroll solo una vez
+        if (!chatScrollListenerActivo) {
+            vboxMensajes.heightProperty().addListener((obs, oldVal, newVal) ->
+                javafx.application.Platform.runLater(() -> scrollChat.setVvalue(1.0)));
+            chatScrollListenerActivo = true;
+        }
+
+        // Bloquear input hasta que el contexto est\u00e9 listo
+        txtMensajeChat.setDisable(true);
+        btnEnviarChat.setDisable(true);
+        lblEstadoChat.setText("Cargando datos...");
+
         new Thread(() -> {
             String contexto = construirContextoGemini();
             geminiService.setContexto(contexto);
-            javafx.application.Platform.runLater(() ->
-                lblEstadoChat.setText("\u2713 Datos cargados"));
+            javafx.application.Platform.runLater(() -> {
+                lblEstadoChat.setText("\u2713 Datos cargados");
+                txtMensajeChat.setDisable(false);
+                btnEnviarChat.setDisable(false);
+                txtMensajeChat.requestFocus();
+            });
         }).start();
     }
 
@@ -2696,14 +2718,13 @@ public class controladorApp implements Initializable {
     private String construirContextoGemini() {
         StringBuilder ctx = new StringBuilder();
         ctx.append("Eres el asistente inteligente de AutoReach, sistema de gestión de alquiler y venta de vehículos.\n");
-        ctx.append("Responde SIEMPRE en español.\n");
-        ctx.append("Tienes acceso completo a los datos en tiempo real del sistema.\n");
-        ctx.append("Para preguntas sobre totales o estadísticas: calcula tú mismo a partir de los datos.\n");
-        ctx.append("Para preguntas sobre fechas: razona sobre las fechas de recogida y devolución.\n");
-        ctx.append("Para preguntas sobre disponibilidad: los coches listados en 'COCHES DISPONIBLES' están libres ahora mismo.\n");
-        ctx.append("Si no encuentras el dato solicitado, dilo claramente en lugar de inventarlo.\n");
-        ctx.append("IMPORTANTE: Solo responde preguntas relacionadas con AutoReach y sus datos (clientes, coches, alquileres, agentes). ");
-        ctx.append("Si el usuario pregunta algo ajeno al sistema, responde: 'Solo puedo ayudarte con información del sistema AutoReach.'\n\n");
+        ctx.append("REGLAS OBLIGATORIAS — debes seguirlas siempre sin excepción:\n");
+        ctx.append("1. Responde ÚNICAMENTE en español, sin importar el idioma del usuario.\n");
+        ctx.append("2. Usa SOLO texto plano. Prohibido usar markdown: sin asteriscos, sin #, sin guiones de lista, sin negrita, sin cursiva.\n");
+        ctx.append("3. Solo responde preguntas sobre AutoReach (clientes, coches, alquileres, agentes). Si preguntan otra cosa, di exactamente: 'Solo puedo ayudarte con información del sistema AutoReach.'\n");
+        ctx.append("4. Usa los datos que te proporciono. No inventes información.\n");
+        ctx.append("5. Para estadísticas o totales, calcula con los datos disponibles.\n");
+        ctx.append("6. Los coches en 'COCHES DISPONIBLES' están libres ahora mismo.\n\n");
 
         try {
             // ── CLIENTES ──────────────────────────────────────────────
@@ -2735,16 +2756,53 @@ public class controladorApp implements Initializable {
                    .append("\n");
             }
 
+            // Mapa DNI → nombre cliente para cruzar datos
+            java.util.Map<String, String> nombrePorDni = new java.util.HashMap<>();
+            for (com.javafx.Model.Cliente c : clientes) {
+                nombrePorDni.put(c.getDni(), c.getNombre() + " " + c.getApellidos());
+            }
+
             // ── ALQUILERES ACTIVOS ────────────────────────────────────
             javafx.collections.ObservableList<com.javafx.Model.Alquiler> alquileres =
                     com.javafx.JDBC.Conexion.mostrarAlquiler();
             ctx.append("\n=== ALQUILERES ACTIVOS (").append(alquileres.size()).append(") ===\n");
             for (com.javafx.Model.Alquiler a : alquileres) {
+                String nombreCliente = nombrePorDni.getOrDefault(a.getDni(), a.getDni());
                 ctx.append("Matrícula: ").append(a.getMatricula())
-                   .append(" | Cliente DNI: ").append(a.getDni())
+                   .append(" | Cliente: ").append(nombreCliente).append(" (DNI: ").append(a.getDni()).append(")")
                    .append(" | Recogida: ").append(a.getFechaRecogida())
                    .append(" | Devolución prevista: ").append(a.getFechaDevolucion())
                    .append(" | Hora: ").append(a.getHoraDevolucion())
+                   .append("\n");
+            }
+
+            // ── TRANSACCIONES DE VENTA ────────────────────────────────
+            javafx.collections.ObservableList<com.javafx.Model.Transaccion> ventas =
+                    com.javafx.JDBC.Conexion.obtenerTodasLasTransacciones("VENTA");
+            ctx.append("\n=== TRANSACCIONES DE VENTA (").append(ventas.size()).append(") ===\n");
+            for (com.javafx.Model.Transaccion t : ventas) {
+                ctx.append("ID:").append(t.getId())
+                   .append(" | Matrícula: ").append(t.getMatricula())
+                   .append(" | Cliente: ").append(t.getCliente())
+                   .append(" | Agente: ").append(t.getAgente().isBlank() ? "Sin asignar" : t.getAgente())
+                   .append(" | Monto: ").append(t.getMonto())
+                   .append(" | Estado pago: ").append(t.getEstadoPago())
+                   .append(" | Fecha: ").append(t.getFecha())
+                   .append("\n");
+            }
+
+            // ── TRANSACCIONES DE ALQUILER ─────────────────────────────
+            javafx.collections.ObservableList<com.javafx.Model.Transaccion> transAlquileres =
+                    com.javafx.JDBC.Conexion.obtenerTodasLasTransacciones("ALQUILER");
+            ctx.append("\n=== TRANSACCIONES DE ALQUILER (").append(transAlquileres.size()).append(") ===\n");
+            for (com.javafx.Model.Transaccion t : transAlquileres) {
+                ctx.append("ID:").append(t.getId())
+                   .append(" | Matrícula: ").append(t.getMatricula())
+                   .append(" | Cliente: ").append(t.getCliente())
+                   .append(" | Agente: ").append(t.getAgente().isBlank() ? "Sin asignar" : t.getAgente())
+                   .append(" | Monto: ").append(t.getMonto())
+                   .append(" | Estado pago: ").append(t.getEstadoPago())
+                   .append(" | Fecha: ").append(t.getFecha())
                    .append("\n");
             }
 
@@ -2765,8 +2823,10 @@ public class controladorApp implements Initializable {
             // ── RESUMEN ESTADÍSTICO ───────────────────────────────────
             ctx.append("\n=== RESUMEN ESTADÍSTICO ===\n");
             ctx.append("Total clientes: ").append(clientes.size()).append("\n");
-            ctx.append("Coches disponibles: ").append(coches.size()).append("\n");
+            ctx.append("Coches disponibles ahora: ").append(coches.size()).append("\n");
             ctx.append("Alquileres activos: ").append(alquileres.size()).append("\n");
+            ctx.append("Ventas registradas: ").append(ventas.size()).append("\n");
+            ctx.append("Transacciones de alquiler registradas: ").append(transAlquileres.size()).append("\n");
             ctx.append("Agentes activos: ")
                .append(agentes.stream().filter(com.javafx.Model.Agente::isActivo).count())
                .append(" de ").append(agentes.size()).append(" totales\n");
