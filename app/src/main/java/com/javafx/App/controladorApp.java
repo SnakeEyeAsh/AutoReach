@@ -2695,30 +2695,84 @@ public class controladorApp implements Initializable {
 
     private String construirContextoGemini() {
         StringBuilder ctx = new StringBuilder();
-        ctx.append("Eres el asistente inteligente de AutoReach, un sistema de gestión de ");
-        ctx.append("alquiler y venta de vehículos de una concesionaria. ");
-        ctx.append("Responde siempre en español, de forma concisa y precisa. ");
-        ctx.append("Solo responde preguntas relacionadas con los datos de AutoReach.\n\n");
+        ctx.append("Eres el asistente inteligente de AutoReach, sistema de gestión de alquiler y venta de vehículos.\n");
+        ctx.append("Responde SIEMPRE en español.\n");
+        ctx.append("Tienes acceso completo a los datos en tiempo real del sistema.\n");
+        ctx.append("Para preguntas sobre totales o estadísticas: calcula tú mismo a partir de los datos.\n");
+        ctx.append("Para preguntas sobre fechas: razona sobre las fechas de recogida y devolución.\n");
+        ctx.append("Para preguntas sobre disponibilidad: los coches listados en 'COCHES DISPONIBLES' están libres ahora mismo.\n");
+        ctx.append("Si no encuentras el dato solicitado, dilo claramente en lugar de inventarlo.\n");
+        ctx.append("IMPORTANTE: Solo responde preguntas relacionadas con AutoReach y sus datos (clientes, coches, alquileres, agentes). ");
+        ctx.append("Si el usuario pregunta algo ajeno al sistema, responde: 'Solo puedo ayudarte con información del sistema AutoReach.'\n\n");
 
         try {
+            // ── CLIENTES ──────────────────────────────────────────────
             javafx.collections.ObservableList<com.javafx.Model.Cliente> clientes =
                     com.javafx.JDBC.Conexion.mostrarClientes();
-            ctx.append("=== CLIENTES: ").append(clientes.size()).append(" registrados.\n");
+            ctx.append("=== CLIENTES REGISTRADOS (").append(clientes.size()).append(") ===\n");
+            for (com.javafx.Model.Cliente c : clientes) {
+                ctx.append("ID:").append(c.getId())
+                   .append(" | ").append(c.getNombre()).append(" ").append(c.getApellidos())
+                   .append(" | DNI: ").append(c.getDni())
+                   .append(" | Tel: ").append(c.getTelefono())
+                   .append(" | Email: ").append(c.getEmail())
+                   .append(" | Dirección: ").append(c.getDireccion())
+                   .append("\n");
+            }
 
+            // ── COCHES DISPONIBLES ────────────────────────────────────
             javafx.collections.ObservableList<com.javafx.Model.Coche> coches =
                     com.javafx.JDBC.Conexion.mostrarCoches();
-            ctx.append("=== COCHES DISPONIBLES: ").append(coches.size()).append(" unidades.\n");
+            ctx.append("\n=== COCHES DISPONIBLES (").append(coches.size()).append(") ===\n");
+            for (com.javafx.Model.Coche c : coches) {
+                ctx.append("Matrícula: ").append(c.getMatricula())
+                   .append(" | ").append(c.getMarca()).append(" ").append(c.getModelo())
+                   .append(" | Año: ").append(c.getAño())
+                   .append(" | Color: ").append(c.getColor())
+                   .append(" | Km: ").append(c.getKms())
+                   .append(" | Precio: ").append(c.getPrecio()).append("€")
+                   .append(" | Bastidor: ").append(c.getBastidor())
+                   .append("\n");
+            }
 
+            // ── ALQUILERES ACTIVOS ────────────────────────────────────
             javafx.collections.ObservableList<com.javafx.Model.Alquiler> alquileres =
                     com.javafx.JDBC.Conexion.mostrarAlquiler();
-            ctx.append("=== ALQUILERES ACTIVOS: ").append(alquileres.size()).append(" registros.\n");
+            ctx.append("\n=== ALQUILERES ACTIVOS (").append(alquileres.size()).append(") ===\n");
+            for (com.javafx.Model.Alquiler a : alquileres) {
+                ctx.append("Matrícula: ").append(a.getMatricula())
+                   .append(" | Cliente DNI: ").append(a.getDni())
+                   .append(" | Recogida: ").append(a.getFechaRecogida())
+                   .append(" | Devolución prevista: ").append(a.getFechaDevolucion())
+                   .append(" | Hora: ").append(a.getHoraDevolucion())
+                   .append("\n");
+            }
 
+            // ── AGENTES ───────────────────────────────────────────────
             javafx.collections.ObservableList<com.javafx.Model.Agente> agentes =
                     com.javafx.JDBC.Conexion.mostrarAgentes();
-            ctx.append("=== AGENTES DEL SISTEMA: ").append(agentes.size()).append(" operadores.\n");
+            ctx.append("\n=== AGENTES DEL SISTEMA (").append(agentes.size()).append(") ===\n");
+            for (com.javafx.Model.Agente a : agentes) {
+                ctx.append("ID:").append(a.getId())
+                   .append(" | ").append(a.getNombre()).append(" ").append(a.getApellidos())
+                   .append(" | Usuario: ").append(a.getUsername())
+                   .append(" | Email: ").append(a.getEmail())
+                   .append(" | Tel: ").append(a.getTelefono())
+                   .append(" | Activo: ").append(a.isActivo() ? "Sí" : "No")
+                   .append("\n");
+            }
+
+            // ── RESUMEN ESTADÍSTICO ───────────────────────────────────
+            ctx.append("\n=== RESUMEN ESTADÍSTICO ===\n");
+            ctx.append("Total clientes: ").append(clientes.size()).append("\n");
+            ctx.append("Coches disponibles: ").append(coches.size()).append("\n");
+            ctx.append("Alquileres activos: ").append(alquileres.size()).append("\n");
+            ctx.append("Agentes activos: ")
+               .append(agentes.stream().filter(com.javafx.Model.Agente::isActivo).count())
+               .append(" de ").append(agentes.size()).append(" totales\n");
 
         } catch (Exception e) {
-            ctx.append("\n[Error al cargar datos: ").append(e.getMessage()).append("]\n");
+            ctx.append("[Error al cargar datos: ").append(e.getMessage()).append("]");
         }
 
         return ctx.toString();

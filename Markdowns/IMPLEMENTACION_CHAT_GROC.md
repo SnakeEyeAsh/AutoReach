@@ -419,6 +419,139 @@ private String construirContextoGemini() {
 
 ---
 
+## Mejoras para respuestas más complejas
+
+Las tres modificaciones siguientes permiten al asistente responder preguntas avanzadas como:  
+*"¿Qué coches BMW están disponibles y a qué precio?"*, *"¿Cuántos alquileres vencen esta semana?"*, *"¿Qué cliente tiene más alquileres?"*
+
+---
+
+### Mejora 1 — Contexto completo en `construirContextoGemini()`
+
+**Archivo:** `controladorApp.java`  
+**Qué cambiar:** Reemplazar el método `construirContextoGemini()` completo por la versión siguiente, que envía todos los campos relevantes de cada entidad en lugar de solo conteos.
+
+```java
+private String construirContextoGemini() {
+    StringBuilder ctx = new StringBuilder();
+    ctx.append("Eres el asistente inteligente de AutoReach, sistema de gestión de alquiler y venta de vehículos.\n");
+    ctx.append("Responde SIEMPRE en español, de forma concisa y precisa.\n");
+    ctx.append("Usa los datos exactos que te proporciono a continuación para responder.\n");
+    ctx.append("Si te preguntan por totales, ingresos o estadísticas, calcula con los datos disponibles.\n\n");
+
+    try {
+        // ── CLIENTES ──────────────────────────────────────────────
+        var clientes = com.javafx.JDBC.Conexion.mostrarClientes();
+        ctx.append("=== CLIENTES REGISTRADOS (").append(clientes.size()).append(") ===\n");
+        for (var c : clientes) {
+            ctx.append("ID:").append(c.getId())
+               .append(" | ").append(c.getNombre()).append(" ").append(c.getApellidos())
+               .append(" | DNI: ").append(c.getDni())
+               .append(" | Tel: ").append(c.getTelefono())
+               .append(" | Email: ").append(c.getEmail())
+               .append(" | Dirección: ").append(c.getDireccion())
+               .append("\n");
+        }
+
+        // ── COCHES DISPONIBLES ────────────────────────────────────
+        var coches = com.javafx.JDBC.Conexion.mostrarCoches();
+        ctx.append("\n=== COCHES DISPONIBLES (").append(coches.size()).append(") ===\n");
+        for (var c : coches) {
+            ctx.append("Matrícula: ").append(c.getMatricula())
+               .append(" | ").append(c.getMarca()).append(" ").append(c.getModelo())
+               .append(" | Año: ").append(c.getAño())
+               .append(" | Color: ").append(c.getColor())
+               .append(" | Km: ").append(c.getKilometraje())
+               .append(" | Precio: ").append(c.getPrecio()).append("€")
+               .append(" | Bastidor: ").append(c.getBastidor())
+               .append("\n");
+        }
+
+        // ── ALQUILERES ACTIVOS ────────────────────────────────────
+        var alquileres = com.javafx.JDBC.Conexion.mostrarAlquiler();
+        ctx.append("\n=== ALQUILERES ACTIVOS (").append(alquileres.size()).append(") ===\n");
+        for (var a : alquileres) {
+            ctx.append("Matrícula: ").append(a.getMatricula())
+               .append(" | Cliente DNI: ").append(a.getDni())
+               .append(" | Recogida: ").append(a.getFechaRecogida())
+               .append(" | Devolución prevista: ").append(a.getFechaDevolucion())
+               .append(" | Hora: ").append(a.getHoraDevolucion())
+               .append("\n");
+        }
+
+        // ── AGENTES ───────────────────────────────────────────────
+        var agentes = com.javafx.JDBC.Conexion.mostrarAgentes();
+        ctx.append("\n=== AGENTES DEL SISTEMA (").append(agentes.size()).append(") ===\n");
+        for (var a : agentes) {
+            ctx.append("ID:").append(a.getId())
+               .append(" | ").append(a.getNombre()).append(" ").append(a.getApellidos())
+               .append(" | Usuario: ").append(a.getUsername())
+               .append(" | Email: ").append(a.getEmail())
+               .append(" | Tel: ").append(a.getTelefono())
+               .append(" | Activo: ").append(a.isActivo() ? "Sí" : "No")
+               .append("\n");
+        }
+
+        // ── RESUMEN ESTADÍSTICO ───────────────────────────────────
+        ctx.append("\n=== RESUMEN ESTADÍSTICO ===\n");
+        ctx.append("Total clientes registrados: ").append(clientes.size()).append("\n");
+        ctx.append("Coches disponibles ahora: ").append(coches.size()).append("\n");
+        ctx.append("Alquileres activos ahora: ").append(alquileres.size()).append("\n");
+        ctx.append("Agentes activos: ")
+           .append(agentes.stream().filter(com.javafx.Model.Agente::isActivo).count())
+           .append(" de ").append(agentes.size()).append(" totales\n");
+
+    } catch (Exception e) {
+        ctx.append("[Error al cargar datos: ").append(e.getMessage()).append("]");
+    }
+
+    return ctx.toString();
+}
+```
+
+---
+
+### Mejora 2 — Aumentar `max_tokens` en `GeminiService.java`
+
+**Archivo:** `app/src/main/java/com/javafx/Service/GeminiService.java`  
+**Qué cambiar:** Subir `max_tokens` de `1024` a `4096` para permitir respuestas más largas con listados y cálculos.
+
+```java
+// Antes:
+body.addProperty("max_tokens", 1024);
+
+// Después:
+body.addProperty("max_tokens", 4096);
+```
+
+---
+
+### Mejora 3 — Instrucción de razonamiento en el prompt de sistema
+
+**Archivo:** `controladorApp.java` — inicio del método `construirContextoGemini()`  
+**Qué cambiar:** Las primeras líneas del contexto (el prompt de sistema) deben instruir explícitamente al modelo a razonar sobre los datos. Reemplazar las líneas iniciales del StringBuilder por:
+
+```java
+ctx.append("Eres el asistente inteligente de AutoReach, sistema de gestión de alquiler y venta de vehículos.\n");
+ctx.append("Responde SIEMPRE en español.\n");
+ctx.append("Tienes acceso completo a los datos en tiempo real del sistema.\n");
+ctx.append("Para preguntas sobre totales o estadísticas: calcula tú mismo a partir de los datos.\n");
+ctx.append("Para preguntas sobre fechas: razona sobre las fechas de recogida y devolución.\n");
+ctx.append("Para preguntas sobre disponibilidad: los coches listados en 'COCHES DISPONIBLES' están libres ahora mismo.\n");
+ctx.append("Si no encuentras el dato solicitado, dilo claramente en lugar de inventarlo.\n\n");
+```
+
+---
+
+### Notas de implementación
+
+- Los tres cambios son independientes — se pueden aplicar por separado
+- La **Mejora 1** es la más impactante: sin datos completos las Mejoras 2 y 3 tienen poco efecto
+- Groq con `llama-3.3-70b-versatile` soporta hasta **128k tokens** de contexto — hay margen de sobra para enviar toda la BD
+- Si la BD crece mucho (>500 registros), considerar limitar el contexto a los últimos N registros o añadir filtros por fecha
+
+---
+
 ## Notas importantes
 
 - **La key de Groq** se guarda en la propiedad `claude.api.key` de `Application.properties` (nombre heredado, no cambia el funcionamiento)

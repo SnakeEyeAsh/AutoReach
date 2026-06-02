@@ -59,7 +59,7 @@ public class GeminiService {
         body.addProperty("model", MODEL);
         body.add("messages", messages);
         body.addProperty("temperature", 0.3);
-        body.addProperty("max_tokens", 1024);
+        body.addProperty("max_tokens", 4096);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
