@@ -11,11 +11,13 @@
 
 | Archivo | Estado | Qué se hizo |
 |---------|--------|-------------|
-| `Application.properties` | ✅ Hecho | Añadida propiedad `claude.api.key` con la key de Groq |
-| `GeminiService.java` | ✅ Hecho | Clase creada usando Groq API, modelo llama-3.3-70b |
-| `cambiarColores.java` | ✅ Hecho | Añadida sobrecarga de 6 botones |
-| `pantalla1.fxml` | ✅ Hecho | Botón `btnChat` en sidebar con `groq.png` + panel completo |
-| `controladorApp.java` | ✅ Hecho | Campos FXML, métodos de chat, contexto BD, navegación |
+| `Application.properties` | ✅ Hecho | Propiedad `claude.api.key` con la key de Groq |
+| `GeminiService.java` | ✅ Hecho | Groq API, modelo `llama-3.3-70b-versatile`, max_tokens=4096 |
+| `cambiarColores.java` | ✅ Hecho | Sobrecarga de 6 botones |
+| `pantalla1.fxml` | ✅ Hecho | Botón `btnChat` con `groq.png` + panel de chat completo |
+| `controladorApp.java` | ✅ Hecho | Campos FXML, navegación, contexto completo con relaciones, bloqueo de input, auto-scroll, reglas de idioma |
+| `Transaccion.java` | ✅ Hecho | Campo `agente` añadido con constructor compatible |
+| `Conexion.java` | ✅ Hecho | `obtenerTodasLasTransacciones()` con parseo de agente |
 
 ---
 
@@ -419,31 +421,125 @@ private String construirContextoGemini() {
 
 ---
 
-## Mejoras para respuestas más complejas
+## Mejoras y correcciones aplicadas — Estado actual
 
-Las tres modificaciones siguientes permiten al asistente responder preguntas avanzadas como:  
-*"¿Qué coches BMW están disponibles y a qué precio?"*, *"¿Cuántos alquileres vencen esta semana?"*, *"¿Qué cliente tiene más alquileres?"*
+Todas las mejoras están ya aplicadas en el código. Este apartado documenta el código final de cada una.
 
 ---
 
-### Mejora 1 — Contexto completo en `construirContextoGemini()`
+### Mejora 1 — `max_tokens` subido a 4096
+**Estado: ✅ Aplicado** — `GeminiService.java`
 
-**Archivo:** `controladorApp.java`  
-**Qué cambiar:** Reemplazar el método `construirContextoGemini()` completo por la versión siguiente, que envía todos los campos relevantes de cada entidad en lugar de solo conteos.
+```java
+body.addProperty("max_tokens", 4096);
+```
+
+---
+
+### Mejora 2 — `Transaccion.java` con campo `agente`
+**Estado: ✅ Aplicado** — `app/src/main/java/com/javafx/Model/Transaccion.java`
+
+Se añadió el campo `agente` y un constructor de 8 parámetros manteniendo compatibilidad con el de 7:
+
+```java
+private final String agente;
+
+// Constructor original (7 params) — sigue funcionando
+public Transaccion(int id, String tipo, String fecha,
+                   String cliente, String matricula,
+                   String monto, String estadoPago) {
+    this(id, tipo, fecha, cliente, matricula, monto, estadoPago, "");
+}
+
+// Constructor nuevo con agente (8 params)
+public Transaccion(int id, String tipo, String fecha,
+                   String cliente, String matricula,
+                   String monto, String estadoPago, String agente) {
+    // ...
+    this.agente = agente;
+}
+
+public String getAgente() { return agente; }
+```
+
+---
+
+### Mejora 3 — `obtenerTodasLasTransacciones()` en `Conexion.java`
+**Estado: ✅ Aplicado** — `app/src/main/java/com/javafx/JDBC/Conexion.java`
+
+Nuevo método que trae todas las transacciones (sin filtro de estado) e incluye el agente:
+
+```java
+public static ObservableList<com.javafx.Model.Transaccion> obtenerTodasLasTransacciones(String tipo) {
+    ObservableList<com.javafx.Model.Transaccion> lista = FXCollections.observableArrayList();
+    if (!isConexionActiva()) return lista;
+    try {
+        JsonArray arr = getArray("transacciones?tipo=" + tipo);
+        for (JsonElement el : arr) {
+            JsonObject obj = el.getAsJsonObject();
+            int    id     = intVal(obj, "id");
+            String fecha  = str(obj, "fecha_transaccion").replace("T", " ").replaceAll("\\..*$", "");
+            String monto  = String.format("%.2f €", dblVal(obj, "monto_total"));
+            String estado = str(obj, "estado_pago");
+
+            String cliente = "";
+            if (obj.has("cliente") && !obj.get("cliente").isJsonNull()) {
+                JsonObject c = obj.getAsJsonObject("cliente");
+                cliente = str(c, "nombre") + " " + str(c, "apellidos");
+            }
+            String matricula = "";
+            if (obj.has("coche") && !obj.get("coche").isJsonNull()) {
+                matricula = str(obj.getAsJsonObject("coche"), "matricula");
+            }
+
+            // Parsear agente — puede venir como objeto o solo agente_id
+            String agente = "";
+            if (obj.has("agente") && !obj.get("agente").isJsonNull()) {
+                JsonElement agenteEl = obj.get("agente");
+                if (agenteEl.isJsonObject()) {
+                    JsonObject a = agenteEl.getAsJsonObject();
+                    agente = str(a, "nombre") + " " + str(a, "apellidos");
+                    if (agente.isBlank()) agente = str(a, "username");
+                }
+            } else if (obj.has("agente_id") && !obj.get("agente_id").isJsonNull()) {
+                agente = "ID:" + obj.get("agente_id").getAsString();
+            }
+
+            lista.add(new com.javafx.Model.Transaccion(id, tipo, fecha,
+                    cliente.trim(), matricula, monto, estado, agente.trim()));
+        }
+    } catch (Exception e) {
+        System.err.println("Error al obtener transacciones: " + e.getMessage());
+    }
+    return lista;
+}
+```
+
+---
+
+### Mejora 4 — `construirContextoGemini()` completo y final
+**Estado: ✅ Aplicado** — `controladorApp.java`
+
+Versión definitiva con: prompt de reglas estrictas, todos los campos de cada entidad, cruce de nombres de cliente en alquileres, transacciones completas con agente, y resumen estadístico:
 
 ```java
 private String construirContextoGemini() {
     StringBuilder ctx = new StringBuilder();
     ctx.append("Eres el asistente inteligente de AutoReach, sistema de gestión de alquiler y venta de vehículos.\n");
-    ctx.append("Responde SIEMPRE en español, de forma concisa y precisa.\n");
-    ctx.append("Usa los datos exactos que te proporciono a continuación para responder.\n");
-    ctx.append("Si te preguntan por totales, ingresos o estadísticas, calcula con los datos disponibles.\n\n");
+    ctx.append("REGLAS OBLIGATORIAS — debes seguirlas siempre sin excepción:\n");
+    ctx.append("1. Responde ÚNICAMENTE en español, sin importar el idioma del usuario.\n");
+    ctx.append("2. Usa SOLO texto plano. Prohibido usar markdown: sin asteriscos, sin #, sin guiones de lista, sin negrita, sin cursiva.\n");
+    ctx.append("3. Solo responde preguntas sobre AutoReach (clientes, coches, alquileres, agentes). Si preguntan otra cosa, di exactamente: 'Solo puedo ayudarte con información del sistema AutoReach.'\n");
+    ctx.append("4. Usa los datos que te proporciono. No inventes información.\n");
+    ctx.append("5. Para estadísticas o totales, calcula con los datos disponibles.\n");
+    ctx.append("6. Los coches en 'COCHES DISPONIBLES' están libres ahora mismo.\n\n");
 
     try {
         // ── CLIENTES ──────────────────────────────────────────────
-        var clientes = com.javafx.JDBC.Conexion.mostrarClientes();
+        javafx.collections.ObservableList<com.javafx.Model.Cliente> clientes =
+                com.javafx.JDBC.Conexion.mostrarClientes();
         ctx.append("=== CLIENTES REGISTRADOS (").append(clientes.size()).append(") ===\n");
-        for (var c : clientes) {
+        for (com.javafx.Model.Cliente c : clientes) {
             ctx.append("ID:").append(c.getId())
                .append(" | ").append(c.getNombre()).append(" ").append(c.getApellidos())
                .append(" | DNI: ").append(c.getDni())
@@ -453,26 +549,35 @@ private String construirContextoGemini() {
                .append("\n");
         }
 
+        // Mapa DNI → nombre cliente para cruzar datos con alquileres
+        java.util.Map<String, String> nombrePorDni = new java.util.HashMap<>();
+        for (com.javafx.Model.Cliente c : clientes) {
+            nombrePorDni.put(c.getDni(), c.getNombre() + " " + c.getApellidos());
+        }
+
         // ── COCHES DISPONIBLES ────────────────────────────────────
-        var coches = com.javafx.JDBC.Conexion.mostrarCoches();
+        javafx.collections.ObservableList<com.javafx.Model.Coche> coches =
+                com.javafx.JDBC.Conexion.mostrarCoches();
         ctx.append("\n=== COCHES DISPONIBLES (").append(coches.size()).append(") ===\n");
-        for (var c : coches) {
+        for (com.javafx.Model.Coche c : coches) {
             ctx.append("Matrícula: ").append(c.getMatricula())
                .append(" | ").append(c.getMarca()).append(" ").append(c.getModelo())
                .append(" | Año: ").append(c.getAño())
                .append(" | Color: ").append(c.getColor())
-               .append(" | Km: ").append(c.getKilometraje())
+               .append(" | Km: ").append(c.getKms())          // getter correcto: getKms()
                .append(" | Precio: ").append(c.getPrecio()).append("€")
                .append(" | Bastidor: ").append(c.getBastidor())
                .append("\n");
         }
 
-        // ── ALQUILERES ACTIVOS ────────────────────────────────────
-        var alquileres = com.javafx.JDBC.Conexion.mostrarAlquiler();
+        // ── ALQUILERES ACTIVOS (con nombre cliente cruzado) ───────
+        javafx.collections.ObservableList<com.javafx.Model.Alquiler> alquileres =
+                com.javafx.JDBC.Conexion.mostrarAlquiler();
         ctx.append("\n=== ALQUILERES ACTIVOS (").append(alquileres.size()).append(") ===\n");
-        for (var a : alquileres) {
+        for (com.javafx.Model.Alquiler a : alquileres) {
+            String nombreCliente = nombrePorDni.getOrDefault(a.getDni(), a.getDni());
             ctx.append("Matrícula: ").append(a.getMatricula())
-               .append(" | Cliente DNI: ").append(a.getDni())
+               .append(" | Cliente: ").append(nombreCliente).append(" (DNI: ").append(a.getDni()).append(")")
                .append(" | Recogida: ").append(a.getFechaRecogida())
                .append(" | Devolución prevista: ").append(a.getFechaDevolucion())
                .append(" | Hora: ").append(a.getHoraDevolucion())
@@ -480,9 +585,10 @@ private String construirContextoGemini() {
         }
 
         // ── AGENTES ───────────────────────────────────────────────
-        var agentes = com.javafx.JDBC.Conexion.mostrarAgentes();
+        javafx.collections.ObservableList<com.javafx.Model.Agente> agentes =
+                com.javafx.JDBC.Conexion.mostrarAgentes();
         ctx.append("\n=== AGENTES DEL SISTEMA (").append(agentes.size()).append(") ===\n");
-        for (var a : agentes) {
+        for (com.javafx.Model.Agente a : agentes) {
             ctx.append("ID:").append(a.getId())
                .append(" | ").append(a.getNombre()).append(" ").append(a.getApellidos())
                .append(" | Usuario: ").append(a.getUsername())
@@ -492,11 +598,43 @@ private String construirContextoGemini() {
                .append("\n");
         }
 
+        // ── TRANSACCIONES DE VENTA ────────────────────────────────
+        javafx.collections.ObservableList<com.javafx.Model.Transaccion> ventas =
+                com.javafx.JDBC.Conexion.obtenerTodasLasTransacciones("VENTA");
+        ctx.append("\n=== TRANSACCIONES DE VENTA (").append(ventas.size()).append(") ===\n");
+        for (com.javafx.Model.Transaccion t : ventas) {
+            ctx.append("ID:").append(t.getId())
+               .append(" | Matrícula: ").append(t.getMatricula())
+               .append(" | Cliente: ").append(t.getCliente())
+               .append(" | Agente: ").append(t.getAgente().isBlank() ? "Sin asignar" : t.getAgente())
+               .append(" | Monto: ").append(t.getMonto())
+               .append(" | Estado pago: ").append(t.getEstadoPago())
+               .append(" | Fecha: ").append(t.getFecha())
+               .append("\n");
+        }
+
+        // ── TRANSACCIONES DE ALQUILER ─────────────────────────────
+        javafx.collections.ObservableList<com.javafx.Model.Transaccion> transAlquileres =
+                com.javafx.JDBC.Conexion.obtenerTodasLasTransacciones("ALQUILER");
+        ctx.append("\n=== TRANSACCIONES DE ALQUILER (").append(transAlquileres.size()).append(") ===\n");
+        for (com.javafx.Model.Transaccion t : transAlquileres) {
+            ctx.append("ID:").append(t.getId())
+               .append(" | Matrícula: ").append(t.getMatricula())
+               .append(" | Cliente: ").append(t.getCliente())
+               .append(" | Agente: ").append(t.getAgente().isBlank() ? "Sin asignar" : t.getAgente())
+               .append(" | Monto: ").append(t.getMonto())
+               .append(" | Estado pago: ").append(t.getEstadoPago())
+               .append(" | Fecha: ").append(t.getFecha())
+               .append("\n");
+        }
+
         // ── RESUMEN ESTADÍSTICO ───────────────────────────────────
         ctx.append("\n=== RESUMEN ESTADÍSTICO ===\n");
-        ctx.append("Total clientes registrados: ").append(clientes.size()).append("\n");
+        ctx.append("Total clientes: ").append(clientes.size()).append("\n");
         ctx.append("Coches disponibles ahora: ").append(coches.size()).append("\n");
-        ctx.append("Alquileres activos ahora: ").append(alquileres.size()).append("\n");
+        ctx.append("Alquileres activos: ").append(alquileres.size()).append("\n");
+        ctx.append("Ventas registradas: ").append(ventas.size()).append("\n");
+        ctx.append("Transacciones de alquiler registradas: ").append(transAlquileres.size()).append("\n");
         ctx.append("Agentes activos: ")
            .append(agentes.stream().filter(com.javafx.Model.Agente::isActivo).count())
            .append(" de ").append(agentes.size()).append(" totales\n");
@@ -509,46 +647,15 @@ private String construirContextoGemini() {
 }
 ```
 
----
-
-### Mejora 2 — Aumentar `max_tokens` en `GeminiService.java`
-
-**Archivo:** `app/src/main/java/com/javafx/Service/GeminiService.java`  
-**Qué cambiar:** Subir `max_tokens` de `1024` a `4096` para permitir respuestas más largas con listados y cálculos.
-
-```java
-// Antes:
-body.addProperty("max_tokens", 1024);
-
-// Después:
-body.addProperty("max_tokens", 4096);
-```
-
----
-
-### Mejora 3 — Instrucción de razonamiento en el prompt de sistema
-
-**Archivo:** `controladorApp.java` — inicio del método `construirContextoGemini()`  
-**Qué cambiar:** Las primeras líneas del contexto (el prompt de sistema) deben instruir explícitamente al modelo a razonar sobre los datos. Reemplazar las líneas iniciales del StringBuilder por:
-
-```java
-ctx.append("Eres el asistente inteligente de AutoReach, sistema de gestión de alquiler y venta de vehículos.\n");
-ctx.append("Responde SIEMPRE en español.\n");
-ctx.append("Tienes acceso completo a los datos en tiempo real del sistema.\n");
-ctx.append("Para preguntas sobre totales o estadísticas: calcula tú mismo a partir de los datos.\n");
-ctx.append("Para preguntas sobre fechas: razona sobre las fechas de recogida y devolución.\n");
-ctx.append("Para preguntas sobre disponibilidad: los coches listados en 'COCHES DISPONIBLES' están libres ahora mismo.\n");
-ctx.append("Si no encuentras el dato solicitado, dilo claramente en lugar de inventarlo.\n\n");
-```
+> **Nota importante:** el getter de kilómetros en `Coche.java` es `getKms()`, NO `getKilometraje()`. Usar el incorrecto causa error de compilación.
 
 ---
 
 ### Notas de implementación
 
-- Los tres cambios son independientes — se pueden aplicar por separado
-- La **Mejora 1** es la más impactante: sin datos completos las Mejoras 2 y 3 tienen poco efecto
-- Groq con `llama-3.3-70b-versatile` soporta hasta **128k tokens** de contexto — hay margen de sobra para enviar toda la BD
-- Si la BD crece mucho (>500 registros), considerar limitar el contexto a los últimos N registros o añadir filtros por fecha
+- Groq con `llama-3.3-70b-versatile` soporta hasta **128k tokens** de contexto — margen suficiente para toda la BD
+- Si la BD crece mucho (>500 registros) considerar enviar solo los últimos N registros por fecha
+- El método `obtenerTodasLasTransacciones()` reemplaza a `obtenerTransaccionesPendientes()` en el contexto — el segundo solo traía registros con estado "Pendiente"
 
 ---
 

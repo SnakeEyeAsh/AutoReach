@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -819,20 +819,20 @@
                                         <tooltip><Tooltip text="Correo electrónico del agente" /></tooltip>
                                      </TextField>
 
-                                     <Button fx:id="btnGuardarAgente" layoutX="56.0" layoutY="310.0"
-                                             mnemonicParsing="false" onAction="#guardarAgente"
-                                             prefHeight="28.0" prefWidth="84.0" text="Guardar"
-                                             style="-fx-background-color: #0076a8; -fx-text-fill: white;
-                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand;">
-                                        <tooltip><Tooltip text="Guardar nuevo agente" /></tooltip>
-                                     </Button>
-                                     <Button fx:id="btnCancelarAgente" layoutX="152.0" layoutY="310.0"
-                                             mnemonicParsing="false" onAction="#cancelarNuevoAgente"
-                                             prefHeight="28.0" prefWidth="84.0" text="Cancelar"
-                                             style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
-                                                    -fx-border-radius: 4; -fx-cursor: hand;">
-                                        <tooltip><Tooltip text="Cancelar y limpiar formulario" /></tooltip>
-                                     </Button>
+                                      <Button fx:id="btnGuardarAgente" layoutX="56.0" layoutY="310.0"
+                                              mnemonicParsing="false" onAction="#guardarAgente"
+                                              prefHeight="30.0" prefWidth="100.0" text="Guardar"
+                                              style="-fx-background-color: #0076a8; -fx-text-fill: white;
+                                                     -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                         <tooltip><Tooltip text="Guardar nuevo agente" /></tooltip>
+                                      </Button>
+                                      <Button fx:id="btnCancelarAgente" layoutX="170.0" layoutY="310.0"
+                                              mnemonicParsing="false" onAction="#cancelarNuevoAgente"
+                                              prefHeight="30.0" prefWidth="100.0" text="Cancelar"
+                                              style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                     -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                         <tooltip><Tooltip text="Cancelar y limpiar formulario" /></tooltip>
+                                      </Button>
                                   </children>
                                   <VBox.margin><Insets top="8.0" /></VBox.margin>
                                </AnchorPane>
@@ -857,45 +857,53 @@
                                   </columns>
                                   <VBox.margin><Insets bottom="8.0" /></VBox.margin>
                                </TableView>
-                               <HBox spacing="8.0">
-                                  <children>
-                                     <Button fx:id="btnEditarAgente" mnemonicParsing="false"
-                                             onAction="#editarAgente"
-                                             prefHeight="28.0" prefWidth="74.0" text="Editar"
-                                             style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
-                                                    -fx-border-radius: 4; -fx-cursor: hand;">
-                                        <tooltip><Tooltip text="Editar agente seleccionado" /></tooltip>
-                                     </Button>
-                                     <Button fx:id="btnEliminarAgente" mnemonicParsing="false"
-                                             onAction="#eliminarAgente"
-                                             prefHeight="28.0" prefWidth="74.0" text="Eliminar"
-                                             style="-fx-background-color: #DC2626; -fx-text-fill: white;
-                                                    -fx-background-radius: 4; -fx-cursor: hand;">
-                                        <tooltip><Tooltip text="Eliminar agente seleccionado" /></tooltip>
-                                     </Button>
-                                     <Button fx:id="btnRefrescarAgentes" mnemonicParsing="false"
-                                             onAction="#refrescarAgentes"
-                                             prefHeight="28.0" prefWidth="84.0" text="Refrescar"
-                                             style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
-                                                    -fx-border-radius: 4; -fx-cursor: hand;">
-                                        <tooltip><Tooltip text="Refrescar lista de agentes" /></tooltip>
-                                     </Button>
-                                     <Button fx:id="btnVistaPreviaAgente" mnemonicParsing="false"
-                                             onAction="#vistaPreviaAgente"
-                                             prefHeight="28.0" prefWidth="82.0" text="Vista Previa"
-                                             style="-fx-background-color: #0076a8; -fx-text-fill: white;
-                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 11;">
-                                        <tooltip><Tooltip text="Vista previa del informe del agente" /></tooltip>
-                                     </Button>
-                                     <Button fx:id="btnDescargarPDFAgente" mnemonicParsing="false"
-                                             onAction="#descargarPDFAgente"
-                                             prefHeight="28.0" prefWidth="82.0" text="Descargar PDF"
-                                             style="-fx-background-color: #047857; -fx-text-fill: white;
-                                                    -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 11;">
-                                        <tooltip><Tooltip text="Descargar informe PDF del agente seleccionado" /></tooltip>
-                                     </Button>
-                                  </children>
-                               </HBox>
+                                <VBox spacing="6.0">
+                                   <children>
+                                      <HBox spacing="8.0">
+                                         <children>
+                                            <Button fx:id="btnEditarAgente" mnemonicParsing="false"
+                                                    onAction="#editarAgente"
+                                                    prefHeight="30.0" prefWidth="100.0" text="Editar"
+                                                    style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                           -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                               <tooltip><Tooltip text="Editar agente seleccionado" /></tooltip>
+                                            </Button>
+                                            <Button fx:id="btnEliminarAgente" mnemonicParsing="false"
+                                                    onAction="#eliminarAgente"
+                                                    prefHeight="30.0" prefWidth="100.0" text="Eliminar"
+                                                    style="-fx-background-color: #DC2626; -fx-text-fill: white;
+                                                           -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                               <tooltip><Tooltip text="Eliminar agente seleccionado" /></tooltip>
+                                            </Button>
+                                            <Button fx:id="btnRefrescarAgentes" mnemonicParsing="false"
+                                                    onAction="#refrescarAgentes"
+                                                    prefHeight="30.0" prefWidth="120.0" text="Refrescar"
+                                                    style="-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB;
+                                                           -fx-border-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                               <tooltip><Tooltip text="Refrescar lista de agentes" /></tooltip>
+                                            </Button>
+                                         </children>
+                                      </HBox>
+                                      <HBox spacing="8.0">
+                                         <children>
+                                            <Button fx:id="btnVistaPreviaAgente" mnemonicParsing="false"
+                                                    onAction="#vistaPreviaAgente"
+                                                    prefHeight="30.0" prefWidth="158.0" text="Vista Previa"
+                                                    style="-fx-background-color: #0076a8; -fx-text-fill: white;
+                                                           -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                               <tooltip><Tooltip text="Vista previa del informe del agente" /></tooltip>
+                                            </Button>
+                                            <Button fx:id="btnDescargarPDFAgente" mnemonicParsing="false"
+                                                    onAction="#descargarPDFAgente"
+                                                    prefHeight="30.0" prefWidth="158.0" text="Descargar PDF"
+                                                    style="-fx-background-color: #047857; -fx-text-fill: white;
+                                                           -fx-font-weight: bold; -fx-background-radius: 4; -fx-cursor: hand; -fx-font-size: 12;">
+                                               <tooltip><Tooltip text="Descargar informe PDF del agente seleccionado" /></tooltip>
+                                            </Button>
+                                         </children>
+                                      </HBox>
+                                   </children>
+                                </VBox>
                             </children>
                          </VBox>
 
@@ -913,7 +921,7 @@
                    <Pane layoutX="0" layoutY="0" prefHeight="56" prefWidth="724"
                          style="-fx-background-color: #1a1a2e;">
                       <children>
-                         <Label layoutX="24" layoutY="16" text="Asistente IA \u2014 AutoReach"
+                         <Label layoutX="24" layoutY="16" text="Asistente IA — AutoReach"
                                 style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;
                                        -fx-font-family: 'Segoe UI';"/>
                          <Label fx:id="lblEstadoChat" layoutX="420" layoutY="20" text=""

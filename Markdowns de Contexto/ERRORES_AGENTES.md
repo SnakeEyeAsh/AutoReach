@@ -480,6 +480,52 @@ if (!txtAgenteEmail.getText().trim().isEmpty() &&
 
 ---
 
+## Cambios adicionales en archivos compartidos (módulo Chat IA)
+
+Estos cambios se aplicaron en la misma sesión durante la implementación del chat con Groq. Afectan a archivos que también usa el módulo de agentes.
+
+### `Transaccion.java` — campo `agente` añadido
+
+**Ruta:** `app/src/main/java/com/javafx/Model/Transaccion.java`
+
+Se añadió el campo `agente` con un constructor de 8 parámetros manteniendo compatibilidad con el de 7. El constructor original (`sin agente`) llama internamente al nuevo con `""` como valor por defecto, por lo que no rompe ningún código existente.
+
+```java
+// Constructor original sigue funcionando
+public Transaccion(int id, String tipo, String fecha,
+                   String cliente, String matricula,
+                   String monto, String estadoPago) {
+    this(id, tipo, fecha, cliente, matricula, monto, estadoPago, "");
+}
+
+// Nuevo constructor con agente
+public Transaccion(int id, String tipo, String fecha,
+                   String cliente, String matricula,
+                   String monto, String estadoPago, String agente) { ... }
+
+public String getAgente() { return agente; }
+```
+
+---
+
+### `Conexion.java` — nuevo método `obtenerTodasLasTransacciones()`
+
+**Ruta:** `app/src/main/java/com/javafx/JDBC/Conexion.java`
+
+Añadido después de `obtenerTransaccionesPendientes()`. Trae todas las transacciones del tipo indicado sin filtrar por estado de pago, e incluye el nombre del agente parseando el campo `agente` (objeto) o `agente_id` (número) de la respuesta de la API.
+
+```java
+public static ObservableList<com.javafx.Model.Transaccion> obtenerTodasLasTransacciones(String tipo) {
+    // GET /api/transacciones?tipo=VENTA  (sin filtro de estado_pago)
+    // Parsea campo "agente" como objeto o como "agente_id" numérico
+    // Devuelve Transaccion con agente incluido
+}
+```
+
+> El método `obtenerTransaccionesPendientes()` **no se eliminó** — sigue disponible para los paneles de pagos y documentos que lo usan.
+
+---
+
 ## Contexto importante para el backend (no es código Java)
 
 El endpoint `PUT /api/agentes/:id` del backend Node.js debe:
